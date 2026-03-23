@@ -1,2 +1,9 @@
 *.vsidx
 /.vs
+/Tomb of Mask/.vs
+/Tomb of Mask/Project1/x64
+Tomb of Mask/Project1/Project1.vcxproj
+Tomb of Mask/Project1/Project1.vcxproj.filters
+Tomb of Mask/Project1/Project1.vcxproj.user
+Tomb of Mask/x64/Debug/Project1.exe
+Tomb of Mask/x64/Debug/Project1.pdb
