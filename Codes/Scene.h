@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "Player.h"
 #include "Camera.h"
+#include "Level.h"
 
 class Scene
 {
