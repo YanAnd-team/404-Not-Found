@@ -4,7 +4,7 @@ void Player::Init(Vector2 startPos)
 {
     startPosition = startPos;
     position = startPos;
-    speed = 2.0f;
+    speed = 5.0f;
     texture = LoadTexture("resources/sprites/Ship_1.png");
 }
 
