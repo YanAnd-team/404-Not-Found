@@ -4,7 +4,7 @@ void Scene::Init()
 {
     // Audio
     InitAudioDevice();
-    sound = LoadSound("resources/raylib_audio_resources/sound.wav");
+    sound = { LoadSound("resources/raylib_audio_resources/sound.wav"), LoadSound("resources\SFX\Coins.wav"), LoadSound("resources\SFX\Movement.wav"), LoadSound("resources\SFX\PlayerDie.wav")};
     music = LoadMusicStream("resources/raylib_audio_resources/country.mp3");
     music.looping = true;
     PlayMusicStream(music);

@@ -18,7 +18,7 @@ public:
 
 private:
     Texture2D background;
-    Sound sound;
+    Sound sound[4];
     Music music;
     Font font;
 };
