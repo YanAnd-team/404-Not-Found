@@ -2,7 +2,7 @@
 
 void Level::Init()
 {
-	//
+	Spike = LoadTexture("");
 }
 
 void Level::Update()

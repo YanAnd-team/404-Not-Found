@@ -11,5 +11,7 @@ public:
 	void DeInit();
 	//
 private:
-	//
+	Texture2D Spike;
+	Texture2D TrapSpike;
+	Texture2D Gun;
 };
