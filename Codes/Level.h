@@ -1,7 +1,7 @@
 #pragma once
 #include "raylib.h"
 
-enum Map = { Void = 0,Wall1,Wall2,Wall3,Spike,Guntrap};
+enum Map {Vacum = 0, Wall1, Wall2, Wall3, Spike};
 
 class Level
 {
