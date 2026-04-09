@@ -9,9 +9,10 @@ public:
 	void Init();
 	void Update();
 	void DeInit();
+	void Load();
 	//
 private:
 	Texture2D Spike;
 	Texture2D TrapSpike;
-	Texture2D Gun;
+	Texture2D GunTrap;
 };

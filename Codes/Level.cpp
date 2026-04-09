@@ -14,3 +14,8 @@ void Level::DeInit()
 {
 	//
 }
+
+void Level::Load()
+{
+	//
+}
