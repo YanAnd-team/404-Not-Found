@@ -4,16 +4,17 @@ void Player::Init(Vector2 startPos)
 {
     startPosition = startPos;
     position = startPos;
-    speed = 5.0f;
+    // speed is in pixels per second; multiplied by dt in Update
+    speed = 200.0f;
     texture = LoadTexture("resources/sprites/Ship_1.png");
 }
 
 void Player::Update(float dt)
 {
-    if (IsKeyDown(KEY_RIGHT)) position.x += speed;
-    if (IsKeyDown(KEY_LEFT))  position.x -= speed;
-    if (IsKeyDown(KEY_DOWN))  position.y += speed;
-    if (IsKeyDown(KEY_UP))    position.y -= speed;
+    if (IsKeyDown(KEY_RIGHT)) position.x += speed * dt;
+    if (IsKeyDown(KEY_LEFT))  position.x -= speed * dt;
+    if (IsKeyDown(KEY_DOWN))  position.y += speed * dt;
+    if (IsKeyDown(KEY_UP))    position.y -= speed * dt;
 
     // Clamp to screen bounds
     float screenW = (float)GetScreenWidth();
@@ -42,5 +43,6 @@ void Player::Reset()
 
 Vector2 Player::GetCenter() const
 {
+    // Player drawn with scale 2, so center should account for that
     return { position.x + texture.width, position.y + texture.height };
 }

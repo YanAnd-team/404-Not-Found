@@ -2,7 +2,7 @@
 
 void Level::Init()
 {
-	Spike = LoadTexture("resources\Image\SpikeTrapWait.png");
+	Spike = LoadTexture("resources/Image/SpikeTrapWait.png");
 }
 
 void Level::Update()
