@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="TombOfMaskProject/TombOfMaskProject.vcxproj" Id="36486833-7df7-4146-b008-8f3fcdb3411a" />
+</Solution>
