@@ -1,5 +1,4 @@
 #pragma once
-#pragma once
 #include "raylib.h"
 #include "Scene.h"
 #include "Level.h"

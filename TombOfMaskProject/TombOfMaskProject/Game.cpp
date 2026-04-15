@@ -5,7 +5,7 @@ void Game::Init()
     screenWidth = 800;
     screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "Raylib Handout - Game Structure");
+    InitWindow(screenWidth, screenHeight, "Tomb of Mask");
     SetTargetFPS(60);
 
     // Game Manager state
@@ -15,9 +15,14 @@ void Game::Init()
 
     // Scene
     scene.Init();
-
+    
     // Font (owned by Game for state screens)
     font = LoadFontEx("resources/fonts/gomarice_game_continue_03.ttf", FONT_SIZE, NULL, 0);
+    if (font.texture.id == 0)
+    {
+        // Fallback to default font provided by raylib
+        font = GetFontDefault();
+    }
 }
 
 void Game::Update()
@@ -139,6 +144,9 @@ void Game::DrawGameplay()
     // HUD
     DrawText(TextFormat("Lives: %d", playerLives), 10, 10, 20, WHITE);
     DrawText(TextFormat("Score: %d", score), 10, 35, 20, WHITE);
+
+    // Scene-level UI (placeholder)
+    scene.DrawUI();
 
     // Controls hint
     DrawText("Arrows: Move | SPACE: Score | BACKSPACE: Lose life", 10, screenHeight - 25, 15, GRAY);

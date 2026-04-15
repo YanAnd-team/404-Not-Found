@@ -21,4 +21,6 @@ private:
     Sound sound;
     Music music;
     Font font;
+    bool soundLoaded;
+    bool musicLoaded;
 };

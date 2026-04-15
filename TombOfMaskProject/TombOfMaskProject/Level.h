@@ -1,7 +1,7 @@
 #pragma once
 #include "raylib.h"
 
-enum Map { Vacum = 0, Wall1, Wall2, Wall3, Spike };
+enum Map { Empty='-', Wall1='1', Wall2='2', Wall3='3', Spike='S', TrapSpike='T', GunTrap='G' };
 
 class Level
 {

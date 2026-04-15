@@ -6,7 +6,7 @@ class Player
 {
 public:
     void Init(Vector2 startPos);
-    void Update(float dt);
+    void Update(float dt, Rectangle worldBounds);
     void Draw();
     void DeInit();
 
