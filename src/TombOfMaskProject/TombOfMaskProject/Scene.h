@@ -1,8 +1,8 @@
 #pragma once
 #include "raylib.h"
-#include "Player00.h"
-#include "Camera00.h"
-#include "Level00.h"
+#include "Player.h"
+#include "Camera.h"
+#include "Level.h"
 
 class Scene
 {

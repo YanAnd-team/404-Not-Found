@@ -1,4 +1,4 @@
-#include "Scene00.h"
+#include "Scene.h"
 
 void Scene::Init()
 {

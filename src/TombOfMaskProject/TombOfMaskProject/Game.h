@@ -1,8 +1,8 @@
 #pragma once
 #pragma once
 #include "raylib.h"
-#include "Scene00.h"
-#include "Level00.h"
+#include "Scene.h"
+#include "Level.h"
 
 #define FONT_SIZE       32
 #define TEXT_SPACING    2.0f

@@ -1,4 +1,4 @@
-#include "Camera00.h"
+#include "Camera.h"
 
 void GameCamera::Init(int screenWidth, int screenHeight)
 {

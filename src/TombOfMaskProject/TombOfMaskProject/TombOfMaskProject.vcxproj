@@ -127,22 +127,22 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Camera00.cpp" />
-    <ClCompile Include="Game00.cpp" />
-    <ClCompile Include="Level00.cpp" />
-    <ClCompile Include="main00.cpp" />
-    <ClCompile Include="Player00.cpp" />
-    <ClCompile Include="Scene00.cpp" />
+    <ClCompile Include="Camera.cpp" />
+    <ClCompile Include="Game.cpp" />
+    <ClCompile Include="Level.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Scene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Camera00.h" />
-    <ClInclude Include="Game00.h" />
-    <ClInclude Include="Level00.h" />
-    <ClInclude Include="Player00.h" />
-    <ClInclude Include="Scene00.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="Level.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="Scene.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

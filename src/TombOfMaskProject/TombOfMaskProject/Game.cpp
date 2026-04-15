@@ -1,4 +1,4 @@
-#include "Game00.h"
+#include "Game.h"
 
 void Game::Init()
 {
