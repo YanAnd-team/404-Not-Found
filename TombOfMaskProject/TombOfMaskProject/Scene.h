@@ -15,6 +15,7 @@ public:
 
     Player player;
     GameCamera camera;
+    Level level;
 
 private:
     Texture2D background;

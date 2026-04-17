@@ -37,14 +37,25 @@ void Scene::Init()
     // Camera
     camera.Init(GetScreenWidth(), GetScreenHeight());
 
-    // Player
-    player.Init({ 400, 200 });
+    // Level
+    level.Init();
+    if (!level.Load(1))
+    {
+        // failed to load level 1, keep player at default
+        player.Init({ 400, 200 });
+    }
+    else
+    {
+        // place player at level start
+        Vector2 start = level.GetStartPosition();
+        player.Init(start);
+    }
 }
 
 void Scene::Update(float dt)
 {
-    // Provide world bounds to player (use full screen for now)
-    Rectangle world = { 0.0f, 0.0f, (float)GetScreenWidth(), (float)GetScreenHeight() };
+    // Provide world bounds to player (from level if loaded)
+    Rectangle world = level.GetWorldBounds();
     player.Update(dt, world);
     camera.Update(player.GetCenter());
     UpdateMusicStream(music);
@@ -55,6 +66,7 @@ void Scene::DrawWorld()
     camera.BeginWorld();
 
     DrawTextureEx(background, Vector2{ 0, 0 }, 0, 1, WHITE);
+    level.Draw();
     player.Draw();
 
     camera.EndWorld();
@@ -68,6 +80,7 @@ void Scene::DrawUI()
 void Scene::DeInit()
 {
     player.DeInit();
+    level.DeInit();
     if (musicLoaded)
     {
         StopMusicStream(music);
