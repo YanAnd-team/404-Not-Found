@@ -1,6 +1,6 @@
 # Mask Tomb
 
-## 📖 Description
+##  Description
 
 **Mask Tomb** is a **platformer** arcade-style game. Players delving deep into an ancient mask-filled tomb, avoiding enemies, crossing traps, and finding teleporters to uncover the secrets of the tomb.
 
@@ -10,7 +10,7 @@ Inspired by classic platformers like *Super Mario*, the game features **5 challe
 
 ---
 
-## 👥 Team Members
+##  Team Members
 
 | Role         | Name      | Responsibilities |
 
@@ -23,7 +23,7 @@ Inspired by classic platformers like *Super Mario*, the game features **5 challe
 
 ---
 
-## 🎮 How to Play
+##  How to Play
 
 ### Controls (Keyboard)
 
@@ -40,14 +40,14 @@ Inspired by classic platformers like *Super Mario*, the game features **5 challe
 - Avoid enemies carefully — there are no second chances.
 - Reaching the teleporter on Level 5 grants victory.
 
-### ⚠️ Important
+###  Important
 
 - **No health system** — touching an enemy = instant game over.
 - After a game over, you return to the main menu and can restart.
 
 ---
 
-## ✨ Implemented Features
+##  Implemented Features
 
 ### Core Gameplay
 - ✅ Player movement (left/right, gravity, jumping)
@@ -71,7 +71,7 @@ Inspired by classic platformers like *Super Mario*, the game features **5 challe
 
 ---
 
-## 🎥 Demo Video
+##  Demo Video
 
 [Watch the 1-minute demo video](https://youtu.be/your-video-id)
 
@@ -79,13 +79,13 @@ Inspired by classic platformers like *Super Mario*, the game features **5 challe
 
 ---
 
-## 🔗 Project Links
+##  Project Links
 
 - **GitHub Repository**: [https://github.com/YanAnd-team/404-Not-Found]
 
 ---
 
-## 📄 License
+##  License
 
 This project is licensed under the **MIT License**. See [LICENSE](https://github.com/YanAnd-team/404-Not-Found/blob/main/LICENSE.md) for details.
 
