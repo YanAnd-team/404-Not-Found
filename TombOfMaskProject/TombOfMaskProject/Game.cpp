@@ -149,13 +149,16 @@ void Game::DrawTitle()
     // Dark overlay
 	DrawTextureEx(menu, Vector2{ 0, 0 }, 0, 3.5f, Fade(WHITE, 0.8f));
 
+    // Title
+    const char* titleText = "Tomb of the Mask";
+    Vector2 titleSize = MeasureTextEx(font, titleText, FONT_SIZE * 2, TEXT_SPACING);
+    Vector2 titlePos = { screenWidth / 2.0f - titleSize.x / 2.0f, screenHeight / 2.0f - titleSize.y / 2.0f - 170 };
+    DrawTextEx(font, titleText, titlePos, FONT_SIZE * 2, TEXT_SPACING, ORANGE);
+
     // Subtitle
     const char* subText = "Press ENTER to start";
     Vector2 subSize = MeasureTextEx(font, subText, FONT_SIZE, TEXT_SPACING);
-    Vector2 subPos = {
-        screenWidth / 2.0f - subSize.x / 2.0f,
-        screenHeight / 2.0f + 20
-    };
+    Vector2 subPos = { screenWidth / 2.0f - subSize.x / 2.0f, screenHeight / 2.0f + 20 };
     DrawTextEx(font, subText, subPos, FONT_SIZE, TEXT_SPACING, YELLOW);
 }
 
