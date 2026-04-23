@@ -107,7 +107,7 @@ void Scene::DrawWorld()
 {
     camera.BeginWorld();
 
-    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.7f));
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(WHITE, 0.7f));
     level.Draw();
     // draw entities
     for (auto e : entities) if (e && e->IsActive()) e->Draw();
