@@ -77,11 +77,13 @@ Ghost::Ghost(Vector2 pos, bool vertical)
     speed = 60.0f;
     if (vertical) dir = {0,1}; else dir = {1,0};
     texLoaded = false;
-    if (FileExists("resources/sprites/Ghost.png")) 
-    { 
-        tex = LoadTexture("resources/sprites/Ghost.png"); 
-        texLoaded = true; 
+    if (FileExists("resources/sprites/Ghost.png"))
+    {
+        tex = LoadTexture("resources/sprites/Ghost.png");
+        texLoaded = true;
     }
+    frameIndex = 0;
+    animTimer = 0.0f;
 }
 
 Ghost::~Ghost()
@@ -91,6 +93,14 @@ Ghost::~Ghost()
 
 void Ghost::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
 {
+    animTimer += dt;
+    if (animTimer >= 0.1f)
+    {
+        animTimer = 0.0f;
+        int totalFrames = texLoaded ? (tex.width / 32) : 1;
+        frameIndex = (frameIndex + 1) % totalFrames;
+    }
+
     // move and reverse on hitting wall or out of bounds
     Vector2 newPos = { position.x + dir.x * speed * dt, position.y + dir.y * speed * dt };
     // check tile at center
@@ -118,7 +128,11 @@ void Ghost::Update(float dt, Player &player, std::vector<Entity*> &entities, Lev
 void Ghost::Draw()
 {
     Rectangle dest = { position.x, position.y, 32, 32 };
-    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,32.0f,32.0f}, dest, Vector2{0,0}, 0, WHITE);
+    if (texLoaded)
+    {
+        Rectangle src = { (float)(frameIndex * 32), 0, 32.0f, (float)tex.height };
+        DrawTexturePro(tex, src, dest, Vector2{0,0}, 0, WHITE);
+    }
     else DrawRectangleRec(dest, MAGENTA);
 }
 
@@ -129,17 +143,31 @@ GhostPlus::GhostPlus(Vector2 pos, bool vertical) : Ghost(pos, vertical)
 {
     blinkTimer = 0.0f;
     visible = true;
+    plusTexLoaded = false;
+    if (FileExists("resources/sprites/GhostPlus.png"))
+    {
+        plusTex = LoadTexture("resources/sprites/GhostPlus.png");
+        plusTexLoaded = true;
+    }
+    frameIndex = 0;
+    animTimer = 0.0f;
 }
 
-GhostPlus::~GhostPlus() {}
-
-void GhostPlus::Draw()
+GhostPlus::~GhostPlus()
 {
-    if (visible) Ghost::Draw();
+    if (plusTexLoaded) UnloadTexture(plusTex);
 }
 
 void GhostPlus::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
 {
+    animTimer += dt;
+    if (animTimer >= 0.1f)
+    {
+        animTimer = 0.0f;
+        int totalFrames = plusTexLoaded ? (plusTex.width / 32) : 1;
+        frameIndex = (frameIndex + 1) % totalFrames;
+    }
+
     blinkTimer += dt;
     if (blinkTimer >= 2.0f)
     {
@@ -150,6 +178,18 @@ void GhostPlus::Update(float dt, Player &player, std::vector<Entity*> &entities,
     {
         Ghost::Update(dt, player, entities, level);
     }
+}
+
+void GhostPlus::Draw()
+{
+    if (!visible) return;
+    if (plusTexLoaded)
+    {
+        Rectangle src  = { (float)(frameIndex * 32), 0, 32.0f, (float)plusTex.height };
+        Rectangle dest = { position.x, position.y, 32, 32 };
+        DrawTexturePro(plusTex, src, dest, Vector2{0,0}, 0, WHITE);
+    }
+    else Ghost::Draw();
 }
 
 // --- GunTrap (local implementation) ---
@@ -229,6 +269,10 @@ TriggerTrap::TriggerTrap(Vector2 pos)
     triggered = false;
     texLoaded = false;
     if (FileExists("resources/sprites/SpikeTrap.png")) { tex = LoadTexture("resources/sprites/SpikeTrap.png"); texLoaded = true; }
+    frameIndex = 0;
+    animTimer = 0.0f;
+    retractTimer = 0.0f;
+    retracting = false;
 }
 
 TriggerTrap::~TriggerTrap() { if (texLoaded) UnloadTexture(tex); }
@@ -242,10 +286,10 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
     int py = (int)(player.position.y / level.GetTileSize());
     int dx = abs(px - tx);
     int dy = abs(py - ty);
-    if ((dx==1 && dy==0) || (dx==0 && dy==1))
+    if (!triggered && ((dx==1 && dy==0) || (dx==0 && dy==1)))
     {
         timer += dt;
-        if (timer >= 1.0f) triggered = true;
+        if (timer >= 0.5f) triggered = true;
     }
     else
     {
@@ -254,11 +298,32 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
 
     if (triggered)
     {
-        // dangerous: check collision with player
-        Rectangle pr = player.GetBounds();
-        if (CheckCollisionRecs(pr, GetBounds()))
+        if (!retracting && frameIndex < 4)
         {
-            player.Reset();
+            animTimer += dt;
+            if (animTimer >= 0.05f) { animTimer = 0.0f; frameIndex++; }
+        }
+        else if (!retracting && frameIndex == 4)
+        {
+            retractTimer += dt;
+            if (retractTimer >= 1.5f) { retractTimer = 0.0f; retracting = true; }
+        }
+        else if (retracting && frameIndex > 0)
+        {
+            animTimer += dt;
+            if (animTimer >= 0.05f) { animTimer = 0.0f; frameIndex--; }
+        }
+        else if (retracting && frameIndex == 0)
+        {
+            triggered = false;
+            retracting = false;
+            timer = 0.0f;
+        }
+
+        if (!retracting)
+        {
+            Rectangle pr = player.GetBounds();
+            if (CheckCollisionRecs(pr, GetBounds())) player.Reset();
         }
     }
 }
@@ -266,7 +331,11 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
 void TriggerTrap::Draw()
 {
     Rectangle dest = { position.x, position.y, 32, 32 };
-    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
+    if (texLoaded)
+    {
+        Rectangle src = { (float)(frameIndex * 32), 0, 32.0f, 32.0f };
+        DrawTexturePro(tex, src, dest, Vector2{0,0}, 0, WHITE);
+    }
     else DrawRectangleRec(dest, RED);
 }
 

@@ -42,12 +42,15 @@ public:
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
     void Draw() override;
     Rectangle GetBounds() const override;
-private:
+protected:
     Vector2 position;
+private:
     Vector2 dir;
     float speed;
     Texture2D tex;
     bool texLoaded = false;
+    int frameIndex;
+    float animTimer;
 };
 
 class GhostPlus : public Ghost {
@@ -59,6 +62,10 @@ public:
 private:
     float blinkTimer;
     bool visible;
+    Texture2D plusTex;
+    bool plusTexLoaded;
+    int frameIndex;
+    float animTimer;
 };
 
 // GunTrap is implemented in Entities.cpp (concrete definition not exposed here)
@@ -76,6 +83,10 @@ private:
     bool triggered;
     Texture2D tex;
     bool texLoaded=false;
+    int frameIndex;
+    float animTimer;
+    float retractTimer;
+    bool retracting;
 };
 
 class FixedTrap : public Entity {
