@@ -89,3 +89,5 @@ private:
     Texture2D tex;
     bool texLoaded=false;
 };
+
+// GunTrap is implemented privately in Entities.cpp

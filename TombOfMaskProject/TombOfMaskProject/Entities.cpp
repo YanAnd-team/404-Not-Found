@@ -4,22 +4,6 @@
 #include <math.h>
 #include <algorithm>
 
-// Local MachineGunTrap class (hidden from header)
-class MachineGunTrap : public Entity {
-public:
-    MachineGunTrap(Vector2 pos);
-    ~MachineGunTrap();
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
-    void Draw() override;
-    Rectangle GetBounds() const override;
-private:
-    Vector2 position;
-    Vector2 dir;
-    float shootCooldown;
-    Texture2D tex;
-    bool texLoaded=false;
-};
-
 // --- Bullet ---
 Bullet::Bullet(Vector2 pos, Vector2 dir, float speed)
 {
@@ -73,7 +57,11 @@ void Bullet::Update(float dt, Player &player, std::vector<Entity*> &entities, Le
 void Bullet::Draw()
 {
     Rectangle dest = { position.x, position.y, 8, 8 };
-    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
+    if (texLoaded)
+    {
+        // draw first frame 8x8 or scale if sheet is larger
+        DrawTexturePro(tex, Rectangle{0,0,8.0f,8.0f}, dest, Vector2{0,0}, 0, WHITE);
+    }
     else DrawRectangleRec(dest, YELLOW);
 }
 
@@ -89,7 +77,11 @@ Ghost::Ghost(Vector2 pos, bool vertical)
     speed = 60.0f;
     if (vertical) dir = {0,1}; else dir = {1,0};
     texLoaded = false;
-    if (FileExists("resources/sprites/Ghost.png")) { tex = LoadTexture("resources/sprites/Ghost.png"); texLoaded = true; }
+    if (FileExists("resources/sprites/Ghost.png")) 
+    { 
+        tex = LoadTexture("resources/sprites/Ghost.png"); 
+        texLoaded = true; 
+    }
 }
 
 Ghost::~Ghost()
@@ -125,12 +117,12 @@ void Ghost::Update(float dt, Player &player, std::vector<Entity*> &entities, Lev
 
 void Ghost::Draw()
 {
-    Rectangle dest = { position.x, position.y, 16, 16 };
-    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
+    Rectangle dest = { position.x, position.y, 32, 32 };
+    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,32.0f,32.0f}, dest, Vector2{0,0}, 0, WHITE);
     else DrawRectangleRec(dest, MAGENTA);
 }
 
-Rectangle Ghost::GetBounds() const { return Rectangle{ position.x, position.y, 16, 16 }; }
+Rectangle Ghost::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 
 // --- GhostPlus ---
 GhostPlus::GhostPlus(Vector2 pos, bool vertical) : Ghost(pos, vertical)
@@ -155,8 +147,23 @@ void GhostPlus::Update(float dt, Player &player, std::vector<Entity*> &entities,
     }
 }
 
-// --- MachineGunTrap ---
-MachineGunTrap::MachineGunTrap(Vector2 pos)
+// --- GunTrap (local implementation) ---
+class GunTrap : public Entity {
+public:
+    GunTrap(Vector2 pos);
+    ~GunTrap();
+    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Draw() override;
+    Rectangle GetBounds() const override;
+private:
+    Vector2 position;
+    Vector2 dir;
+    float shootCooldown;
+    Texture2D tex;
+    bool texLoaded=false;
+};
+
+GunTrap::GunTrap(Vector2 pos)
 {
     position = pos;
     shootCooldown = 2.0f; // initial delay before first shot
@@ -165,9 +172,9 @@ MachineGunTrap::MachineGunTrap(Vector2 pos)
     if (FileExists("resources/sprites/GunTrap.png")) { tex = LoadTexture("resources/sprites/GunTrap.png"); texLoaded = true; }
 }
 
-MachineGunTrap::~MachineGunTrap() { if (texLoaded) UnloadTexture(tex); }
+GunTrap::~GunTrap() { if (texLoaded) UnloadTexture(tex); }
 
-void MachineGunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
+void GunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
 {
     // decide direction on creation if unknown
     if (dir.x==0 && dir.y==0)
@@ -195,18 +202,18 @@ void MachineGunTrap::Update(float dt, Player &player, std::vector<Entity*> &enti
     }
 }
 
-void MachineGunTrap::Draw()
+void GunTrap::Draw()
 {
-    Rectangle dest = { position.x, position.y, 16, 16 };
-    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
+    Rectangle dest = { position.x, position.y, 32, 32 };
+    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,32.0f,32.0f}, dest, Vector2{0,0}, 0, WHITE);
     else DrawRectangleRec(dest, BROWN);
 }
 
-Rectangle MachineGunTrap::GetBounds() const { return Rectangle{ position.x, position.y, 16, 16 }; }
+Rectangle GunTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 
 Entity* CreateGunTrap(Vector2 pos, Level &level)
 {
-    return new MachineGunTrap(pos);
+    return new GunTrap(pos);
 }
 
 // --- TriggerTrap ---
@@ -253,12 +260,12 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
 
 void TriggerTrap::Draw()
 {
-    Rectangle dest = { position.x, position.y, 16, 16 };
+    Rectangle dest = { position.x, position.y, 32, 32 };
     if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
     else DrawRectangleRec(dest, RED);
 }
 
-Rectangle TriggerTrap::GetBounds() const { return Rectangle{ position.x, position.y, 16, 16 }; }
+Rectangle TriggerTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 
 // --- FixedTrap ---
 FixedTrap::FixedTrap(Vector2 pos)
@@ -282,12 +289,12 @@ void FixedTrap::Update(float dt, Player &player, std::vector<Entity*> &entities,
 
 void FixedTrap::Draw()
 {
-    Rectangle dest = { position.x, position.y, 16, 16 };
+    Rectangle dest = { position.x, position.y, 32, 32 };
     if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
     else DrawRectangleRec(dest, ORANGE);
 }
 
-Rectangle FixedTrap::GetBounds() const { return Rectangle{ position.x, position.y, 16, 16 }; }
+Rectangle FixedTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 // forward declaration for helper
 Entity* CreateGunTrap(Vector2 pos, Level &level);
 

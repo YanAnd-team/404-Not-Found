@@ -182,15 +182,19 @@ void Level::Draw() const
                 DrawRectangleRec(dest, DARKGRAY);
                 break;
             case Spike:
-                if (spikeLoaded) DrawTexturePro(spikeTex, Rectangle{0,0,(float)spikeTex.width,(float)spikeTex.height}, dest, Vector2{0,0}, 0, WHITE);
+                if (spikeLoaded)
+                {
+                    // draw first 32x32 frame from spritesheet
+                    DrawTexturePro(spikeTex, Rectangle{0,0,32.0f,32.0f}, dest, Vector2{0,0}, 0, WHITE);
+                }
                 else DrawRectangleRec(dest, RED);
                 break;
             case TrapSpike:
-                if (trapLoaded) DrawTexturePro(trapSpikeTex, Rectangle{0,0,(float)trapSpikeTex.width,(float)trapSpikeTex.height}, dest, Vector2{0,0}, 0, WHITE);
+                if (trapLoaded) DrawTexturePro(trapSpikeTex, Rectangle{0,0,32.0f,32.0f}, dest, Vector2{0,0}, 0, WHITE);
                 else DrawRectangleRec(dest, ORANGE);
                 break;
-            case GunTrap:
-                if (gunLoaded) DrawTexturePro(gunTrapTex, Rectangle{0,0,(float)gunTrapTex.width,(float)gunTrapTex.height}, dest, Vector2{0,0}, 0, WHITE);
+            case GunTrapTile:
+                if (gunLoaded) DrawTexturePro(gunTrapTex, Rectangle{0,0,32.0f,32.0f}, dest, Vector2{0,0}, 0, WHITE);
                 else DrawRectangleRec(dest, PURPLE);
                 break;
             case Empty:
