@@ -14,7 +14,7 @@ void Player::Init(Vector2 startPos)
 {
     startPosition = startPos;
     position = startPos;
-    speed = 200.0f;
+    speed = 700.0f;
     currentDir = { 0, 0 };
     sliding = false;
 
