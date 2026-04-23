@@ -76,7 +76,7 @@ Enemies and traps will reset the player and cost a life — lose all 3 lives and
 
 ## Demo Video
 
-[Watch the 1-minute demo video](https://youtu.be/your-video-id)
+[Watch the 1-minute demo video](https://studio.youtube.com/channel/UChX7OsgOiBF6U9FGsiRFZcA/videos/upload?filter=%5B%5D&sort=%7B"columnType"%3A"date"%2C"sortOrder"%3A"DESCENDING"%7D)
 
 > The video shows: initial screen → title screen → gameplay → enemy/trap contact (game over) → return to title → successful run → win screen → return to title.
 
