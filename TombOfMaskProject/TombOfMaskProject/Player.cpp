@@ -31,6 +31,7 @@ void Player::Init(Vector2 startPos)
     drawScale = 1.0f;
     drawRotation = 0.0f;
     flipX = false;
+    diedThisFrame = false;
 }
 
 // Comprueba si hay pared (o límite del mundo) en la dirección dada
@@ -66,6 +67,7 @@ bool Player::IsWallAhead(Vector2 dir, Level& level) const
 
 void Player::Update(float dt, Rectangle worldBounds, Level& level)
 {
+    diedThisFrame = false;
     // Solo se acepta nueva dirección si el jugador no está deslizándose,
     // o si ya chocó con la pared (sliding == false)
     if (!sliding)
@@ -154,6 +156,7 @@ void Player::Reset()
     position = startPosition;
     currentDir = { 0, 0 };
     sliding = false;
+    diedThisFrame = true;
 }
 
 Vector2 Player::GetCenter() const

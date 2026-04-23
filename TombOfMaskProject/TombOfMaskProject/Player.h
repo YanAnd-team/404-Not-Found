@@ -22,9 +22,11 @@ public:
 
     Vector2 GetCenter() const;
     Rectangle GetBounds() const;
+    bool IsSliding() const { return sliding; }
 
     Vector2 position;
     float speed;
+    bool diedThisFrame;
 
 private:
     bool IsWallAhead(Vector2 dir, Level& level) const;

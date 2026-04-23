@@ -18,6 +18,11 @@ public:
     bool HasPlayerWon() const;
     void LoadLevel(int levelNumber);
 
+    void UpdateAudio();
+    void OnEnterMenu();
+    void OnEnterGameplay();
+    void OnPlayerWon();
+
     Player player;
     GameCamera camera;
     Level level;
@@ -30,4 +35,5 @@ private:
     Font font;
 	bool soundLoaded[4] = {};
 	bool musicLoaded[2] = {};
+    bool wasSliding = false;
 };

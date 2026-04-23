@@ -40,6 +40,8 @@ void Game::Update()
 {
     float dt = GetFrameTime();
 
+    scene.UpdateAudio();
+
     switch (currentState)
     {
     case TITLE:    UpdateTitle();        break;
@@ -95,6 +97,7 @@ void Game::UpdateTitle()
         playerLives = 3;
         score = 0;
         scene.player.Reset();
+        scene.OnEnterGameplay();
     }
 }
 
@@ -105,6 +108,7 @@ void Game::UpdateGameplay(float dt)
     if (scene.HasPlayerWon())
     {
         currentState = WIN;
+        scene.OnPlayerWon();
         return;
     }
 
@@ -137,6 +141,7 @@ void Game::UpdateWin()
     if (IsKeyPressed(KEY_ENTER))
     {
         currentState = TITLE;
+        scene.OnEnterMenu();
     }
 }
 
@@ -145,6 +150,7 @@ void Game::UpdateGameOver()
     if (IsKeyPressed(KEY_ENTER))
     {
         currentState = TITLE;
+        scene.OnEnterMenu();
     }
 }
 

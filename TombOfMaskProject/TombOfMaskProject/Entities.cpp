@@ -136,7 +136,7 @@ void Ghost::Draw()
     else DrawRectangleRec(dest, MAGENTA);
 }
 
-Rectangle Ghost::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
+Rectangle Ghost::GetBounds() const { return Rectangle{ position.x + 3, position.y, 26, 32 }; }
 
 // --- GhostPlus ---
 GhostPlus::GhostPlus(Vector2 pos, bool vertical) : Ghost(pos, vertical)

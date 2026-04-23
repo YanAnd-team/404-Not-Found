@@ -38,7 +38,6 @@ void Scene::Init()
     {
 		music[1] = LoadMusicStream("resources/Music/BattleSong.mp3");
         music[1].looping = true;
-        PlayMusicStream(music[1]);
 		musicLoaded[1] = true;
 	}
 
@@ -99,8 +98,15 @@ void Scene::Update(float dt)
         else ++i;
     }
 
-    if (musicLoaded[0]) UpdateMusicStream(music[0]);
-    if (musicLoaded[1]) UpdateMusicStream(music[1]);
+    // Movement sound: play when slide starts
+    bool nowSliding = player.IsSliding();
+    if (nowSliding && !wasSliding && soundLoaded[1])
+        PlaySound(sound[1]);
+    wasSliding = nowSliding;
+
+    // Death sound
+    if (player.diedThisFrame && soundLoaded[2])
+        PlaySound(sound[2]);
 }
 
 void Scene::DrawWorld()
@@ -114,6 +120,37 @@ void Scene::DrawWorld()
     player.Draw();
 
     camera.EndWorld();
+}
+
+void Scene::UpdateAudio()
+{
+    if (musicLoaded[0]) UpdateMusicStream(music[0]);
+    if (musicLoaded[1]) UpdateMusicStream(music[1]);
+}
+
+void Scene::OnEnterMenu()
+{
+    if (musicLoaded[1]) StopMusicStream(music[1]);
+    if (musicLoaded[0])
+    {
+        StopMusicStream(music[0]);
+        PlayMusicStream(music[0]);
+    }
+}
+
+void Scene::OnEnterGameplay()
+{
+    if (musicLoaded[0]) StopMusicStream(music[0]);
+    if (musicLoaded[1])
+    {
+        StopMusicStream(music[1]);
+        PlayMusicStream(music[1]);
+    }
+}
+
+void Scene::OnPlayerWon()
+{
+    if (soundLoaded[3]) PlaySound(sound[3]);
 }
 
 void Scene::LoadLevel(int levelNumber)
