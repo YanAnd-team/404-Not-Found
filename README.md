@@ -6,10 +6,10 @@
 
 Inspired by the mobile game *Tomb of the Mask*, movement works by sliding in one direction until hitting a wall — there is no jumping. Navigation relies on reading the level layout and reacting to enemies in real time.
 
-**Subject**: [Game Design and Development]  
-**Degree**: [Bachelor's Degree in Game Design and Development]  
-**University**: [Universitat Politècnica de Catalunya]  
-**Tutors**: [De Pedro Lombao Rodrigo]  
+**Subject**: Game Design and Development  
+**Degree**: Bachelor's Degree in Game Design and Development  
+**University**: Universitat Politècnica de Catalunya  
+**Tutors**: De Pedro Lombao Rodrigo  
 **GitHub**: https://github.com/YanAnd-team/404-Not-Found
 
 ---
@@ -18,10 +18,10 @@ Inspired by the mobile game *Tomb of the Mask*, movement works by sliding in one
 
 | Role | Name | GitHub |
 |------|------|--------|
-| Art / Design | WEIHAOYAN | [https://github.com/yanweihao136699-art] |
-| Programming / Audio | YIXIANGLU | [https://github.com/Renshengwuqu] |
+| Art / Design | WEIHAOYAN | https://github.com/yanweihao136699-art |
+| Programming / Audio | YIXIANGLU | https://github.com/Renshengwuqu |
 
-Full task breakdown is available in (https://github.com/YanAnd-team/404-Not-Found/blob/main/Tasks.pdf)
+Full task breakdown: [Tasks.pdf](https://github.com/YanAnd-team/404-Not-Found/blob/main/Tasks.pdf)
 
 ---
 
@@ -35,12 +35,14 @@ Full task breakdown is available in (https://github.com/YanAnd-team/404-Not-Foun
 | Arrow Left  | Slide left until hitting a wall  |
 | Arrow Up    | Slide up until hitting a wall    |
 | Arrow Down  | Slide down until hitting a wall  |
-| Enter       | Confirm / Start game             |
+| 1 – 5       | Load level 1 through 5 directly  |
+| Enter       | Confirm / advance screen         |
 
 ### Objective
 
 Slide through each level and reach the **exit tile** to complete it.  
-Enemies and traps will reset the player and cost a life — lose all 3 lives and it is Game Over.
+Any contact with an enemy or trap triggers **Game Over** immediately.  
+Collect up to **3 stars** hidden in each level for a perfect run.
 
 ### Enemies & Traps
 
@@ -49,7 +51,7 @@ Enemies and traps will reset the player and cost a life — lose all 3 lives and
 | Ghost | Bounces back and forth between walls |
 | GhostPlus | Same as Ghost but periodically turns invisible |
 | Fixed Spikes | Always dangerous on contact |
-| Trigger Spikes | Deploy when the player is adjacent; retract after a moment |
+| Trigger Spikes | Deploy when the player passes adjacent; retract after a moment |
 | Gun Trap | Fires a bullet periodically in a fixed direction |
 
 ---
@@ -58,25 +60,26 @@ Enemies and traps will reset the player and cost a life — lose all 3 lives and
 
 ### Core Gameplay
 - Player sliding movement in 4 directions (stops on wall contact, snaps to grid)
-- 5 tile-based levels
-- 2 enemy types with independent movement and animation
+- 5 tile-based levels, switchable at any time with keys 1–5
+- 2 enemy types with independent movement and spritesheet animation
 - 3 trap types with distinct behaviours
+- Star collectibles: up to 3 per level, displayed as icons in the top-left HUD
 - Win condition: reach the exit tile
-- Lose condition: 3 lives; contact with enemies or traps resets position and costs a life
-- Camera follow with world boundary limits
+- Lose condition: any contact with an enemy or trap → Game Over
+- Camera follow with world boundary clamping
 
 ### UI & Audio
-- Score and lives HUD during gameplay
-- Background music per screen (menu music and battle music)
-- Sound effects: movement, player death, level victory
+- Initial info screen (project info, team, GitHub)
 - Title screen, gameplay screen, win screen, game over screen
-- Initial screen with project information
+- Star HUD during gameplay; star rating shown on the win screen
+- Background music per screen (menu music and battle music)
+- Sound effects: movement slide, player death, level victory
 
 ---
 
 ## Demo Video
 
-[Watch the 1-minute demo video](https://studio.youtube.com/channel/UChX7OsgOiBF6U9FGsiRFZcA/videos/upload?filter=%5B%5D&sort=%7B"columnType"%3A"date"%2C"sortOrder"%3A"DESCENDING"%7D)
+[Watch the 1-minute demo video](https://youtu.be/your-video-id)
 
 > The video shows: initial screen → title screen → gameplay → enemy/trap contact (game over) → return to title → successful run → win screen → return to title.
 
