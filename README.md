@@ -6,10 +6,10 @@
 
 Inspired by the mobile game *Tomb of the Mask*, movement works by sliding in one direction until hitting a wall — there is no jumping. Navigation relies on reading the level layout and reacting to enemies in real time.
 
-**Subject**: [TODO: subject name]  
-**Degree**: [TODO: degree program]  
-**University**: [TODO: university name]  
-**Tutors**: [TODO: tutor name(s)]  
+**Subject**: [Game Design and Development]  
+**Degree**: [Bachelor's Degree in Game Design and Development]  
+**University**: [Universitat Politècnica de Catalunya]  
+**Tutors**: [De Pedro Lombao Rodrigo]  
 **GitHub**: https://github.com/YanAnd-team/404-Not-Found
 
 ---
@@ -18,7 +18,7 @@ Inspired by the mobile game *Tomb of the Mask*, movement works by sliding in one
 
 | Role | Name | GitHub |
 |------|------|--------|
-| Art / Design | WEIHAOYAN | [TODO: https://github.com/WEIHAOYAN-username] |
+| Art / Design | WEIHAOYAN | [TODO: https://github.com/yanweihao136699-art] |
 | Programming / Audio | YIXIANGLU | [TODO: https://github.com/YIXIANGLU-username] |
 
 Full task breakdown is available in (https://github.com/YanAnd-team/404-Not-Found/blob/main/Tasks.pdf)
