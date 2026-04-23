@@ -8,7 +8,7 @@ Level::Level()
     tileSize = 32;
     startPos = { 0, 0 };
     goalPos = { 0, 0 };
-    spikeLoaded = trapLoaded = gunLoaded = endLoaded = false;
+    spikeLoaded = trapLoaded = gunLoaded = endLoaded = starLoaded = false;
     wallLoaded[0] = wallLoaded[1] = false;
 }
 
@@ -35,6 +35,11 @@ void Level::Init()
         endTex = LoadTexture("resources/sprites/END.png");
         endLoaded = true;
     }
+    if (FileExists("resources/sprites/Star.png"))
+    {
+        starTex = LoadTexture("resources/sprites/Star.png");
+        starLoaded = true;
+    }
 	if (FileExists("resources/sprites/Wall1.png"))
     {
         wallTex[0] = LoadTexture("resources/sprites/Wall1.png");
@@ -60,6 +65,7 @@ void Level::DeInit()
     if (wallLoaded[0]) UnloadTexture(wallTex[0]);
     if (wallLoaded[1]) UnloadTexture(wallTex[1]);
     if (endLoaded) UnloadTexture(endTex);
+    if (starLoaded) UnloadTexture(starTex);
 }
 
 bool Level::Load(int levelNumber)
@@ -198,6 +204,12 @@ void Level::Draw() const
                     DrawTexturePro(endTex, Rectangle{ 0,0,(float)endTex.width,(float)endTex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
                 else
                     DrawRectangleRec(dest, GOLD);
+                break;
+            case Star:
+                if (starLoaded)
+                    DrawTexturePro(starTex, Rectangle{ 0,0,(float)starTex.width,(float)starTex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
+                else
+                    DrawRectangleRec(dest, YELLOW);
                 break;
             case Empty:
             default:

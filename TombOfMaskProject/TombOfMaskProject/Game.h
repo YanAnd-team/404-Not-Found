@@ -35,8 +35,6 @@ private:
     void DrawWin();
 
     GameState currentState;
-    int playerLives;
-    int score;
 
     int screenWidth;
     int screenHeight;

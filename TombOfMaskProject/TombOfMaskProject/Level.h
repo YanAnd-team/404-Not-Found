@@ -45,10 +45,12 @@ private:
     Texture2D gunTrapTex;
 	Texture2D wallTex[2];
     Texture2D endTex;
+    Texture2D starTex;
 
     bool spikeLoaded;
     bool trapLoaded;
     bool gunLoaded;
     bool wallLoaded[2];
     bool endLoaded;
+    bool starLoaded;
 };
