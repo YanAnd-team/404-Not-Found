@@ -85,7 +85,7 @@ Inspired by classic platformers like *Super Mario*, the game features **5 challe
 
 ## 📄 License
 
-This project is licensed under the **MIT License**. See [LICENSE](LICENSE) for details.
+This project is licensed under the **MIT License**. See [LICENSE](https://github.com/YanAnd-team/404-Not-Found/blob/main/LICENSE.md) for details.
 
 MIT License © 2026 WEIHAOYAN & YIXIANGLU (Mask & Mummy Team)
 
