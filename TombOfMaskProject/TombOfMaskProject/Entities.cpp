@@ -288,12 +288,7 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
     int dy = abs(py - ty);
     if (!triggered && ((dx==1 && dy==0) || (dx==0 && dy==1)))
     {
-        timer += dt;
-        if (timer >= 0.5f) triggered = true;
-    }
-    else
-    {
-        timer = 0.0f;
+        triggered = true;
     }
 
     if (triggered)
