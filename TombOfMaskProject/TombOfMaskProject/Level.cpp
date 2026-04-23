@@ -8,7 +8,7 @@ Level::Level()
     tileSize = 32;
     startPos = { 0, 0 };
     goalPos = { 0, 0 };
-    spikeLoaded = trapLoaded = gunLoaded = false;
+    spikeLoaded = trapLoaded = gunLoaded = endLoaded = false;
     wallLoaded[0] = wallLoaded[1] = false;
 }
 
@@ -29,6 +29,11 @@ void Level::Init()
     {
         gunTrapTex = LoadTexture("resources/sprites/GunTrap.png");
         gunLoaded = true;
+    }
+    if (FileExists("resources/sprites/END.png"))
+    {
+        endTex = LoadTexture("resources/sprites/END.png");
+        endLoaded = true;
     }
 	if (FileExists("resources/sprites/Wall1.png"))
     {
@@ -54,6 +59,7 @@ void Level::DeInit()
     if (gunLoaded) UnloadTexture(gunTrapTex);
     if (wallLoaded[0]) UnloadTexture(wallTex[0]);
     if (wallLoaded[1]) UnloadTexture(wallTex[1]);
+    if (endLoaded) UnloadTexture(endTex);
 }
 
 bool Level::Load(int levelNumber)
@@ -186,6 +192,12 @@ void Level::Draw() const
             case GunTrapTile:
                 if (gunLoaded) DrawTexturePro(gunTrapTex, Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
                 else DrawRectangleRec(dest, PURPLE);
+                break;
+            case 'f':
+                if (endLoaded)
+                    DrawTexturePro(endTex, Rectangle{ 0,0,(float)endTex.width,(float)endTex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
+                else
+                    DrawRectangleRec(dest, GOLD);
                 break;
             case Empty:
             default:
