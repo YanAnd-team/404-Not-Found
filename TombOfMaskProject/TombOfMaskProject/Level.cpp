@@ -205,12 +205,6 @@ void Level::Draw() const
                 else
                     DrawRectangleRec(dest, GOLD);
                 break;
-            case Star:
-                if (starLoaded)
-                    DrawTexturePro(starTex, Rectangle{ 0,0,(float)starTex.width,(float)starTex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
-                else
-                    DrawRectangleRec(dest, YELLOW);
-                break;
             case Empty:
             default:
                 break;

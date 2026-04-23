@@ -192,6 +192,47 @@ void GhostPlus::Draw()
     else Ghost::Draw();
 }
 
+// --- StarCollectible ---
+StarCollectible::StarCollectible(Vector2 pos, int* countPtr)
+{
+    position = pos;
+    this->countPtr = countPtr;
+    texLoaded = false;
+    if (FileExists("resources/sprites/Star.png"))
+    {
+        tex = LoadTexture("resources/sprites/Star.png");
+        texLoaded = true;
+    }
+}
+
+StarCollectible::~StarCollectible()
+{
+    if (texLoaded) UnloadTexture(tex);
+}
+
+void StarCollectible::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
+{
+    if (CheckCollisionRecs(player.GetBounds(), GetBounds()))
+    {
+        if (countPtr && *countPtr < 3) (*countPtr)++;
+        active = false;
+    }
+}
+
+void StarCollectible::Draw()
+{
+    Rectangle dest = { position.x, position.y, 32, 32 };
+    if (texLoaded)
+        DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
+    else
+        DrawRectangleRec(dest, YELLOW);
+}
+
+Rectangle StarCollectible::GetBounds() const
+{
+    return Rectangle{ position.x, position.y, 32, 32 };
+}
+
 // --- GunTrap (local implementation) ---
 class GunTrap : public Entity {
 public:
@@ -267,6 +308,7 @@ TriggerTrap::TriggerTrap(Vector2 pos)
     position = pos;
     timer = 0.0f;
     triggered = false;
+    timerStarted = false;
     texLoaded = false;
     if (FileExists("resources/sprites/SpikeTrap.png")) { tex = LoadTexture("resources/sprites/SpikeTrap.png"); texLoaded = true; }
     frameIndex = 0;
@@ -286,9 +328,16 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
     int py = (int)(player.position.y / level.GetTileSize());
     int dx = abs(px - tx);
     int dy = abs(py - ty);
-    if (!triggered && ((dx==1 && dy==0) || (dx==0 && dy==1)))
+    if (!triggered)
     {
-        triggered = true;
+        if (!timerStarted && ((dx==1 && dy==0) || (dx==0 && dy==1)))
+            timerStarted = true;
+
+        if (timerStarted)
+        {
+            timer += dt;
+            if (timer >= 0.6f) triggered = true;
+        }
     }
 
     if (triggered)
@@ -313,6 +362,7 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
             triggered = false;
             retracting = false;
             timer = 0.0f;
+            timerStarted = false;
         }
 
         if (!retracting)
@@ -368,7 +418,7 @@ Rectangle FixedTrap::GetBounds() const { return Rectangle{ position.x, position.
 Entity* CreateGunTrap(Vector2 pos, Level &level);
 
 // Factory implementation
-Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level)
+Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCountPtr)
 {
     switch (tile)
     {
@@ -391,6 +441,7 @@ Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level)
         if (level.GetTileAt(tx-1,ty) == '0' || level.GetTileAt(tx+1,ty) == '0') horiz = true;
         return new GhostPlus(pos, !horiz ? true : false);
     }
+    case 's': return new StarCollectible(pos, starCountPtr);
     default: return nullptr;
     }
 }

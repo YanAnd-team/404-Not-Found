@@ -17,7 +17,7 @@ protected:
 };
 
 // Factory: create entity from tile char
-Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level);
+Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCountPtr = nullptr);
 
 // Simple bullet entity
 class Bullet : public Entity {
@@ -81,6 +81,7 @@ private:
     Vector2 position;
     float timer;
     bool triggered;
+    bool timerStarted;
     Texture2D tex;
     bool texLoaded=false;
     int frameIndex;
@@ -102,4 +103,16 @@ private:
     bool texLoaded=false;
 };
 
-// GunTrap is implemented privately in Entities.cpp
+class StarCollectible : public Entity {
+public:
+    StarCollectible(Vector2 pos, int* countPtr);
+    ~StarCollectible();
+    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Draw() override;
+    Rectangle GetBounds() const override;
+private:
+    Vector2 position;
+    int* countPtr;
+    Texture2D tex;
+    bool texLoaded = false;
+};

@@ -155,6 +155,7 @@ void Game::DrawTitle()
 void Game::DrawGameplay()
 {
     scene.DrawUI();
+    scene.DrawStarHUD();
 
     // Controls hint
     DrawText("Arrows: Move", 10, screenHeight - 25, 15, GRAY);
@@ -189,15 +190,18 @@ void Game::DrawWin()
     Vector2 winSize = MeasureTextEx(font, winText, FONT_SIZE * 2, TEXT_SPACING);
     Vector2 winPos = {
         screenWidth / 2.0f - winSize.x / 2.0f,
-        screenHeight / 2.0f - winSize.y / 2.0f - 20
+        screenHeight / 2.0f - winSize.y / 2.0f - 80
     };
     DrawTextEx(font, winText, winPos, FONT_SIZE * 2, TEXT_SPACING, GREEN);
+
+    // star slots drawn centered vertically in the gap between the two texts
+    scene.DrawWinStars();
 
     const char* backText = "Press ENTER to return to menu";
     Vector2 backSize = MeasureTextEx(font, backText, FONT_SIZE, TEXT_SPACING);
     Vector2 backPos = {
         screenWidth / 2.0f - backSize.x / 2.0f,
-        screenHeight / 2.0f + 30
+        screenHeight / 2.0f + 70
     };
     DrawTextEx(font, backText, backPos, FONT_SIZE, TEXT_SPACING, YELLOW);
 }

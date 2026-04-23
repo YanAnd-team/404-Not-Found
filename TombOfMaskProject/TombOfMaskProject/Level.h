@@ -31,6 +31,8 @@ public:
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
     int GetTileSize() const { return tileSize; }
+    Texture2D GetStarTex() const { return starTex; }
+    bool IsStarLoaded() const { return starLoaded; }
 
 private:
     int width;

@@ -22,11 +22,14 @@ public:
     void OnEnterMenu();
     void OnEnterGameplay();
     void OnPlayerWon();
+    void DrawStarHUD();
+    void DrawWinStars();
 
     Player player;
     GameCamera camera;
     Level level;
     std::vector<Entity*> entities;
+    int starCount = 0;
 
 private:
     
@@ -36,4 +39,6 @@ private:
 	bool soundLoaded[4] = {};
 	bool musicLoaded[2] = {};
     bool wasSliding = false;
+    Texture2D starToCompTex;
+    bool starToCompLoaded = false;
 };

@@ -41,6 +41,12 @@ void Scene::Init()
 		musicLoaded[1] = true;
 	}
 
+    if (FileExists("resources/sprites/StarToComp.png"))
+    {
+        starToCompTex = LoadTexture("resources/sprites/StarToComp.png");
+        starToCompLoaded = true;
+    }
+
     // Font
     font = LoadFontEx("resources/fonts/easvhs.ttf", 32, NULL, 0);
 
@@ -70,7 +76,7 @@ void Scene::Init()
         {
             char t = level.GetTileAt(x, y);
             Vector2 pos = { (float)(x * ts), (float)(y * ts) };
-            Entity *e = CreateEntityFromTile(t, pos, level);
+            Entity *e = CreateEntityFromTile(t, pos, level, &starCount);
             if (e) entities.push_back(e);
         }
     }
@@ -157,6 +163,7 @@ void Scene::LoadLevel(int levelNumber)
 {
     for (auto e : entities) { if (e) delete e; }
     entities.clear();
+    starCount = 0;
 
     if (!level.Load(levelNumber))
         return;
@@ -172,7 +179,7 @@ void Scene::LoadLevel(int levelNumber)
         {
             char t = level.GetTileAt(x, y);
             Vector2 pos = { (float)(x * ts), (float)(y * ts) };
-            Entity* e = CreateEntityFromTile(t, pos, level);
+            Entity* e = CreateEntityFromTile(t, pos, level, &starCount);
             if (e) entities.push_back(e);
         }
     }
@@ -187,7 +194,41 @@ bool Scene::HasPlayerWon() const
 
 void Scene::DrawUI()
 {
-    // Scene-level UI could go here (e.g. minimap, objective markers)
+}
+
+void Scene::DrawStarHUD()
+{
+    if (!level.IsStarLoaded()) return;
+    Texture2D starTex = level.GetStarTex();
+    for (int i = 0; i < starCount && i < 3; ++i)
+    {
+        Rectangle dest = { 10.0f + i * 42.0f, 10.0f, 32.0f, 32.0f };
+        DrawTexturePro(starTex, Rectangle{0,0,(float)starTex.width,(float)starTex.height}, dest, Vector2{0,0}, 0, WHITE);
+    }
+}
+
+void Scene::DrawWinStars()
+{
+    // 3 slots, centered horizontally; filled = Star.png, empty = StarToComp.png
+    const float slotSize = 48.0f;
+    const float gap = 16.0f;
+    float totalW = 3 * slotSize + 2 * gap;
+    float startX = GetScreenWidth() / 2.0f - totalW / 2.0f;
+    float y = GetScreenHeight() / 2.0f - slotSize / 2.0f;
+
+    bool hasStar = level.IsStarLoaded();
+    Texture2D starTex = hasStar ? level.GetStarTex() : Texture2D{};
+
+    for (int i = 0; i < 3; ++i)
+    {
+        Rectangle dest = { startX + i * (slotSize + gap), y, slotSize, slotSize };
+        if (i < starCount && hasStar)
+            DrawTexturePro(starTex, Rectangle{0,0,(float)starTex.width,(float)starTex.height}, dest, Vector2{0,0}, 0, WHITE);
+        else if (starToCompLoaded)
+            DrawTexturePro(starToCompTex, Rectangle{0,0,(float)starToCompTex.width,(float)starToCompTex.height}, dest, Vector2{0,0}, 0, WHITE);
+        else
+            DrawRectangleRec(dest, Fade(WHITE, 0.3f));
+    }
 }
 
 void Scene::DeInit()
@@ -227,6 +268,7 @@ void Scene::DeInit()
         StopSound(sound[3]);
 		UnloadSound(sound[3]);
     }
+    if (starToCompLoaded) UnloadTexture(starToCompTex);
     UnloadFont(font);
     CloseAudioDevice();
 }
