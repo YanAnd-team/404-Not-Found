@@ -19,7 +19,7 @@ Inspired by classic platformers like *Super Mario*, the game features **5 challe
 
 | Programming / Audio | YIXIANGLU | Game logic, collision detection, audio integration, coding |
 
-> Full task breakdown is available in (
+> Full task breakdown is available in (https://github.com/YanAnd-team/404-Not-Found/blob/main/TombOfMaskProject/TombOfMaskProject/Tasks.pdf)
 
 ---
 
