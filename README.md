@@ -12,12 +12,14 @@ Inspired by classic platformers like *Super Mario*, the game features **5 challe
 
 ## 👥 Team Members
 
-| Role | Name | GitHub | Responsibilities |
-|------|------|--------|------------------|
-| Art / Design | WEIHAOYAN | [@WEIHAOYAN] | Character art, UI design, level layout, animations |
-| Programming / Audio | YIXIANGLU | [@YIXIANGLU] | Game logic, collision detection, audio integration, coding |
+| Role         | Name      | Responsibilities |
 
-> Full task breakdown is available in `TasksList.pdf`
+
+| Art / Design | WEIHAOYAN |Character art, UI design, level layout, animations |
+
+| Programming / Audio | YIXIANGLU | Game logic, collision detection, audio integration, coding |
+
+> Full task breakdown is available in (
 
 ---
 
@@ -63,9 +65,9 @@ Inspired by classic platformers like *Super Mario*, the game features **5 challe
 - ✅ Sound effects (jump, death, level complete, victory, game over)
 
 ### Technical Quality
-- ✅ Release build (no debug files)
-- ✅ Tested on target environment — no crashes (R4 compliant)
-- ✅ Correct naming and folder structure (R3, R5 compliant)
+- ✅ Release build 
+- ✅ Tested on target environment — no crashes 
+- ✅ Correct naming and folder structure 
 
 ---
 
