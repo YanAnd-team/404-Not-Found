@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-enum Map { Empty='-', Wall1='1', Wall2='2', Spike='S', TrapSpike='T', GunTrapTile='G', End='f' };
+enum Map { Empty='-', Wall1='1', Wall2='2', Spike='S', TrapSpike='T', GunTrapTile='G', End='f', Star='s' };
 
 class Level
 {
