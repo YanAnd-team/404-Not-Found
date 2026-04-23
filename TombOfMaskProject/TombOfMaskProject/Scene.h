@@ -18,10 +18,10 @@ public:
     Level level;
 
 private:
-    Texture2D background;
-    Sound sound;
-    Music music;
+    
+    Sound sound[4];
+    Music music[2];
     Font font;
-    bool soundLoaded;
-    bool musicLoaded;
+	bool soundLoaded[4];
+	bool musicLoaded[2];
 };

@@ -6,7 +6,7 @@ void Player::Init(Vector2 startPos)
     position = startPos;
     // speed is in pixels per second; multiplied by dt in Update
     speed = 200.0f;
-    texture = LoadTexture("resources/sprites/Ship_1.png");
+    texture = LoadTexture("resources/sprites/Player.png");
     // If texture failed to load, create a simple placeholder (1x1 white texture)
     if (texture.width == 0 || texture.height == 0)
     {

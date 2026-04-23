@@ -40,4 +40,5 @@ private:
 
     Font font;
     Scene scene;
+    Texture2D menu;
 };

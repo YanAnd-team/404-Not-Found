@@ -9,6 +9,7 @@ Level::Level()
     startPos = { 0, 0 };
     goalPos = { 0, 0 };
     spikeLoaded = trapLoaded = gunLoaded = false;
+    wallLoaded[0] = wallLoaded[1] = false;
 }
 
 void Level::Init()
@@ -19,15 +20,25 @@ void Level::Init()
         spikeTex = LoadTexture("resources/sprites/Spike.png");
         spikeLoaded = true;
     }
-    if (FileExists("resources/sprites/TrapSpike.png"))
+    if (FileExists("resources/sprites/SpikeTrap.png"))
     {
-        trapSpikeTex = LoadTexture("resources/sprites/TrapSpike.png");
+        trapSpikeTex = LoadTexture("resources/sprites/SpikeTrap.png");
         trapLoaded = true;
     }
     if (FileExists("resources/sprites/GunTrap.png"))
     {
         gunTrapTex = LoadTexture("resources/sprites/GunTrap.png");
         gunLoaded = true;
+    }
+	if (FileExists("resources/sprites/Wall1.png"))
+    {
+        wallTex[0] = LoadTexture("resources/sprites/Wall1.png");
+        wallLoaded[0] = true;
+    }
+    if (FileExists("resources/sprites/Wall2.png"))
+    {
+        wallTex[1] = LoadTexture("resources/sprites/Wall2.png");
+        wallLoaded[1] = true;
     }
 }
 
@@ -41,6 +52,8 @@ void Level::DeInit()
     if (spikeLoaded) UnloadTexture(spikeTex);
     if (trapLoaded) UnloadTexture(trapSpikeTex);
     if (gunLoaded) UnloadTexture(gunTrapTex);
+	if (wallLoaded[0]) UnloadTexture(wallTex[0]);
+    if (wallLoaded[1]) UnloadTexture(wallTex[1]);
 }
 
 bool Level::Load(int levelNumber)
@@ -48,7 +61,7 @@ bool Level::Load(int levelNumber)
     rows.clear();
 
     std::ostringstream path;
-    path << "Level/Level " << levelNumber << ".txt";
+    path << levelNumber << ".txt";
 
     std::ifstream f(path.str());
     if (!f.is_open()) return false;
@@ -111,9 +124,6 @@ void Level::Draw() const
                 break;
             case Wall2:
                 DrawRectangleRec(dest, DARKGRAY);
-                break;
-            case Wall3:
-                DrawRectangleRec(dest, LIGHTGRAY);
                 break;
             case Spike:
                 if (spikeLoaded) DrawTexturePro(spikeTex, Rectangle{0,0,(float)spikeTex.width,(float)spikeTex.height}, dest, Vector2{0,0}, 0, WHITE);

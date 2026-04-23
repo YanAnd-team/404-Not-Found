@@ -2,8 +2,8 @@
 
 void Game::Init()
 {
-    screenWidth = 800;
-    screenHeight = 450;
+    screenWidth = 896;
+    screenHeight = 630;
 
     InitWindow(screenWidth, screenHeight, "Tomb of Mask");
     SetTargetFPS(60);
@@ -13,11 +13,22 @@ void Game::Init()
     playerLives = 3;
     score = 0;
 
+    // Main Menu
+    if (FileExists("resources/sprites/MainMenu.png"))
+        menu = LoadTexture("resources/sprites/MainMenu.png");
+    else
+    {
+        // make a placeholder 1x1 texture
+        Image img = GenImageColor(512, 360, WHITE);
+        menu = LoadTextureFromImage(img);
+        UnloadImage(img);
+    }
+
     // Scene
     scene.Init();
     
     // Font (owned by Game for state screens)
-    font = LoadFontEx("resources/fonts/gomarice_game_continue_03.ttf", FONT_SIZE, NULL, 0);
+    font = LoadFontEx("resources/fonts/easvhs.ttf", FONT_SIZE, NULL, 0);
     if (font.texture.id == 0)
     {
         // Fallback to default font provided by raylib
@@ -63,6 +74,7 @@ void Game::DeInit()
 {
     scene.DeInit();
     UnloadFont(font);
+    UnloadTexture(menu);
     CloseWindow();
 }
 
@@ -118,16 +130,7 @@ void Game::UpdateGameOver()
 void Game::DrawTitle()
 {
     // Dark overlay
-    DrawRectangle(0, 0, screenWidth, screenHeight, Fade(BLACK, 0.7f));
-
-    // Title
-    const char* titleText = "SPACE SHOOTER";
-    Vector2 titleSize = MeasureTextEx(font, titleText, FONT_SIZE * 2, TEXT_SPACING);
-    Vector2 titlePos = {
-        screenWidth / 2.0f - titleSize.x / 2.0f,
-        screenHeight / 2.0f - titleSize.y / 2.0f - 40
-    };
-    DrawTextEx(font, titleText, titlePos, FONT_SIZE * 2, TEXT_SPACING, WHITE);
+	DrawTextureEx(menu, Vector2{ 0, 0 }, 0, 3.5f, Fade(WHITE, 0.8f));
 
     // Subtitle
     const char* subText = "Press ENTER to start";

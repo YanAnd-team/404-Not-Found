@@ -5,34 +5,43 @@ void Scene::Init()
     // Audio
     // Initialize audio device if not already initialized
     InitAudioDevice();
-    soundLoaded = false;
-    musicLoaded = false;
-    if (FileExists("resources/raylib_audio_resources/sound.wav"))
+    if (FileExists("resources/SFX/Coins.wav"))
     {
-        sound = LoadSound("resources/raylib_audio_resources/sound.wav");
-        soundLoaded = true;
+        sound[0] = LoadSound("resources/SFX/Coins.wav");
+		soundLoaded[0] = true;
     }
-    if (FileExists("resources/raylib_audio_resources/country.mp3"))
+    if (FileExists("resources/SFX/Movement.wav"))
     {
-        music = LoadMusicStream("resources/raylib_audio_resources/country.mp3");
-        music.looping = true;
-        PlayMusicStream(music);
-        musicLoaded = true;
+        sound[1] = LoadSound("resources/SFX/Movement.wav");
+		soundLoaded[1] = true;
     }
+    if(FileExists("resources/SFX/PlayerDie.wav"))
+    {
+        sound[2] = LoadSound("resources/SFX/PlayerDie.wav");
+		soundLoaded[2] = true;
+    }
+    if(FileExists("resources/SFX/Win.wav"))
+    {
+        sound[3] = LoadSound("resources/SFX/Win.wav");
+		soundLoaded[3] = true;
+    }
+
+    if(FileExists("resources/Music/MenuSong.mp3"))
+    {
+        music[0] = LoadMusicStream("resources/Music/MenuSong.mp3");
+		music[0].looping = true;
+        PlayMusicStream(music[0]);
+		musicLoaded[0] = true;
+	}
+    if(FileExists("resources/Music/BattleSong.mp3"))
+    {
+		music[1] = LoadMusicStream("resources/Music/BattleSong.mp3");
+        music[1].looping = true;
+		musicLoaded[1] = true;
+	}
 
     // Font
-    font = LoadFontEx("resources/fonts/gomarice_game_continue_03.ttf", 32, NULL, 0);
-
-    // Background
-    if (FileExists("resources/sprites/space_background.png"))
-        background = LoadTexture("resources/sprites/space_background.png");
-    else
-    {
-        // make a placeholder 1x1 texture
-        Image img = GenImageColor(1, 1, BLACK);
-        background = LoadTextureFromImage(img);
-        UnloadImage(img);
-    }
+    font = LoadFontEx("resources/fonts/easvhs.ttf", 32, NULL, 0);
 
     // Camera
     camera.Init(GetScreenWidth(), GetScreenHeight());
@@ -58,14 +67,14 @@ void Scene::Update(float dt)
     Rectangle world = level.GetWorldBounds();
     player.Update(dt, world);
     camera.Update(player.GetCenter());
-    UpdateMusicStream(music);
+    UpdateMusicStream(music[0]);
 }
 
 void Scene::DrawWorld()
 {
     camera.BeginWorld();
 
-    DrawTextureEx(background, Vector2{ 0, 0 }, 0, 1, WHITE);
+    DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.7f));
     level.Draw();
     player.Draw();
 
@@ -81,17 +90,36 @@ void Scene::DeInit()
 {
     player.DeInit();
     level.DeInit();
-    if (musicLoaded)
+    if (musicLoaded[0])
     {
-        StopMusicStream(music);
-        UnloadMusicStream(music);
+        StopMusicStream(music[0]);
+        UnloadMusicStream(music[0]);
     }
-    if (soundLoaded)
+	if (musicLoaded[1])
     {
-        StopSound(sound);
-        UnloadSound(sound);
+        StopMusicStream(music[1]);
+        UnloadMusicStream(music[1]);
+    }
+    if (soundLoaded[0])
+    {
+        StopSound(sound[0]);
+        UnloadSound(sound[0]);
+    }
+    if (soundLoaded[1])
+    {
+        StopSound(sound[1]);
+        UnloadSound(sound[1]);
+    }
+    if (soundLoaded[2])
+    {
+        StopSound(sound[2]);
+        UnloadSound(sound[2]);
+    }
+    if (soundLoaded[3])
+    {
+        StopSound(sound[3]);
+		UnloadSound(sound[3]);
     }
     UnloadFont(font);
-    UnloadTexture(background);
     CloseAudioDevice();
 }

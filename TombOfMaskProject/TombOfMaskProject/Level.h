@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-enum Map { Empty='-', Wall1='1', Wall2='2', Wall3='3', Spike='S', TrapSpike='T', GunTrap='G' };
+enum Map { Empty='-', Wall1='1', Wall2='2', Spike='S', TrapSpike='T', GunTrap='G' };
 
 class Level
 {
@@ -37,8 +37,10 @@ private:
     Texture2D spikeTex;
     Texture2D trapSpikeTex;
     Texture2D gunTrapTex;
+	Texture2D wallTex[2];
 
     bool spikeLoaded;
     bool trapLoaded;
     bool gunLoaded;
+    bool wallLoaded[2];
 };
