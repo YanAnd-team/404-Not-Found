@@ -16,6 +16,9 @@ protected:
     bool active = true;
 };
 
+// Factory: create entity from tile char
+Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level);
+
 // Simple bullet entity
 class Bullet : public Entity {
 public:
@@ -57,20 +60,7 @@ private:
     bool visible;
 };
 
-class GunTrap : public Entity {
-public:
-    GunTrap(Vector2 pos);
-    ~GunTrap();
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
-    void Draw() override;
-    Rectangle GetBounds() const override;
-private:
-    Vector2 position;
-    Vector2 dir;
-    float shootCooldown;
-    Texture2D tex;
-    bool texLoaded=false;
-};
+// GunTrap is implemented in Entities.cpp (concrete definition not exposed here)
 
 class TriggerTrap : public Entity {
 public:

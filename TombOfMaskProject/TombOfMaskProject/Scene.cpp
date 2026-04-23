@@ -1,5 +1,5 @@
-#include "Scene.h"
 #include "Entities.h"
+#include "Scene.h"
 
 void Scene::Init()
 {
@@ -70,34 +70,8 @@ void Scene::Init()
         {
             char t = level.GetTileAt(x, y);
             Vector2 pos = { (float)(x * ts), (float)(y * ts) };
-            switch (t)
-            {
-            case '3': // trigger trap
-                entities.push_back(new TriggerTrap(pos));
-                break;
-            case '4': // fixed trap
-                entities.push_back(new FixedTrap(pos));
-                break;
-            case '5': // gun trap (placeholder uses TriggerTrap for now)
-                entities.push_back(new TriggerTrap(pos));
-                break;
-            case '6': // ghost, decide orientation by neighbors
-            {
-                bool horiz = false;
-                if (level.GetTileAt(x-1,y) == '0' || level.GetTileAt(x+1,y) == '0') horiz = true;
-                entities.push_back(new Ghost(pos, !horiz ? true : false));
-            }
-                break;
-            case '7':
-            {
-                bool horiz = false;
-                if (level.GetTileAt(x-1,y) == '0' || level.GetTileAt(x+1,y) == '0') horiz = true;
-                entities.push_back(new GhostPlus(pos, !horiz ? true : false));
-            }
-                break;
-            default:
-                break;
-            }
+            Entity *e = CreateEntityFromTile(t, pos, level);
+            if (e) entities.push_back(e);
         }
     }
 }

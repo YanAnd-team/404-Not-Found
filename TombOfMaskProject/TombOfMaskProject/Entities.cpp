@@ -4,6 +4,22 @@
 #include <math.h>
 #include <algorithm>
 
+// Local MachineGunTrap class (hidden from header)
+class MachineGunTrap : public Entity {
+public:
+    MachineGunTrap(Vector2 pos);
+    ~MachineGunTrap();
+    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Draw() override;
+    Rectangle GetBounds() const override;
+private:
+    Vector2 position;
+    Vector2 dir;
+    float shootCooldown;
+    Texture2D tex;
+    bool texLoaded=false;
+};
+
 // --- Bullet ---
 Bullet::Bullet(Vector2 pos, Vector2 dir, float speed)
 {
@@ -30,6 +46,15 @@ void Bullet::Update(float dt, Player &player, std::vector<Entity*> &entities, Le
     // simple lifetime: deactivate if out of level bounds
     Rectangle bounds = level.GetWorldBounds();
     if (position.x < bounds.x || position.y < bounds.y || position.x > bounds.x + bounds.width || position.y > bounds.y + bounds.height)
+    {
+        active = false; return;
+    }
+
+    // deactivate if hits a wall tile
+    int btx = (int)((position.x + 4) / level.GetTileSize());
+    int bty = (int)((position.y + 4) / level.GetTileSize());
+    char bt = level.GetTileAt(btx, bty);
+    if (bt == '1' || bt == '2' || bt == (char)Empty)
     {
         active = false; return;
     }
@@ -130,19 +155,19 @@ void GhostPlus::Update(float dt, Player &player, std::vector<Entity*> &entities,
     }
 }
 
-// --- GunTrap ---
-GunTrap::GunTrap(Vector2 pos)
+// --- MachineGunTrap ---
+MachineGunTrap::MachineGunTrap(Vector2 pos)
 {
     position = pos;
-    shootCooldown = 0.0f;
+    shootCooldown = 2.0f; // initial delay before first shot
     dir = {0,0};
     texLoaded = false;
     if (FileExists("resources/sprites/GunTrap.png")) { tex = LoadTexture("resources/sprites/GunTrap.png"); texLoaded = true; }
 }
 
-GunTrap::~GunTrap() { if (texLoaded) UnloadTexture(tex); }
+MachineGunTrap::~MachineGunTrap() { if (texLoaded) UnloadTexture(tex); }
 
-void GunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
+void MachineGunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
 {
     // decide direction on creation if unknown
     if (dir.x==0 && dir.y==0)
@@ -159,7 +184,7 @@ void GunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, L
     shootCooldown -= dt;
     if (shootCooldown <= 0.0f)
     {
-        shootCooldown = 1.5f; // fire every 1.5s
+        shootCooldown = 2.0f; // fire every 2.0s
         if (dir.x!=0 || dir.y!=0)
         {
             Vector2 bpos = { position.x + dir.x * 8.0f, position.y + dir.y * 8.0f };
@@ -170,14 +195,19 @@ void GunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, L
     }
 }
 
-void GunTrap::Draw()
+void MachineGunTrap::Draw()
 {
     Rectangle dest = { position.x, position.y, 16, 16 };
     if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
     else DrawRectangleRec(dest, BROWN);
 }
 
-Rectangle GunTrap::GetBounds() const { return Rectangle{ position.x, position.y, 16, 16 }; }
+Rectangle MachineGunTrap::GetBounds() const { return Rectangle{ position.x, position.y, 16, 16 }; }
+
+Entity* CreateGunTrap(Vector2 pos, Level &level)
+{
+    return new MachineGunTrap(pos);
+}
 
 // --- TriggerTrap ---
 TriggerTrap::TriggerTrap(Vector2 pos)
@@ -258,3 +288,33 @@ void FixedTrap::Draw()
 }
 
 Rectangle FixedTrap::GetBounds() const { return Rectangle{ position.x, position.y, 16, 16 }; }
+// forward declaration for helper
+Entity* CreateGunTrap(Vector2 pos, Level &level);
+
+// Factory implementation
+Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level)
+{
+    switch (tile)
+    {
+    case '3': return new TriggerTrap(pos);
+    case '4': return new FixedTrap(pos);
+    case '5': return CreateGunTrap(pos, level);
+    case '6':
+    {
+        bool horiz = false;
+        int tx = (int)(pos.x / level.GetTileSize());
+        int ty = (int)(pos.y / level.GetTileSize());
+        if (level.GetTileAt(tx-1,ty) == '0' || level.GetTileAt(tx+1,ty) == '0') horiz = true;
+        return new Ghost(pos, !horiz ? true : false);
+    }
+    case '7':
+    {
+        bool horiz = false;
+        int tx = (int)(pos.x / level.GetTileSize());
+        int ty = (int)(pos.y / level.GetTileSize());
+        if (level.GetTileAt(tx-1,ty) == '0' || level.GetTileAt(tx+1,ty) == '0') horiz = true;
+        return new GhostPlus(pos, !horiz ? true : false);
+    }
+    default: return nullptr;
+    }
+}
