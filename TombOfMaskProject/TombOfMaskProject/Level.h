@@ -15,9 +15,14 @@ public:
 
     // Load level by number (loads file "Level/Level N.txt"). Returns true on success.
     bool Load(int levelNumber);
+    // Alternate loader: load by filename inside Level/ folder (e.g. "1.txt").
+    bool LoadFromFile(const char* filename);
 
     // Draw level tiles
     void Draw() const;
+
+    // Query tile char at tile coordinates (tx,ty). Returns '-' if out of bounds.
+    char GetTileAt(int tx, int ty) const;
 
     // Accessors
     Vector2 GetStartPosition() const;
@@ -25,6 +30,7 @@ public:
     Rectangle GetWorldBounds() const;
     int GetWidth() const { return width; }
     int GetHeight() const { return height; }
+    int GetTileSize() const { return tileSize; }
 
 private:
     int width;
@@ -38,9 +44,13 @@ private:
     Texture2D trapSpikeTex;
     Texture2D gunTrapTex;
 	Texture2D wallTex[2];
+    Texture2D ghostTex;
+    Texture2D ghostPlusTex;
 
     bool spikeLoaded;
     bool trapLoaded;
     bool gunLoaded;
     bool wallLoaded[2];
+    bool ghostLoaded;
+    bool ghostPlusLoaded;
 };

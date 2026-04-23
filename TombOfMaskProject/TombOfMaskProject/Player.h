@@ -13,6 +13,7 @@ public:
     void Reset();
 
     Vector2 GetCenter() const;
+    Rectangle GetBounds() const;
 
     Vector2 position;
     float speed;

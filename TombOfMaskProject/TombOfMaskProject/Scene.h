@@ -3,6 +3,8 @@
 #include "Player.h"
 #include "Camera.h"
 #include "Level.h"
+#include "Entities.h"
+#include <vector>
 
 class Scene
 {
@@ -16,6 +18,7 @@ public:
     Player player;
     GameCamera camera;
     Level level;
+    std::vector<Entity*> entities;
 
 private:
     

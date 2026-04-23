@@ -53,3 +53,8 @@ Vector2 Player::GetCenter() const
     // Player drawn with scale 2, so center should account for that
     return { position.x + texture.width, position.y + texture.height };
 }
+
+Rectangle Player::GetBounds() const
+{
+    return Rectangle{ position.x, position.y, (float)texture.width * 2.0f, (float)texture.height * 2.0f };
+}

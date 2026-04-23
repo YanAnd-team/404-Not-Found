@@ -1,4 +1,5 @@
 #include "Scene.h"
+#include "Entities.h"
 
 void Scene::Init()
 {
@@ -59,6 +60,46 @@ void Scene::Init()
         Vector2 start = level.GetStartPosition();
         player.Init(start);
     }
+    // Create entities from level tiles
+    int w = level.GetWidth();
+    int h = level.GetHeight();
+    int ts = level.GetTileSize();
+    for (int y = 0; y < h; ++y)
+    {
+        for (int x = 0; x < w; ++x)
+        {
+            char t = level.GetTileAt(x, y);
+            Vector2 pos = { (float)(x * ts), (float)(y * ts) };
+            switch (t)
+            {
+            case '3': // trigger trap
+                entities.push_back(new TriggerTrap(pos));
+                break;
+            case '4': // fixed trap
+                entities.push_back(new FixedTrap(pos));
+                break;
+            case '5': // gun trap (placeholder uses TriggerTrap for now)
+                entities.push_back(new TriggerTrap(pos));
+                break;
+            case '6': // ghost, decide orientation by neighbors
+            {
+                bool horiz = false;
+                if (level.GetTileAt(x-1,y) == '0' || level.GetTileAt(x+1,y) == '0') horiz = true;
+                entities.push_back(new Ghost(pos, !horiz ? true : false));
+            }
+                break;
+            case '7':
+            {
+                bool horiz = false;
+                if (level.GetTileAt(x-1,y) == '0' || level.GetTileAt(x+1,y) == '0') horiz = true;
+                entities.push_back(new GhostPlus(pos, !horiz ? true : false));
+            }
+                break;
+            default:
+                break;
+            }
+        }
+    }
 }
 
 void Scene::Update(float dt)
@@ -67,6 +108,22 @@ void Scene::Update(float dt)
     Rectangle world = level.GetWorldBounds();
     player.Update(dt, world);
     camera.Update(player.GetCenter());
+    // Update entities
+    for (size_t i = 0; i < entities.size(); ++i)
+    {
+        if (entities[i]) entities[i]->Update(dt, player, entities, level);
+    }
+    // remove inactive
+    for (size_t i = 0; i < entities.size(); )
+    {
+        if (!entities[i] || !entities[i]->IsActive())
+        {
+            delete entities[i];
+            entities.erase(entities.begin() + i);
+        }
+        else ++i;
+    }
+
     UpdateMusicStream(music[0]);
 }
 
@@ -76,6 +133,8 @@ void Scene::DrawWorld()
 
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(BLACK, 0.7f));
     level.Draw();
+    // draw entities
+    for (auto e : entities) if (e && e->IsActive()) e->Draw();
     player.Draw();
 
     camera.EndWorld();
@@ -90,6 +149,9 @@ void Scene::DeInit()
 {
     player.DeInit();
     level.DeInit();
+    // cleanup entities
+    for (auto e : entities) { if (e) delete e; }
+    entities.clear();
     if (musicLoaded[0])
     {
         StopMusicStream(music[0]);
