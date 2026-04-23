@@ -83,10 +83,14 @@ void Player::Update(float dt, Rectangle worldBounds, Level& level)
         {
             // Se detiene: snap al tile más cercano para no quedar solapado
             int ts = level.GetTileSize();
-            if (currentDir.x != 0)
+            if (currentDir.x > 0)
                 position.x = (float)((int)(position.x / ts) * ts);
-            if (currentDir.y != 0)
+            else if (currentDir.x < 0)
+                position.x = (float)(((int)((position.x - 1) / ts) + 1) * ts);
+            if (currentDir.y > 0)
                 position.y = (float)((int)(position.y / ts) * ts);
+            else if (currentDir.y < 0)
+                position.y = (float)(((int)((position.y - 1) / ts) + 1) * ts);
 
             sliding = false;
             currentDir = { 0, 0 };

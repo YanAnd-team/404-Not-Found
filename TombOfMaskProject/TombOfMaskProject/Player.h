@@ -2,6 +2,7 @@
 #include "raylib.h"
 #include "Level.h"
 
+//Player animation frames
 #define PLAYER_IDLE       0
 #define PLAYER_START_MOVE 32
 #define PLAYER_MOVE_1     64
