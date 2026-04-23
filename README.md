@@ -6,6 +6,10 @@
 
 Inspired by the mobile game *Tomb of the Mask*, movement works by sliding in one direction until hitting a wall — there is no jumping. Navigation relies on reading the level layout and reacting to enemies in real time.
 
+**Subject**: [TODO: subject name]  
+**Degree**: [TODO: degree program]  
+**University**: [TODO: university name]  
+**Tutors**: [TODO: tutor name(s)]  
 **GitHub**: https://github.com/YanAnd-team/404-Not-Found
 
 ---
