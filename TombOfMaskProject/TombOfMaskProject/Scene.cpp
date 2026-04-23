@@ -80,7 +80,7 @@ void Scene::Update(float dt)
 {
     // Provide world bounds to player (from level if loaded)
     Rectangle world = level.GetWorldBounds();
-    player.Update(dt, world);
+    player.Update(dt, world, level);
     camera.Update(player.GetCenter());
     // Update entities
     for (size_t i = 0; i < entities.size(); ++i)
