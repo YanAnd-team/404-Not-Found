@@ -8,7 +8,7 @@ void Game::Init()
     InitWindow(screenWidth, screenHeight, "Tomb of Mask");
     SetTargetFPS(60);
 
-    currentState = TITLE;
+    currentState = INITIAL;
 
     // Main Menu
     if (FileExists("resources/sprites/MainMenu.png"))
@@ -39,6 +39,7 @@ void Game::Update()
 
     switch (currentState)
     {
+    case INITIAL:  UpdateInitial();      break;
     case TITLE:    UpdateTitle();        break;
     case GAMEPLAY: UpdateGameplay(dt);   break;
     case GAMEOVER: UpdateGameOver();     break;
@@ -58,6 +59,7 @@ void Game::Draw()
 
     switch (currentState)
     {
+    case INITIAL:  DrawInitial();  break;
     case TITLE:    DrawTitle();    break;
     case GAMEPLAY: DrawGameplay(); break;
     case GAMEOVER: DrawGameOver(); break;
@@ -81,6 +83,12 @@ bool Game::ShouldClose() const
 }
 
 // --- State Updates ---
+
+void Game::UpdateInitial()
+{
+    if (IsKeyPressed(KEY_ENTER))
+        currentState = TITLE;
+}
 
 void Game::UpdateTitle()
 {
@@ -137,6 +145,52 @@ void Game::UpdateGameOver()
 
 // --- State Draws (Canvas / Screen Space) ---
 
+void Game::DrawInitial()
+{
+    DrawRectangle(0, 0, screenWidth, screenHeight, Color{5, 5, 25, 255});
+
+    float cx = screenWidth * 0.5f;
+
+    auto dc = [&](const char* text, float y, float size, Color col)
+    {
+        Vector2 sz = MeasureTextEx(font, text, size, TEXT_SPACING);
+        DrawTextEx(font, text, {cx - sz.x * 0.5f, y}, size, TEXT_SPACING, col);
+    };
+
+    // Title + subtitle
+    dc("TOMB OF MASK",                       30,  40, ORANGE);
+    dc("Arcade-Style Sliding Maze Game",     82,  19, LIGHTGRAY);
+
+    DrawLine(60, 115, screenWidth - 60, 115, Fade(WHITE, 0.35f));
+
+    // Project info
+    dc("Subject:    Game Design and Development",                      129, 19, WHITE);
+    dc("Degree:     Bachelor's Degree in Game Design and Development", 154, 17, WHITE);
+    dc("University: Universitat Politecnica de Catalunya",             177, 19, WHITE);
+    dc("Tutors:     De Pedro Lombao Rodrigo",                         202, 19, WHITE);
+
+    DrawLine(60, 234, screenWidth - 60, 234, Fade(WHITE, 0.35f));
+
+    // Team
+    dc("TEAM MEMBERS",                          252, 23, YELLOW);
+    dc("WEIHAOYAN   -   Art / Design",           290, 19, WHITE);
+    dc("YIXIANGLU   -   Programming / Audio",    318, 19, WHITE);
+
+    DrawLine(60, 353, screenWidth - 60, 353, Fade(WHITE, 0.35f));
+
+    // GitHub
+    dc("GitHub:  github.com/YanAnd-team/404-Not-Found", 371, 17, SKYBLUE);
+
+    DrawLine(60, 403, screenWidth - 60, 403, Fade(WHITE, 0.35f));
+
+    // Short description
+    dc("Slide through 5 levels of ancient tombs.",         422, 17, LIGHTGRAY);
+    dc("Dodge traps and enemies, reach the exit to win.",  446, 17, LIGHTGRAY);
+
+    // Prompt
+    dc("Press ENTER to continue", screenHeight - 52.0f, 22, YELLOW);
+}
+
 void Game::DrawTitle()
 {
 	DrawTextureEx(menu, Vector2{ 0, 0 }, 0, 3.5f, Fade(WHITE, 0.8f));
@@ -158,7 +212,8 @@ void Game::DrawGameplay()
     scene.DrawStarHUD();
 
     // Controls hint
-    DrawText("Arrows: Move", 10, screenHeight - 25, 15, GRAY);
+    DrawText("Arrows: Move", 10, screenHeight - 40, 15, GRAY);
+    DrawText("1 ~ 5: Load Level", 10, screenHeight - 22, 15, GRAY);
 }
 
 void Game::DrawGameOver()

@@ -171,7 +171,7 @@ void Level::Draw() const
         for (int x = 0; x < (int)row.size() && x < width; ++x)
         {
             char c = row[x];
-            Rectangle dest = { x * tileSize, y * tileSize, (float)tileSize, (float)tileSize };
+            Rectangle dest = { (float)(x * tileSize), (float)(y * tileSize), (float)tileSize, (float)tileSize };
             switch (c)
             {
             case Wall1:

@@ -7,6 +7,7 @@
 #define TEXT_SPACING    2.0f
 
 enum GameState {
+    INITIAL,
     TITLE,
     GAMEPLAY,
     GAMEOVER,
@@ -24,11 +25,13 @@ public:
     bool ShouldClose() const;
 
 private:
+    void UpdateInitial();
     void UpdateTitle();
     void UpdateGameplay(float dt);
     void UpdateGameOver();
     void UpdateWin();
 
+    void DrawInitial();
     void DrawTitle();
     void DrawGameplay();
     void DrawGameOver();
