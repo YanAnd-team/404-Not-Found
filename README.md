@@ -21,7 +21,7 @@ Inspired by the mobile game *Tomb of the Mask*, movement works by sliding in one
 | Art / Design | WEIHAOYAN | [TODO: https://github.com/WEIHAOYAN-username] |
 | Programming / Audio | YIXIANGLU | [TODO: https://github.com/YIXIANGLU-username] |
 
-Full task breakdown is available in `TasksList.pdf`.
+Full task breakdown is available in (https://github.com/YanAnd-team/404-Not-Found/blob/main/Tasks.pdf)
 
 ---
 
