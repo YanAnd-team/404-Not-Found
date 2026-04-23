@@ -45,6 +45,7 @@ void Game::Update()
     case TITLE:    UpdateTitle();        break;
     case GAMEPLAY: UpdateGameplay(dt);   break;
     case GAMEOVER: UpdateGameOver();     break;
+    case WIN:      UpdateWin();          break;
     }
 }
 
@@ -54,7 +55,7 @@ void Game::Draw()
     ClearBackground(BLACK);
 
     // World space (inside Camera2D)
-    if (currentState == GAMEPLAY || currentState == GAMEOVER)
+    if (currentState == GAMEPLAY || currentState == GAMEOVER || currentState == WIN)
     {
         scene.DrawWorld();
     }
@@ -65,6 +66,7 @@ void Game::Draw()
     case TITLE:    DrawTitle();    break;
     case GAMEPLAY: DrawGameplay(); break;
     case GAMEOVER: DrawGameOver(); break;
+    case WIN:      DrawWin();      break;
     }
 
     EndDrawing();
@@ -90,7 +92,7 @@ void Game::UpdateTitle()
     if (IsKeyPressed(KEY_ENTER))
     {
         currentState = GAMEPLAY;
-        playerLives = 5;
+        playerLives = 3;
         score = 0;
         scene.player.Reset();
     }
@@ -99,6 +101,12 @@ void Game::UpdateTitle()
 void Game::UpdateGameplay(float dt)
 {
     scene.Update(dt);
+
+    if (scene.HasPlayerWon())
+    {
+        currentState = WIN;
+        return;
+    }
 
     // Placeholder: score on SPACE
     if (IsKeyPressed(KEY_SPACE))
@@ -117,6 +125,14 @@ void Game::UpdateGameplay(float dt)
     }
 }
 
+void Game::UpdateWin()
+{
+    if (IsKeyPressed(KEY_ENTER))
+    {
+        currentState = TITLE;
+    }
+}
+
 void Game::UpdateGameOver()
 {
     if (IsKeyPressed(KEY_ENTER))
@@ -124,6 +140,7 @@ void Game::UpdateGameOver()
         currentState = TITLE;
     }
 }
+
 
 // --- State Draws (Canvas / Screen Space) ---
 
@@ -186,4 +203,33 @@ void Game::DrawGameOver()
         screenHeight / 2.0f + 50
     };
     DrawTextEx(font, restartText, restartPos, FONT_SIZE, TEXT_SPACING, YELLOW);
+}
+
+void Game::DrawWin()
+{
+    DrawRectangle(0, 0, screenWidth, screenHeight, Fade(GREEN, 0.3f));
+
+    const char* winText = "YOU WIN!";
+    Vector2 winSize = MeasureTextEx(font, winText, FONT_SIZE * 2, TEXT_SPACING);
+    Vector2 winPos = {
+        screenWidth / 2.0f - winSize.x / 2.0f,
+        screenHeight / 2.0f - winSize.y / 2.0f - 40
+    };
+    DrawTextEx(font, winText, winPos, FONT_SIZE * 2, TEXT_SPACING, GREEN);
+
+    const char* scoreText = TextFormat("Final Score: %d", score);
+    Vector2 scoreSize = MeasureTextEx(font, scoreText, FONT_SIZE, TEXT_SPACING);
+    Vector2 scorePos = {
+        screenWidth / 2.0f - scoreSize.x / 2.0f,
+        screenHeight / 2.0f + 10
+    };
+    DrawTextEx(font, scoreText, scorePos, FONT_SIZE, TEXT_SPACING, WHITE);
+
+    const char* backText = "Press ENTER to return to menu";
+    Vector2 backSize = MeasureTextEx(font, backText, FONT_SIZE, TEXT_SPACING);
+    Vector2 backPos = {
+        screenWidth / 2.0f - backSize.x / 2.0f,
+        screenHeight / 2.0f + 50
+    };
+    DrawTextEx(font, backText, backPos, FONT_SIZE, TEXT_SPACING, YELLOW);
 }

@@ -9,7 +9,8 @@
 enum GameState {
     TITLE,
     GAMEPLAY,
-    GAMEOVER
+    GAMEOVER,
+    WIN
 };
 
 class Game
@@ -26,10 +27,12 @@ private:
     void UpdateTitle();
     void UpdateGameplay(float dt);
     void UpdateGameOver();
+    void UpdateWin();
 
     void DrawTitle();
     void DrawGameplay();
     void DrawGameOver();
+    void DrawWin();
 
     GameState currentState;
     int playerLives;

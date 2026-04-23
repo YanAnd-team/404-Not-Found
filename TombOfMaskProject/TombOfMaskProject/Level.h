@@ -44,13 +44,9 @@ private:
     Texture2D trapSpikeTex;
     Texture2D gunTrapTex;
 	Texture2D wallTex[2];
-    Texture2D ghostTex;
-    Texture2D ghostPlusTex;
 
     bool spikeLoaded;
     bool trapLoaded;
     bool gunLoaded;
     bool wallLoaded[2];
-    bool ghostLoaded;
-    bool ghostPlusLoaded;
 };

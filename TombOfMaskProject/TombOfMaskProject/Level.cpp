@@ -10,7 +10,6 @@ Level::Level()
     goalPos = { 0, 0 };
     spikeLoaded = trapLoaded = gunLoaded = false;
     wallLoaded[0] = wallLoaded[1] = false;
-    ghostLoaded = ghostPlusLoaded = false;
 }
 
 void Level::Init()
@@ -30,16 +29,6 @@ void Level::Init()
     {
         gunTrapTex = LoadTexture("resources/sprites/GunTrap.png");
         gunLoaded = true;
-    }
-    if (FileExists("resources/sprites/Ghost.png"))
-    {
-        ghostTex = LoadTexture("resources/sprites/Ghost.png");
-        ghostLoaded = true;
-    }
-    if (FileExists("resources/sprites/GhostPlus.png"))
-    {
-        ghostPlusTex = LoadTexture("resources/sprites/GhostPlus.png");
-        ghostPlusLoaded = true;
     }
 	if (FileExists("resources/sprites/Wall1.png"))
     {
@@ -65,8 +54,6 @@ void Level::DeInit()
     if (gunLoaded) UnloadTexture(gunTrapTex);
     if (wallLoaded[0]) UnloadTexture(wallTex[0]);
     if (wallLoaded[1]) UnloadTexture(wallTex[1]);
-    if (ghostLoaded) UnloadTexture(ghostTex);
-    if (ghostPlusLoaded) UnloadTexture(ghostPlusTex);
 }
 
 bool Level::Load(int levelNumber)

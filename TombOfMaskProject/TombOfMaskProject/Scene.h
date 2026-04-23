@@ -15,6 +15,8 @@ public:
     void DrawUI();
     void DeInit();
 
+    bool HasPlayerWon() const;
+
     Player player;
     GameCamera camera;
     Level level;
@@ -25,6 +27,6 @@ private:
     Sound sound[4];
     Music music[2];
     Font font;
-	bool soundLoaded[4];
-	bool musicLoaded[2];
+	bool soundLoaded[4] = {};
+	bool musicLoaded[2] = {};
 };

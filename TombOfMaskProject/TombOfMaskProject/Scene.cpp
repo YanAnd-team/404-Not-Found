@@ -38,6 +38,7 @@ void Scene::Init()
     {
 		music[1] = LoadMusicStream("resources/Music/BattleSong.mp3");
         music[1].looping = true;
+        PlayMusicStream(music[1]);
 		musicLoaded[1] = true;
 	}
 
@@ -98,7 +99,8 @@ void Scene::Update(float dt)
         else ++i;
     }
 
-    UpdateMusicStream(music[0]);
+    if (musicLoaded[0]) UpdateMusicStream(music[0]);
+    if (musicLoaded[1]) UpdateMusicStream(music[1]);
 }
 
 void Scene::DrawWorld()
@@ -112,6 +114,13 @@ void Scene::DrawWorld()
     player.Draw();
 
     camera.EndWorld();
+}
+
+bool Scene::HasPlayerWon() const
+{
+    Vector2 goal = level.GetGoalPosition();
+    Rectangle goalRect = { goal.x, goal.y, (float)level.GetTileSize(), (float)level.GetTileSize() };
+    return CheckCollisionRecs(player.GetBounds(), goalRect);
 }
 
 void Scene::DrawUI()

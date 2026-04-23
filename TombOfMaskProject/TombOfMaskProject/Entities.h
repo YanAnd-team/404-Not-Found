@@ -55,6 +55,7 @@ public:
     GhostPlus(Vector2 pos, bool vertical=false);
     ~GhostPlus();
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Draw() override;
 private:
     float blinkTimer;
     bool visible;

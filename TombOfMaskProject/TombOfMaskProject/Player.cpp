@@ -132,9 +132,12 @@ void Player::Update(float dt, Rectangle worldBounds, Level& level)
 void Player::Draw()
 {
     int srcX = framePositions[frameIndex];
+    float drawW = 32.0f * drawScale;
+    float drawH = 32.0f * drawScale;
     Rectangle src = { (float)srcX, 0, flipX ? -32.0f : 32.0f, 32.0f };
-    Rectangle dest = { position.x, position.y, 32.0f * drawScale, 32.0f * drawScale };
-    DrawTexturePro(texture, src, dest, { 0, 0 }, drawRotation, WHITE);
+    // Pivot at center: dest origin is the center point, so offset by half size
+    Rectangle dest = { position.x + drawW / 2.0f, position.y + drawH / 2.0f, drawW, drawH };
+    DrawTexturePro(texture, src, dest, { drawW / 2.0f, drawH / 2.0f }, drawRotation, WHITE);
 }
 
 void Player::DeInit()

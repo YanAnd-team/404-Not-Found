@@ -133,6 +133,11 @@ GhostPlus::GhostPlus(Vector2 pos, bool vertical) : Ghost(pos, vertical)
 
 GhostPlus::~GhostPlus() {}
 
+void GhostPlus::Draw()
+{
+    if (visible) Ghost::Draw();
+}
+
 void GhostPlus::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
 {
     blinkTimer += dt;
