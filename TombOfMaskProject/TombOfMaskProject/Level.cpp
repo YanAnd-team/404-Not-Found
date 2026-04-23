@@ -193,7 +193,7 @@ void Level::Draw() const
                 if (gunLoaded) DrawTexturePro(gunTrapTex, Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
                 else DrawRectangleRec(dest, PURPLE);
                 break;
-            case 'f':
+            case End:
                 if (endLoaded)
                     DrawTexturePro(endTex, Rectangle{ 0,0,(float)endTex.width,(float)endTex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
                 else

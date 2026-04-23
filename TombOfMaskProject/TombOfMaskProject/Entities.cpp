@@ -60,7 +60,7 @@ void Bullet::Draw()
     if (texLoaded)
     {
         // draw first frame 8x8 or scale if sheet is larger
-        DrawTexturePro(tex, Rectangle{0,0,8.0f,8.0f}, dest, Vector2{0,0}, 0, WHITE);
+        DrawTexturePro(tex, Rectangle{0,0,16.0f,16.0f}, dest, Vector2{0,0}, 0, WHITE);
     }
     else DrawRectangleRec(dest, YELLOW);
 }
