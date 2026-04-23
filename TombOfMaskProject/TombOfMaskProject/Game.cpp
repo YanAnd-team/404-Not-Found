@@ -108,6 +108,13 @@ void Game::UpdateGameplay(float dt)
         return;
     }
 
+    // Load level by number key
+    if (IsKeyPressed(KEY_ONE))   scene.LoadLevel(1);
+    if (IsKeyPressed(KEY_TWO))   scene.LoadLevel(2);
+    if (IsKeyPressed(KEY_THREE)) scene.LoadLevel(3);
+    if (IsKeyPressed(KEY_FOUR))  scene.LoadLevel(4);
+    if (IsKeyPressed(KEY_FIVE))  scene.LoadLevel(5);
+
     // Placeholder: score on SPACE
     if (IsKeyPressed(KEY_SPACE))
     {

@@ -16,6 +16,7 @@ public:
     void DeInit();
 
     bool HasPlayerWon() const;
+    void LoadLevel(int levelNumber);
 
     Player player;
     GameCamera camera;

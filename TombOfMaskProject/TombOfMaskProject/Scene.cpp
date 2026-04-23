@@ -116,6 +116,31 @@ void Scene::DrawWorld()
     camera.EndWorld();
 }
 
+void Scene::LoadLevel(int levelNumber)
+{
+    for (auto e : entities) { if (e) delete e; }
+    entities.clear();
+
+    if (!level.Load(levelNumber))
+        return;
+
+    player.Init(level.GetStartPosition());
+
+    int w = level.GetWidth();
+    int h = level.GetHeight();
+    int ts = level.GetTileSize();
+    for (int y = 0; y < h; ++y)
+    {
+        for (int x = 0; x < w; ++x)
+        {
+            char t = level.GetTileAt(x, y);
+            Vector2 pos = { (float)(x * ts), (float)(y * ts) };
+            Entity* e = CreateEntityFromTile(t, pos, level);
+            if (e) entities.push_back(e);
+        }
+    }
+}
+
 bool Scene::HasPlayerWon() const
 {
     Vector2 goal = level.GetGoalPosition();
