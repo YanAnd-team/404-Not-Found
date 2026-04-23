@@ -18,8 +18,8 @@ Inspired by the mobile game *Tomb of the Mask*, movement works by sliding in one
 
 | Role | Name | GitHub |
 |------|------|--------|
-| Art / Design | WEIHAOYAN | [TODO: https://github.com/yanweihao136699-art] |
-| Programming / Audio | YIXIANGLU | [TODO: https://github.com/YIXIANGLU-username] |
+| Art / Design | WEIHAOYAN | [https://github.com/yanweihao136699-art] |
+| Programming / Audio | YIXIANGLU | [https://github.com/Renshengwuqu] |
 
 Full task breakdown is available in (https://github.com/YanAnd-team/404-Not-Found/blob/main/Tasks.pdf)
 
