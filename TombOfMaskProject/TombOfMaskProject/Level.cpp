@@ -14,7 +14,6 @@ Level::Level()
 
 void Level::Init()
 {
-    // load common textures if present (optional)
     if (FileExists("resources/sprites/Spike.png"))
     {
         spikeTex = LoadTexture("resources/sprites/Spike.png");
@@ -54,7 +53,6 @@ void Level::Init()
 
 void Level::Update()
 {
-    // placeholder for future updates
 }
 
 void Level::DeInit()
@@ -71,12 +69,11 @@ void Level::DeInit()
 bool Level::Load(int levelNumber)
 {
     rows.clear();
-    // Try preferred file locations: Level/{N}.txt then {N}.txt
-    std::ostringstream p1; p1 << "Level/" << levelNumber << ".txt";
-    std::ostringstream p3; p3 << levelNumber << ".txt";
+    std::ostringstream primaryPath;  primaryPath  << "Level/" << levelNumber << ".txt";
+    std::ostringstream fallbackPath; fallbackPath << levelNumber << ".txt";
 
-    if (FileExists(p1.str().c_str())) return LoadFromFile(p1.str().c_str());
-    if (FileExists(p3.str().c_str())) return LoadFromFile(p3.str().c_str());
+    if (FileExists(primaryPath.str().c_str()))  return LoadFromFile(primaryPath.str().c_str());
+    if (FileExists(fallbackPath.str().c_str())) return LoadFromFile(fallbackPath.str().c_str());
     return false;
 }
 
@@ -84,66 +81,62 @@ bool Level::LoadFromFile(const char* filename)
 {
     rows.clear();
 
-    std::ifstream f(filename);
-    if (!f.is_open()) return false;
+    std::ifstream file(filename);
+    if (!file.is_open()) return false;
 
     std::string line;
     std::vector<std::string> allLines;
-    while (std::getline(f, line))
+    while (std::getline(file, line))
     {
         if (!line.empty() && line.back() == '\r') line.pop_back();
-        // skip empty lines
         if (line.empty()) continue;
         allLines.push_back(line);
     }
     if (allLines.empty()) return false;
 
-    // Detect if file is header-based (first line contains comma) or plain grid
-    bool header = (allLines[0].find(',') != std::string::npos);
-    if (header)
+    bool hasHeader = (allLines[0].find(',') != std::string::npos);
+    if (hasHeader)
     {
-        // reuse previous parsing logic expecting at least 3 header lines
-        std::istringstream ss0(allLines[0]);
-        int w=0,h=0; char comma;
-        ss0 >> w >> comma >> h;
-        if (w<=0 || h<=0) return false;
-        width = w; height = h;
+        std::istringstream headerStream(allLines[0]);
+        int mapWidth = 0, mapHeight = 0; char comma;
+        headerStream >> mapWidth >> comma >> mapHeight;
+        if (mapWidth <= 0 || mapHeight <= 0) return false;
+        width = mapWidth; height = mapHeight;
 
-        // parse start
-        std::istringstream ss1(allLines[1]); int sx=0, sy=0; ss1 >> sx >> comma >> sy;
-        startPos = { (float)sx * tileSize, (float)sy * tileSize };
-        // parse goal
-        std::istringstream ss2(allLines[2]); int gx=0, gy=0; ss2 >> gx >> comma >> gy;
-        goalPos = { (float)gx * tileSize, (float)gy * tileSize };
+        std::istringstream startStream(allLines[1]);
+        int startTileX = 0, startTileY = 0;
+        startStream >> startTileX >> comma >> startTileY;
+        startPos = { (float)startTileX * tileSize, (float)startTileY * tileSize };
 
-        // remaining lines are rows
+        std::istringstream goalStream(allLines[2]);
+        int goalTileX = 0, goalTileY = 0;
+        goalStream >> goalTileX >> comma >> goalTileY;
+        goalPos = { (float)goalTileX * tileSize, (float)goalTileY * tileSize };
+
         rows.clear();
-        for (size_t i=3;i<allLines.size();++i) rows.push_back(allLines[i]);
-        // ensure height consistency
+        for (size_t i = 3; i < allLines.size(); ++i) rows.push_back(allLines[i]);
         height = (int)rows.size();
-        width = rows.empty()?0:(int)rows[0].size();
+        width  = rows.empty() ? 0 : (int)rows[0].size();
     }
     else
     {
-        // plain grid: each line is a row; determine width/height and find start/goal
         rows = allLines;
         height = (int)rows.size();
         width = 0;
-        for (const auto &r : rows) if ((int)r.size() > width) width = (int)r.size();
+        for (const auto& row : rows) if ((int)row.size() > width) width = (int)row.size();
 
-        // find 'x' and 'f'
-        bool foundStart=false, foundGoal=false;
-        for (int y=0;y<height;++y)
+        bool foundStart = false, foundGoal = false;
+        for (int y = 0; y < height; ++y)
         {
-            for (int x=0;x<(int)rows[y].size();++x)
+            for (int x = 0; x < (int)rows[y].size(); ++x)
             {
-                char c = rows[y][x];
-                if (c == 'x' && !foundStart)
+                char tileChar = rows[y][x];
+                if (tileChar == 'x' && !foundStart)
                 {
                     startPos = { (float)x * tileSize, (float)y * tileSize };
                     foundStart = true;
                 }
-                if (c == 'f' && !foundGoal)
+                if (tileChar == 'f' && !foundGoal)
                 {
                     goalPos = { (float)x * tileSize, (float)y * tileSize };
                     foundGoal = true;
@@ -155,24 +148,24 @@ bool Level::LoadFromFile(const char* filename)
     return true;
 }
 
-char Level::GetTileAt(int tx, int ty) const
+char Level::GetTileAt(int tileX, int tileY) const
 {
-    if (ty < 0 || ty >= (int)rows.size()) return (char)Empty;
-    const std::string &row = rows[ty];
-    if (tx < 0 || tx >= (int)row.size()) return (char)Empty;
-    return row[tx];
+    if (tileY < 0 || tileY >= (int)rows.size()) return (char)Empty;
+    const std::string& row = rows[tileY];
+    if (tileX < 0 || tileX >= (int)row.size()) return (char)Empty;
+    return row[tileX];
 }
 
 void Level::Draw() const
 {
     for (int y = 0; y < (int)rows.size(); ++y)
     {
-        const std::string &row = rows[y];
+        const std::string& row = rows[y];
         for (int x = 0; x < (int)row.size() && x < width; ++x)
         {
-            char c = row[x];
+            char tileChar = row[x];
             Rectangle dest = { (float)(x * tileSize), (float)(y * tileSize), (float)tileSize, (float)tileSize };
-            switch (c)
+            switch (tileChar)
             {
             case Wall1:
                 if (wallLoaded[0])
@@ -216,4 +209,3 @@ void Level::Draw() const
 Vector2 Level::GetStartPosition() const { return startPos; }
 Vector2 Level::GetGoalPosition() const { return goalPos; }
 Rectangle Level::GetWorldBounds() const { return Rectangle{ 0.0f, 0.0f, (float)width * tileSize, (float)height * tileSize }; }
-

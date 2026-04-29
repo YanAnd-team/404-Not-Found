@@ -13,23 +13,23 @@
 class Player
 {
 public:
-    void Init(Vector2 startPos);
-    void Update(float dt, Rectangle worldBounds, Level& level);
-    void Draw();
-    void DeInit();
+    void Init(Vector2 startPos);                                    //Initialize player state, texture, and animation vars
+    void Update(float dt, Rectangle worldBounds, Level& level);    //Handle input, slide physics, snap-to-tile on wall hit, and animation
+    void Draw();                                                    //Render with rotation and flip; pivot pinned to sprite center
+    void DeInit();                                                  //Unload texture
 
-    void Reset();
+    void Reset();                                                   //Teleport back to start position and flag death for this frame
 
-    Vector2 GetCenter() const;
-    Rectangle GetBounds() const;
-    bool IsSliding() const { return sliding; }
+    Vector2 GetCenter() const;      //Return the center point of the player sprite
+    Rectangle GetBounds() const;    //Return the collision rectangle of the player
+    bool IsSliding() const { return sliding; }  //Return true if the player is currently moving
 
     Vector2 position;
     float speed;
     bool diedThisFrame;
 
 private:
-    bool IsWallAhead(Vector2 dir, Level& level) const;
+    bool IsWallAhead(Vector2 dir, Level& level) const;  //Check two leading corners in the movement direction for walls
 
     Vector2 startPosition;
     Vector2 currentDir;

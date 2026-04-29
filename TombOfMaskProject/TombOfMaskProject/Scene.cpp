@@ -3,8 +3,6 @@
 
 void Scene::Init()
 {
-    // Audio
-    // Initialize audio device if not already initialized
     InitAudioDevice();
     if (FileExists("resources/SFX/Coins.wav"))
     {
@@ -47,53 +45,44 @@ void Scene::Init()
         starToCompLoaded = true;
     }
 
-    // Font
     font = LoadFontEx("resources/fonts/easvhs.ttf", 32, NULL, 0);
 
-    // Camera
     camera.Init(GetScreenWidth(), GetScreenHeight());
 
-    // Level
     level.Init();
     if (!level.Load(1))
-    {
-        // failed to load level 1, keep player at default
         player.Init({ 400, 200 });
-    }
     else
+        player.Init(level.GetStartPosition());
+
+    // Iterate all tiles and create matching entities
+    int levelWidth  = level.GetWidth();
+    int levelHeight = level.GetHeight();
+    int tileSize    = level.GetTileSize();
+    for (int y = 0; y < levelHeight; ++y)
     {
-        // place player at level start
-        Vector2 start = level.GetStartPosition();
-        player.Init(start);
-    }
-    // Create entities from level tiles
-    int w = level.GetWidth();
-    int h = level.GetHeight();
-    int ts = level.GetTileSize();
-    for (int y = 0; y < h; ++y)
-    {
-        for (int x = 0; x < w; ++x)
+        for (int x = 0; x < levelWidth; ++x)
         {
-            char t = level.GetTileAt(x, y);
-            Vector2 pos = { (float)(x * ts), (float)(y * ts) };
-            Entity *e = CreateEntityFromTile(t, pos, level, &starCount);
-            if (e) entities.push_back(e);
+            char tile = level.GetTileAt(x, y);
+            Vector2 pos = { (float)(x * tileSize), (float)(y * tileSize) };
+            Entity* entity = CreateEntityFromTile(tile, pos, level, &starCount);
+            if (entity) entities.push_back(entity);
         }
     }
 }
 
 void Scene::Update(float dt)
 {
-    // Provide world bounds to player (from level if loaded)
-    Rectangle world = level.GetWorldBounds();
-    player.Update(dt, world, level);
+    Rectangle worldBounds = level.GetWorldBounds();
+    player.Update(dt, worldBounds, level);
     camera.Update(player.GetCenter());
-    // Update entities
+
     for (size_t i = 0; i < entities.size(); ++i)
     {
         if (entities[i]) entities[i]->Update(dt, player, entities, level);
     }
-    // remove inactive
+
+    // Remove inactive entities and free memory
     for (size_t i = 0; i < entities.size(); )
     {
         if (!entities[i] || !entities[i]->IsActive())
@@ -104,13 +93,12 @@ void Scene::Update(float dt)
         else ++i;
     }
 
-    // Movement sound: play when slide starts
+    // Play movement sound on slide start
     bool nowSliding = player.IsSliding();
     if (nowSliding && !wasSliding && soundLoaded[1])
         PlaySound(sound[1]);
     wasSliding = nowSliding;
 
-    // Death sound
     if (player.diedThisFrame && soundLoaded[2])
         PlaySound(sound[2]);
 }
@@ -121,8 +109,7 @@ void Scene::DrawWorld()
 
     DrawRectangle(0, 0, GetScreenWidth(), GetScreenHeight(), Fade(WHITE, 0.7f));
     level.Draw();
-    // draw entities
-    for (auto e : entities) if (e && e->IsActive()) e->Draw();
+    for (auto entity : entities) if (entity && entity->IsActive()) entity->Draw();
     player.Draw();
 
     camera.EndWorld();
@@ -159,9 +146,15 @@ void Scene::OnPlayerWon()
     if (soundLoaded[3]) PlaySound(sound[3]);
 }
 
+void Scene::ReloadLevel()
+{
+    LoadLevel(currentLevelNumber);
+}
+
 void Scene::LoadLevel(int levelNumber)
 {
-    for (auto e : entities) { if (e) delete e; }
+    currentLevelNumber = levelNumber;
+    for (auto entity : entities) { if (entity) delete entity; }
     entities.clear();
     starCount = 0;
 
@@ -170,25 +163,25 @@ void Scene::LoadLevel(int levelNumber)
 
     player.Init(level.GetStartPosition());
 
-    int w = level.GetWidth();
-    int h = level.GetHeight();
-    int ts = level.GetTileSize();
-    for (int y = 0; y < h; ++y)
+    int levelWidth  = level.GetWidth();
+    int levelHeight = level.GetHeight();
+    int tileSize    = level.GetTileSize();
+    for (int y = 0; y < levelHeight; ++y)
     {
-        for (int x = 0; x < w; ++x)
+        for (int x = 0; x < levelWidth; ++x)
         {
-            char t = level.GetTileAt(x, y);
-            Vector2 pos = { (float)(x * ts), (float)(y * ts) };
-            Entity* e = CreateEntityFromTile(t, pos, level, &starCount);
-            if (e) entities.push_back(e);
+            char tile = level.GetTileAt(x, y);
+            Vector2 pos = { (float)(x * tileSize), (float)(y * tileSize) };
+            Entity* entity = CreateEntityFromTile(tile, pos, level, &starCount);
+            if (entity) entities.push_back(entity);
         }
     }
 }
 
 bool Scene::HasPlayerWon() const
 {
-    Vector2 goal = level.GetGoalPosition();
-    Rectangle goalRect = { goal.x, goal.y, (float)level.GetTileSize(), (float)level.GetTileSize() };
+    Vector2 goalPos = level.GetGoalPosition();
+    Rectangle goalRect = { goalPos.x, goalPos.y, (float)level.GetTileSize(), (float)level.GetTileSize() };
     return CheckCollisionRecs(player.GetBounds(), goalRect);
 }
 
@@ -209,19 +202,18 @@ void Scene::DrawStarHUD()
 
 void Scene::DrawWinStars()
 {
-    // 3 slots, centered horizontally; filled = Star.png, empty = StarToComp.png
     const float slotSize = 48.0f;
     const float gap = 16.0f;
-    float totalW = 3 * slotSize + 2 * gap;
-    float startX = GetScreenWidth() / 2.0f - totalW / 2.0f;
-    float y = GetScreenHeight() / 2.0f - slotSize / 2.0f;
+    float totalWidth = 3 * slotSize + 2 * gap;
+    float startX = GetScreenWidth() / 2.0f - totalWidth / 2.0f;
+    float startY = GetScreenHeight() / 2.0f - slotSize / 2.0f;
 
     bool hasStar = level.IsStarLoaded();
     Texture2D starTex = hasStar ? level.GetStarTex() : Texture2D{};
 
     for (int i = 0; i < 3; ++i)
     {
-        Rectangle dest = { startX + i * (slotSize + gap), y, slotSize, slotSize };
+        Rectangle dest = { startX + i * (slotSize + gap), startY, slotSize, slotSize };
         if (i < starCount && hasStar)
             DrawTexturePro(starTex, Rectangle{0,0,(float)starTex.width,(float)starTex.height}, dest, Vector2{0,0}, 0, WHITE);
         else if (starToCompLoaded)
@@ -235,8 +227,7 @@ void Scene::DeInit()
 {
     player.DeInit();
     level.DeInit();
-    // cleanup entities
-    for (auto e : entities) { if (e) delete e; }
+    for (auto entity : entities) { if (entity) delete entity; }
     entities.clear();
     if (musicLoaded[0])
     {
@@ -248,26 +239,10 @@ void Scene::DeInit()
         StopMusicStream(music[1]);
         UnloadMusicStream(music[1]);
     }
-    if (soundLoaded[0])
-    {
-        StopSound(sound[0]);
-        UnloadSound(sound[0]);
-    }
-    if (soundLoaded[1])
-    {
-        StopSound(sound[1]);
-        UnloadSound(sound[1]);
-    }
-    if (soundLoaded[2])
-    {
-        StopSound(sound[2]);
-        UnloadSound(sound[2]);
-    }
-    if (soundLoaded[3])
-    {
-        StopSound(sound[3]);
-		UnloadSound(sound[3]);
-    }
+    if (soundLoaded[0]) { StopSound(sound[0]); UnloadSound(sound[0]); }
+    if (soundLoaded[1]) { StopSound(sound[1]); UnloadSound(sound[1]); }
+    if (soundLoaded[2]) { StopSound(sound[2]); UnloadSound(sound[2]); }
+    if (soundLoaded[3]) { StopSound(sound[3]); UnloadSound(sound[3]); }
     if (starToCompLoaded) UnloadTexture(starToCompTex);
     UnloadFont(font);
     CloseAudioDevice();

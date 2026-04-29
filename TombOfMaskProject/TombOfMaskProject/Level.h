@@ -8,39 +8,34 @@ enum Map { Empty='-', Wall1='1', Wall2='2', Spike='S', TrapSpike='T', GunTrapTil
 class Level
 {
 public:
-    Level();
-    void Init();
-    void Update();
-    void DeInit();
+    Level();                                                        //Set default values; textures are not loaded here
+    void Init();                                                    //Load all tile textures; missing files are handled gracefully
+    void Update();                                                  //Placeholder for future tile logic
+    void DeInit();                                                  //Unload all tile textures
 
-    // Load level by number (loads file "Level/Level N.txt"). Returns true on success.
-    bool Load(int levelNumber);
-    // Alternate loader: load by filename inside Level/ folder (e.g. "1.txt").
-    bool LoadFromFile(const char* filename);
+    bool Load(int levelNumber);                                     //Try "Level/{N}.txt" then "{N}.txt" as fallback
+    bool LoadFromFile(const char* filename);                        //Support two formats: header-based (w,h + start/goal lines) or plain grid (scans for 'x' and 'f')
 
-    // Draw level tiles
-    void Draw() const;
+    void Draw() const;                                              //Draw all tiles using their corresponding textures
 
-    // Query tile char at tile coordinates (tx,ty). Returns '-' if out of bounds.
-    char GetTileAt(int tx, int ty) const;
+    char GetTileAt(int tileX, int tileY) const;                    //Return tile char at grid coords; returns '-' (Empty) if out of bounds
 
-    // Accessors
-    Vector2 GetStartPosition() const;
-    Vector2 GetGoalPosition() const;
-    Rectangle GetWorldBounds() const;
-    int GetWidth() const { return width; }
-    int GetHeight() const { return height; }
-    int GetTileSize() const { return tileSize; }
-    Texture2D GetStarTex() const { return starTex; }
-    bool IsStarLoaded() const { return starLoaded; }
+    Vector2 GetStartPosition() const;       //Return player start position in pixels
+    Vector2 GetGoalPosition() const;        //Return goal tile position in pixels
+    Rectangle GetWorldBounds() const;       //Return the full level area as a rectangle in pixels
+    int GetWidth() const { return width; }              //Return level width in tiles
+    int GetHeight() const { return height; }            //Return level height in tiles
+    int GetTileSize() const { return tileSize; }        //Return tile size in pixels
+    Texture2D GetStarTex() const { return starTex; }    //Return the star texture
+    bool IsStarLoaded() const { return starLoaded; }    //Return true if the star texture is loaded
 
 private:
     int width;
     int height;
-    int tileSize; // pixels per tile
-    Vector2 startPos; // in pixels
-    Vector2 goalPos;  // in pixels
-    std::vector<std::string> rows; // raw tile chars per row
+    int tileSize;
+    Vector2 startPos;
+    Vector2 goalPos;
+    std::vector<std::string> rows;
 
     Texture2D spikeTex;
     Texture2D trapSpikeTex;
