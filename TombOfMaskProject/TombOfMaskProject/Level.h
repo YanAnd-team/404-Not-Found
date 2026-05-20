@@ -13,8 +13,8 @@ public:
     void Update();                                                  //Placeholder for future tile logic
     void DeInit();                                                  //Unload all tile textures
 
-    bool Load(int levelNumber);                                     //Try "Level/{N}.txt" then "{N}.txt" as fallback
-    bool LoadFromFile(const char* filename);                        //Support two formats: header-based (w,h + start/goal lines) or plain grid (scans for 'x' and 'f')
+    bool Load(int levelNumber);                                     //Try "Level/{N}.tmx"
+    bool LoadFromFile(const char* filename);                        //Load a .tmx file; tile slot convention is documented in Level.cpp
 
     void Draw() const;                                              //Draw all tiles using their corresponding textures
 

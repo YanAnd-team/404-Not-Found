@@ -1,6 +1,38 @@
 #include "Level.h"
-#include <fstream>
+#include <tmxlite/Map.hpp>
+#include <tmxlite/TileLayer.hpp>
 #include <sstream>
+
+// Tileset slot convention (0-based local ID = GID - firstGID).
+// Tell your teammate to arrange the tileset image in this order:
+//   slot 0  ->  Wall1        ('1')
+//   slot 1  ->  Wall2        ('2')
+//   slot 2  ->  FixedSpike   ('S')
+//   slot 3  ->  TriggerSpike ('T')
+//   slot 4  ->  GunTrap      ('G')
+//   slot 5  ->  Ghost        ('6')
+//   slot 6  ->  GhostPlus    ('7')
+//   slot 7  ->  Star         ('s')
+//   slot 8  ->  Exit         ('f')
+//   slot 9  ->  PlayerStart  ('x')
+//   GID 0 (empty cell) is always treated as empty ('-').
+static char LocalIDToChar(uint32_t localID)
+{
+    switch (localID)
+    {
+    case 0:  return '1';
+    case 1:  return '2';
+    case 2:  return 'S';
+    case 3:  return 'T';
+    case 4:  return 'G';
+    case 5:  return '6';
+    case 6:  return '7';
+    case 7:  return 's';
+    case 8:  return 'f';
+    case 9:  return 'x';
+    default: return '-';
+    }
+}
 
 Level::Level()
 {
@@ -39,7 +71,7 @@ void Level::Init()
         starTex = LoadTexture("resources/sprites/Star.png");
         starLoaded = true;
     }
-	if (FileExists("resources/sprites/Wall1.png"))
+    if (FileExists("resources/sprites/Wall1.png"))
     {
         wallTex[0] = LoadTexture("resources/sprites/Wall1.png");
         wallLoaded[0] = true;
@@ -57,90 +89,77 @@ void Level::Update()
 
 void Level::DeInit()
 {
-    if (spikeLoaded) UnloadTexture(spikeTex);
-    if (trapLoaded) UnloadTexture(trapSpikeTex);
-    if (gunLoaded) UnloadTexture(gunTrapTex);
+    if (spikeLoaded)  UnloadTexture(spikeTex);
+    if (trapLoaded)   UnloadTexture(trapSpikeTex);
+    if (gunLoaded)    UnloadTexture(gunTrapTex);
     if (wallLoaded[0]) UnloadTexture(wallTex[0]);
     if (wallLoaded[1]) UnloadTexture(wallTex[1]);
-    if (endLoaded) UnloadTexture(endTex);
-    if (starLoaded) UnloadTexture(starTex);
+    if (endLoaded)    UnloadTexture(endTex);
+    if (starLoaded)   UnloadTexture(starTex);
 }
 
 bool Level::Load(int levelNumber)
 {
     rows.clear();
-    std::ostringstream primaryPath;  primaryPath  << "Level/" << levelNumber << ".txt";
-    std::ostringstream fallbackPath; fallbackPath << levelNumber << ".txt";
-
-    if (FileExists(primaryPath.str().c_str()))  return LoadFromFile(primaryPath.str().c_str());
-    if (FileExists(fallbackPath.str().c_str())) return LoadFromFile(fallbackPath.str().c_str());
+    std::ostringstream path;
+    path << "Level/" << levelNumber << ".tmx";
+    if (FileExists(path.str().c_str()))
+        return LoadFromFile(path.str().c_str());
     return false;
 }
 
 bool Level::LoadFromFile(const char* filename)
 {
     rows.clear();
+    startPos = { 0, 0 };
+    goalPos  = { 0, 0 };
 
-    std::ifstream file(filename);
-    if (!file.is_open()) return false;
+    tmx::Map map;
+    if (!map.load(filename)) return false;
 
-    std::string line;
-    std::vector<std::string> allLines;
-    while (std::getline(file, line))
+    const auto& tileCount   = map.getTileCount();
+    const auto& tmxTileSize = map.getTileSize();
+    width    = (int)tileCount.x;
+    height   = (int)tileCount.y;
+    tileSize = (int)tmxTileSize.x;
+
+    // Find the first tile layer
+    const tmx::TileLayer* tileLayer = nullptr;
+    for (const auto& layer : map.getLayers())
     {
-        if (!line.empty() && line.back() == '\r') line.pop_back();
-        if (line.empty()) continue;
-        allLines.push_back(line);
-    }
-    if (allLines.empty()) return false;
-
-    bool hasHeader = (allLines[0].find(',') != std::string::npos);
-    if (hasHeader)
-    {
-        std::istringstream headerStream(allLines[0]);
-        int mapWidth = 0, mapHeight = 0; char comma;
-        headerStream >> mapWidth >> comma >> mapHeight;
-        if (mapWidth <= 0 || mapHeight <= 0) return false;
-        width = mapWidth; height = mapHeight;
-
-        std::istringstream startStream(allLines[1]);
-        int startTileX = 0, startTileY = 0;
-        startStream >> startTileX >> comma >> startTileY;
-        startPos = { (float)startTileX * tileSize, (float)startTileY * tileSize };
-
-        std::istringstream goalStream(allLines[2]);
-        int goalTileX = 0, goalTileY = 0;
-        goalStream >> goalTileX >> comma >> goalTileY;
-        goalPos = { (float)goalTileX * tileSize, (float)goalTileY * tileSize };
-
-        rows.clear();
-        for (size_t i = 3; i < allLines.size(); ++i) rows.push_back(allLines[i]);
-        height = (int)rows.size();
-        width  = rows.empty() ? 0 : (int)rows[0].size();
-    }
-    else
-    {
-        rows = allLines;
-        height = (int)rows.size();
-        width = 0;
-        for (const auto& row : rows) if ((int)row.size() > width) width = (int)row.size();
-
-        bool foundStart = false, foundGoal = false;
-        for (int y = 0; y < height; ++y)
+        if (layer->getType() == tmx::Layer::Type::Tile)
         {
-            for (int x = 0; x < (int)rows[y].size(); ++x)
+            tileLayer = &layer->getLayerAs<tmx::TileLayer>();
+            break;
+        }
+    }
+    if (!tileLayer) return false;
+
+    const auto& tiles = tileLayer->getTiles();
+    uint32_t firstGid = map.getTilesets().empty() ? 1u : map.getTilesets()[0].getFirstGID();
+
+    rows.assign(height, std::string(width, '-'));
+    bool foundStart = false, foundGoal = false;
+
+    for (int y = 0; y < height; ++y)
+    {
+        for (int x = 0; x < width; ++x)
+        {
+            uint32_t gid = tiles[y * width + x].ID;
+            if (gid == 0) continue;
+
+            char ch = LocalIDToChar(gid - firstGid);
+            rows[y][x] = ch;
+
+            if (ch == 'x' && !foundStart)
             {
-                char tileChar = rows[y][x];
-                if (tileChar == 'x' && !foundStart)
-                {
-                    startPos = { (float)x * tileSize, (float)y * tileSize };
-                    foundStart = true;
-                }
-                if (tileChar == 'f' && !foundGoal)
-                {
-                    goalPos = { (float)x * tileSize, (float)y * tileSize };
-                    foundGoal = true;
-                }
+                startPos = { (float)(x * tileSize), (float)(y * tileSize) };
+                foundStart = true;
+            }
+            if (ch == 'f' && !foundGoal)
+            {
+                goalPos = { (float)(x * tileSize), (float)(y * tileSize) };
+                foundGoal = true;
             }
         }
     }
@@ -182,15 +201,20 @@ void Level::Draw() const
             case Spike:
                 if (spikeLoaded)
                     DrawTexturePro(spikeTex, Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
-                else DrawRectangleRec(dest, RED);
+                else
+                    DrawRectangleRec(dest, RED);
                 break;
             case TrapSpike:
-                if (trapLoaded) DrawTexturePro(trapSpikeTex, Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
-                else DrawRectangleRec(dest, ORANGE);
+                if (trapLoaded)
+                    DrawTexturePro(trapSpikeTex, Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
+                else
+                    DrawRectangleRec(dest, ORANGE);
                 break;
             case GunTrapTile:
-                if (gunLoaded) DrawTexturePro(gunTrapTex, Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
-                else DrawRectangleRec(dest, PURPLE);
+                if (gunLoaded)
+                    DrawTexturePro(gunTrapTex, Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
+                else
+                    DrawRectangleRec(dest, PURPLE);
                 break;
             case End:
                 if (endLoaded)
@@ -207,5 +231,5 @@ void Level::Draw() const
 }
 
 Vector2 Level::GetStartPosition() const { return startPos; }
-Vector2 Level::GetGoalPosition() const { return goalPos; }
+Vector2 Level::GetGoalPosition()  const { return goalPos;  }
 Rectangle Level::GetWorldBounds() const { return Rectangle{ 0.0f, 0.0f, (float)width * tileSize, (float)height * tileSize }; }
