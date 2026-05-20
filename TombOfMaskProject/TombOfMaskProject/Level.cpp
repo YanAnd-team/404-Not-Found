@@ -129,7 +129,7 @@ bool Level::LoadFromFile(const char* filename)
     {
         if (layer->getType() == tmx::Layer::Type::Tile)
         {
-            tileLayer = dynamic_cast<const tmx::TileLayer*>(layer.get());
+            tileLayer = &layer->getLayerAs<tmx::TileLayer>();
             break;
         }
     }
