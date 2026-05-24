@@ -47,7 +47,7 @@ bool Player::IsWallAhead(Vector2 dir, Level& level) const
         int tileX = (int)(px / tileSize);
         int tileY = (int)(py / tileSize);
         char tile = level.GetTileAt(tileX, tileY);
-        return tile == (char)Wall1 || tile == (char)Wall2 || tile == (char)Empty;
+        return tile == (char)Wall1 || tile == (char)Wall2;
         };
 
     if (dir.x > 0)

@@ -1,47 +1,14 @@
 #include "Level.h"
-#include <tmxlite/Map.hpp>
-#include <tmxlite/TileLayer.hpp>
-#include <sstream>
-
-// Tileset slot convention (0-based local ID = GID - firstGID).
-// Tell your teammate to arrange the tileset image in this order:
-//   slot 0  ->  Wall1        ('1')
-//   slot 1  ->  Wall2        ('2')
-//   slot 2  ->  FixedSpike   ('S')
-//   slot 3  ->  TriggerSpike ('T')
-//   slot 4  ->  GunTrap      ('G')
-//   slot 5  ->  Ghost        ('6')
-//   slot 6  ->  GhostPlus    ('7')
-//   slot 7  ->  Star         ('s')
-//   slot 8  ->  Exit         ('f')
-//   slot 9  ->  PlayerStart  ('x')
-//   GID 0 (empty cell) is always treated as empty ('-').
-static char LocalIDToChar(uint32_t localID)
-{
-    switch (localID)
-    {
-    case 0:  return '1';
-    case 1:  return '2';
-    case 2:  return 'S';
-    case 3:  return 'T';
-    case 4:  return 'G';
-    case 5:  return '6';
-    case 6:  return '7';
-    case 7:  return 's';
-    case 8:  return 'f';
-    case 9:  return 'x';
-    default: return '-';
-    }
-}
 
 Level::Level()
 {
     width = height = 0;
-    tileSize = 32;
+    tileSize = 16;
     startPos = { 0, 0 };
-    goalPos = { 0, 0 };
+    goalPos  = { 0, 0 };
     spikeLoaded = trapLoaded = gunLoaded = endLoaded = starLoaded = false;
     wallLoaded[0] = wallLoaded[1] = false;
+    projectLoaded = false;
 }
 
 void Level::Init()
@@ -81,6 +48,16 @@ void Level::Init()
         wallTex[1] = LoadTexture("resources/sprites/Wall2.png");
         wallLoaded[1] = true;
     }
+
+    if (FileExists("Level/Levels.ldtk"))
+    {
+        try
+        {
+            ldtkProject.loadFromFile("Level/Levels.ldtk");
+            projectLoaded = true;
+        }
+        catch (...) { projectLoaded = false; }
+    }
 }
 
 void Level::Update()
@@ -89,77 +66,75 @@ void Level::Update()
 
 void Level::DeInit()
 {
-    if (spikeLoaded)  UnloadTexture(spikeTex);
-    if (trapLoaded)   UnloadTexture(trapSpikeTex);
-    if (gunLoaded)    UnloadTexture(gunTrapTex);
+    if (spikeLoaded)   UnloadTexture(spikeTex);
+    if (trapLoaded)    UnloadTexture(trapSpikeTex);
+    if (gunLoaded)     UnloadTexture(gunTrapTex);
     if (wallLoaded[0]) UnloadTexture(wallTex[0]);
     if (wallLoaded[1]) UnloadTexture(wallTex[1]);
-    if (endLoaded)    UnloadTexture(endTex);
-    if (starLoaded)   UnloadTexture(starTex);
+    if (endLoaded)     UnloadTexture(endTex);
+    if (starLoaded)    UnloadTexture(starTex);
 }
 
 bool Level::Load(int levelNumber)
 {
     rows.clear();
-    std::ostringstream path;
-    path << "Level/" << levelNumber << ".tmx";
-    if (FileExists(path.str().c_str()))
-        return LoadFromFile(path.str().c_str());
-    return false;
-}
-
-bool Level::LoadFromFile(const char* filename)
-{
-    rows.clear();
     startPos = { 0, 0 };
     goalPos  = { 0, 0 };
 
-    tmx::Map map;
-    if (!map.load(filename)) return false;
+    if (!projectLoaded) return false;
 
-    const auto& tileCount   = map.getTileCount();
-    const auto& tmxTileSize = map.getTileSize();
-    width    = (int)tileCount.x;
-    height   = (int)tileCount.y;
-    tileSize = (int)tmxTileSize.x;
+    const auto& world  = ldtkProject.getWorld();
+    const auto& levels = world.allLevels();
 
-    // Find the first tile layer
-    const tmx::TileLayer* tileLayer = nullptr;
-    for (const auto& layer : map.getLayers())
-    {
-        if (layer->getType() == tmx::Layer::Type::Tile)
-        {
-            tileLayer = &layer->getLayerAs<tmx::TileLayer>();
-            break;
-        }
-    }
-    if (!tileLayer) return false;
+    if (levelNumber < 1 || levelNumber > (int)levels.size()) return false;
 
-    const auto& tiles = tileLayer->getTiles();
-    uint32_t firstGid = map.getTilesets().empty() ? 1u : map.getTilesets()[0].getFirstGID();
+    const ldtk::Level& ldtkLevel = levels[levelNumber - 1];
+
+    tileSize = 16;
+    width  = (ldtkLevel.size.x + tileSize - 1) / tileSize;
+    height = (ldtkLevel.size.y + tileSize - 1) / tileSize;
 
     rows.assign(height, std::string(width, '-'));
-    bool foundStart = false, foundGoal = false;
 
-    for (int y = 0; y < height; ++y)
+    for (const auto& layer : ldtkLevel.allLayers())
     {
-        for (int x = 0; x < width; ++x)
+        if (layer.getType() == ldtk::LayerType::IntGrid)
         {
-            uint32_t gid = tiles[y * width + x].ID;
-            if (gid == 0) continue;
-
-            char ch = LocalIDToChar(gid - firstGid);
-            rows[y][x] = ch;
-
-            if (ch == 'x' && !foundStart)
+            // Wall collision data — populated once an IntGrid layer is added in LDtk
+            for (int y = 0; y < height; ++y)
+                for (int x = 0; x < width; ++x)
+                {
+                    int val = layer.getIntGridVal(x, y).value;
+                    if      (val == 1) rows[y][x] = (char)Wall1;
+                    else if (val == 2) rows[y][x] = (char)Wall2;
+                }
+        }
+        else if (layer.getType() == ldtk::LayerType::Entities)
+        {
+            for (const auto& entity : layer.allEntities())
             {
-                startPos = { (float)(x * tileSize), (float)(y * tileSize) };
-                foundStart = true;
-            }
-            if (ch == 'f' && !foundGoal)
-            {
-                goalPos = { (float)(x * tileSize), (float)(y * tileSize) };
-                foundGoal = true;
+                int gx = entity.getGridPosition().x;
+                int gy = entity.getGridPosition().y;
+                if (gx < 0 || gx >= width || gy < 0 || gy >= height) continue;
+
+                const std::string& name = entity.getName();
+
+                if (name == "Start")
+                {
+                    startPos     = { (float)entity.getPosition().x, (float)entity.getPosition().y };
+                    rows[gy][gx] = 'x';
+                }
+                else if (name == "Final")
+                {
+                    goalPos      = { (float)entity.getPosition().x, (float)entity.getPosition().y };
+                    rows[gy][gx] = (char)End;
+                }
+                else if (name == "Star")                              { rows[gy][gx] = (char)Star;        }
+                else if (name == "Step")                              { rows[gy][gx] = (char)TrapSpike;   }
+                else if (name == "Sharp1" || name == "Sharp2")        { rows[gy][gx] = (char)Spike;       }
+                else if (name == "Monster1")                          { rows[gy][gx] = '6';               }
+                else if (name == "Monster2")                          { rows[gy][gx] = '7';               }
+                else if (name == "Arrow_trap")                        { rows[gy][gx] = (char)GunTrapTile; }
             }
         }
     }
@@ -188,31 +163,31 @@ void Level::Draw() const
             {
             case Wall1:
                 if (wallLoaded[0])
-                    DrawTexturePro(wallTex[0], Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
+                    DrawTexturePro(wallTex[0], Rectangle{ 0,0,(float)wallTex[0].width,(float)wallTex[0].height }, dest, Vector2{ 0,0 }, 0, WHITE);
                 else
                     DrawRectangleRec(dest, GRAY);
                 break;
             case Wall2:
                 if (wallLoaded[1])
-                    DrawTexturePro(wallTex[1], Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
+                    DrawTexturePro(wallTex[1], Rectangle{ 0,0,(float)wallTex[1].width,(float)wallTex[1].height }, dest, Vector2{ 0,0 }, 0, WHITE);
                 else
                     DrawRectangleRec(dest, DARKGRAY);
                 break;
             case Spike:
                 if (spikeLoaded)
-                    DrawTexturePro(spikeTex, Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
+                    DrawTexturePro(spikeTex, Rectangle{ 0,0,(float)spikeTex.width,(float)spikeTex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
                 else
                     DrawRectangleRec(dest, RED);
                 break;
             case TrapSpike:
                 if (trapLoaded)
-                    DrawTexturePro(trapSpikeTex, Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
+                    DrawTexturePro(trapSpikeTex, Rectangle{ 0,0,(float)trapSpikeTex.width,(float)trapSpikeTex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
                 else
                     DrawRectangleRec(dest, ORANGE);
                 break;
             case GunTrapTile:
                 if (gunLoaded)
-                    DrawTexturePro(gunTrapTex, Rectangle{ 0,0,32.0f,32.0f }, dest, Vector2{ 0,0 }, 0, WHITE);
+                    DrawTexturePro(gunTrapTex, Rectangle{ 0,0,(float)gunTrapTex.width,(float)gunTrapTex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
                 else
                     DrawRectangleRec(dest, PURPLE);
                 break;
