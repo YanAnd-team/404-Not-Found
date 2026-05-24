@@ -74,11 +74,16 @@ void Level::DeInit()
     if (wallLoaded[1]) UnloadTexture(wallTex[1]);
     if (endLoaded)     UnloadTexture(endTex);
     if (starLoaded)    UnloadTexture(starTex);
+
+    for (auto& [uid, tex] : m_tilesetTextures)
+        UnloadTexture(tex);
+    m_tilesetTextures.clear();
 }
 
 bool Level::Load(int levelNumber)
 {
     rows.clear();
+    m_tileCmds.clear();
     startPos = { 0, 0 };
     goalPos  = { 0, 0 };
 
@@ -109,6 +114,31 @@ bool Level::Load(int levelNumber)
                     if      (val == 1) rows[y][x] = (char)Wall1;
                     else if (val == 2) rows[y][x] = (char)Wall2;
                 }
+        }
+        else if (layer.getType() == ldtk::LayerType::Tiles)
+        {
+            if (!layer.hasTileset()) continue;
+            const ldtk::Tileset& tileset = layer.getTileset();
+
+            if (m_tilesetTextures.find(tileset.uid) == m_tilesetTextures.end())
+            {
+                std::string texPath = "Level/" + tileset.path;
+                if (FileExists(texPath.c_str()))
+                    m_tilesetTextures[tileset.uid] = LoadTexture(texPath.c_str());
+            }
+
+            for (const auto& tile : layer.allTiles())
+            {
+                auto pos = tile.getPosition();
+                auto tr  = tile.getTextureRect();
+                TileDrawCmd cmd;
+                cmd.tilesetUid = tileset.uid;
+                cmd.src = { (float)tr.x, (float)tr.y, (float)tr.width, (float)tr.height };
+                cmd.dst = { (float)pos.x, (float)pos.y, (float)tr.width, (float)tr.height };
+                cmd.flipX = tile.flipX;
+                cmd.flipY = tile.flipY;
+                m_tileCmds.push_back(cmd);
+            }
         }
         else if (layer.getType() == ldtk::LayerType::Entities)
         {
@@ -153,6 +183,16 @@ char Level::GetTileAt(int tileX, int tileY) const
 
 void Level::Draw() const
 {
+    for (const auto& cmd : m_tileCmds)
+    {
+        auto it = m_tilesetTextures.find(cmd.tilesetUid);
+        if (it == m_tilesetTextures.end()) continue;
+        Rectangle src = cmd.src;
+        if (cmd.flipX) src.width  = -src.width;
+        if (cmd.flipY) src.height = -src.height;
+        DrawTexturePro(it->second, src, cmd.dst, Vector2{ 0, 0 }, 0.0f, WHITE);
+    }
+
     for (int y = 0; y < (int)rows.size(); ++y)
     {
         const std::string& row = rows[y];

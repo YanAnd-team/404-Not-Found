@@ -1,9 +1,18 @@
 #pragma once
 #include "raylib.h"
+#include <unordered_map>
 #include <vector>
 #include <LDtkLoader/Project.hpp>
 
 enum Map { Empty='-', Wall1='1', Wall2='2', Spike='S', TrapSpike='T', GunTrapTile='G', End='f', Star='s' };
+
+struct TileDrawCmd {
+    int tilesetUid;
+    Rectangle src;
+    Rectangle dst;
+    bool flipX;
+    bool flipY;
+};
 
 class Level
 {
@@ -52,4 +61,7 @@ private:
     bool wallLoaded[2];
     bool endLoaded;
     bool starLoaded;
+
+    std::vector<TileDrawCmd> m_tileCmds;
+    std::unordered_map<int, Texture2D> m_tilesetTextures;
 };
