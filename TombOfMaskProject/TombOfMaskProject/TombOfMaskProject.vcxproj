@@ -138,20 +138,48 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\DataTypes.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\Entity.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\EntityDef.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\Enum.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\FieldsContainer.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\Layer.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\LayerDef.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\Level.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\Project.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\TagsContainer.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\Tile.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\Tileset.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\Utils.cpp" />
-    <ClCompile Include="..\packages\LDtkLoader\src\World.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\DataTypes.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Entity.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\EntityDef.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Enum.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\FieldsContainer.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Layer.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\LayerDef.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Level.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Project.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\TagsContainer.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Tile.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Tileset.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Utils.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\World.cpp">
+      <ObjectFileName>$(IntDir)LDtkLoader\</ObjectFileName>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
