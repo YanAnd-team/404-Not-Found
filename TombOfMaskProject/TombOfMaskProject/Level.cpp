@@ -14,39 +14,39 @@ Level::Level()
 
 void Level::Init()
 {
-    if (FileExists("resources/sprites/Spike.png"))
+    if (FileExists("resources/sprites/Traps/Spike/Spike-down.png"))
     {
-        spikeTex = LoadTexture("resources/sprites/Spike.png");
+        spikeTex = LoadTexture("resources/sprites/Traps/Spike/Spike-down.png");
         spikeLoaded = true;
     }
-    if (FileExists("resources/sprites/SpikeTrap.png"))
+    if (FileExists("resources/sprites/Traps/Spike-trap/Spike-trap-square.png"))
     {
-        trapSpikeTex = LoadTexture("resources/sprites/SpikeTrap.png");
+        trapSpikeTex = LoadTexture("resources/sprites/Traps/Spike-trap/Spike-trap-square.png");
         trapLoaded = true;
     }
-    if (FileExists("resources/sprites/GunTrap.png"))
+    if (FileExists("resources/sprites/Traps/Dart Trap/Dart Trap right stop.png"))
     {
-        gunTrapTex = LoadTexture("resources/sprites/GunTrap.png");
+        gunTrapTex = LoadTexture("resources/sprites/Traps/Dart Trap/Dart Trap right stop.png");
         gunLoaded = true;
     }
-    if (FileExists("resources/sprites/END.png"))
+    if (FileExists("resources/sprites/Exit/exit0.png"))
     {
-        endTex = LoadTexture("resources/sprites/END.png");
+        endTex = LoadTexture("resources/sprites/Exit/exit0.png");
         endLoaded = true;
     }
-    if (FileExists("resources/sprites/Star.png"))
+    if (FileExists("resources/sprites/Stars and coins/star0.png"))
     {
-        starTex = LoadTexture("resources/sprites/Star.png");
+        starTex = LoadTexture("resources/sprites/Stars and coins/star0.png");
         starLoaded = true;
     }
-    if (FileExists("resources/sprites/Wall1.png"))
+    if (FileExists("resources/sprites/Wall/Wall-full.png"))
     {
-        wallTex[0] = LoadTexture("resources/sprites/Wall1.png");
+        wallTex[0] = LoadTexture("resources/sprites/Wall/Wall-full.png");
         wallLoaded[0] = true;
     }
-    if (FileExists("resources/sprites/Wall2.png"))
+    if (FileExists("resources/sprites/Wall/wall2.1.png"))
     {
-        wallTex[1] = LoadTexture("resources/sprites/Wall2.png");
+        wallTex[1] = LoadTexture("resources/sprites/Wall/wall2.1.png");
         wallLoaded[1] = true;
     }
 
