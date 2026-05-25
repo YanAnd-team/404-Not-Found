@@ -202,7 +202,6 @@ void Game::DrawTitle()
 
 void Game::DrawGameplay()
 {
-    scene.DrawUI();
     scene.DrawStarHUD();
 
     DrawText("Arrows: Move", 10, screenHeight - 40, 15, GRAY);

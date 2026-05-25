@@ -185,10 +185,6 @@ bool Scene::HasPlayerWon() const
     return CheckCollisionRecs(player.GetBounds(), goalRect);
 }
 
-void Scene::DrawUI()
-{
-}
-
 void Scene::DrawStarHUD()
 {
     if (!level.IsStarLoaded()) return;

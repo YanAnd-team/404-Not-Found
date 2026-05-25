@@ -12,7 +12,6 @@ public:
     void Init();                        //Load audio, font, camera, level 1, and spawn all tile entities
     void Update(float dt);              //Update player, camera, entities, and audio state
     void DrawWorld();                   //Draw level, entities, and player through the camera
-    void DrawUI();                      //Draw in-game UI overlay (currently unused)
     void DeInit();                      //Unload all assets, entities, audio, and close audio device
 
     bool HasPlayerWon() const;          //Win when player bounds overlap the goal tile

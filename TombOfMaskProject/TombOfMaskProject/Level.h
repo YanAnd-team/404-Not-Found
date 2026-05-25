@@ -19,7 +19,6 @@ class Level
 public:
     Level();
     void Init();     //Load all tile textures and the LDtk project file
-    void Update();
     void DeInit();   //Unload all tile textures
 
     bool Load(int levelNumber);   //Parse level N (1-indexed) from Level/Levels.ldtk
