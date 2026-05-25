@@ -48,11 +48,11 @@ Collect up to **3 stars** hidden in each level for a perfect run.
 
 | Element | Behaviour |
 |---------|-----------|
-| Ghost | Bounces back and forth between walls |
-| GhostPlus | Same as Ghost but periodically turns invisible |
+| Bat | Bounces back and forth between walls |
+| Monkey | Throw bombs vertically outside the game map |
 | Fixed Spikes | Always dangerous on contact |
 | Trigger Spikes | Deploy when the player passes adjacent; retract after a moment |
-| Gun Trap | Fires a bullet periodically in a fixed direction |
+| Arrow Trap | Shoot arrows in the direction of the trap |
 
 ---
 
