@@ -50,11 +50,11 @@ void Level::Init()
         wallLoaded[1] = true;
     }
 
-    if (FileExists("Level/Levels.ldtk"))
+    if (FileExists("Level/level.ldtk"))
     {
         try
         {
-            ldtkProject.loadFromFile("Level/Levels.ldtk");
+            ldtkProject.loadFromFile("Level/level.ldtk");
             projectLoaded = true;
         }
         catch (...) { projectLoaded = false; }
