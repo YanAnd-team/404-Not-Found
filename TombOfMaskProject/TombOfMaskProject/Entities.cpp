@@ -9,9 +9,9 @@ Bullet::Bullet(Vector2 pos, Vector2 dir, float speed)
     direction = dir;
     this->speed = speed;
     texLoaded = false;
-    if (FileExists("resources/sprites/Bullet.png"))
+    if (FileExists("resources/sprites/Traps/Dart Trap/Arrow.png"))
     {
-        tex = LoadTexture("resources/sprites/Bullet.png");
+        tex = LoadTexture("resources/sprites/Traps/Dart Trap/Arrow.png");
         texLoaded = true;
     }
 }
