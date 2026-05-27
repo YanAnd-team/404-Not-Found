@@ -4,7 +4,7 @@ void GameCamera::Init(int screenWidth, int screenHeight)
 {
     camera = { 0 };
     camera.target = { 0, 0 };
-    camera.offset = { screenWidth / 2.0f, screenHeight / 2.0f };
+    camera.offset = { screenWidth / 3.0f, screenHeight / 3.0f };
     camera.rotation = 0.0f;
     camera.zoom = 1.0f;
 }
