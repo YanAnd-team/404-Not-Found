@@ -221,6 +221,9 @@ publish/
 # in these scripts will be unencrypted
 PublishScripts/
 
+# LDtkLoader build intermediates
+TombOfMaskProject/packages/LDtkLoader/obj/
+
 # NuGet Packages
 *.nupkg
 # NuGet Symbol Packages
