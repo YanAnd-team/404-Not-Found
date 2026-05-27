@@ -281,20 +281,16 @@ TriggerTrap::TriggerTrap(Vector2 pos)
 TriggerTrap::~TriggerTrap() { if (texLoaded) UnloadTexture(tex); }
 
 void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
-//Activate when player steps adjacent; animate spike out after 0.6s delay, hold 1.5s, then retract
+//Activate when player steps on this tile; animate spike out after 0.6s delay, hold 1.5s, then retract
 {
     int tileX = (int)(position.x / level.GetTileSize());
     int tileY = (int)(position.y / level.GetTileSize());
     int playerTileX = (int)(player.position.x / level.GetTileSize());
     int playerTileY = (int)(player.position.y / level.GetTileSize());
-    int distX = playerTileX - tileX;
-    int distY = playerTileY - tileY;
 
     if (!triggered)
     {
-        if (!timerStarted && (
-            ((distX == 1 || distX == -1) && distY == 0) ||
-            (distX == 0 && (distY == 1 || distY == -1))))
+        if (!timerStarted && playerTileX == tileX && playerTileY == tileY)
             timerStarted = true;
 
         if (timerStarted)
