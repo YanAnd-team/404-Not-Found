@@ -4,7 +4,6 @@
 #include "Camera.h"
 #include "Level.h"
 #include "Entities.h"
-#include <vector>
 
 class Scene
 {
