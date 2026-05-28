@@ -4,11 +4,11 @@
 
 //Player animation frames
 #define PLAYER_IDLE       0
-#define PLAYER_START_MOVE 32
-#define PLAYER_MOVE_1     64
-#define PLAYER_MOVE_2     128
-#define PLAYER_MOVE_3     224
-#define PLAYER_MOVE_4     352
+#define PLAYER_START_MOVE 40
+#define PLAYER_MOVE_1     80
+#define PLAYER_MOVE_2     120
+#define PLAYER_MOVE_3     160
+#define PLAYER_MOVE_4     200
 
 class Player
 {

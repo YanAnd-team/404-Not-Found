@@ -122,7 +122,7 @@ void Player::Update(float dt, Rectangle worldBounds, Level& level)
         if (idleAnimTimer >= 0.15f)
         {
             idleAnimTimer = 0.0f;
-            int fc = idleTex.width > 0 ? (idleTex.width / 32) : 1;
+            int fc = idleTex.width > 0 ? (idleTex.width / 40) : 1;
             idleFrameIdx = (idleFrameIdx + 1) % fc;
         }
         frameIndex = 0;
@@ -156,16 +156,18 @@ void Player::Draw()
 
     if (frameIndex == 0)
     {
-        int fc = idleTex.width > 0 ? (idleTex.width / 32) : 1;
+        int fc = idleTex.width > 0 ? (idleTex.width / 40) : 1;
         int fi = idleFrameIdx % fc;
-        Rectangle src = { (float)(fi * 32), 0, flipX ? -32.0f : 32.0f, 32.0f };
+        float h = idleTex.height > 0 ? (float)idleTex.height : 40.0f;
+        Rectangle src = { (float)(fi * 40), 0, flipX ? -40.0f : 40.0f, h };
         DrawTexturePro(idleTex, src, dest, { drawWidth / 2.0f, drawHeight / 2.0f }, drawRotation, WHITE);
     }
     else
     {
-        int fc = moveTex.width > 0 ? (moveTex.width / 32) : 1;
+        int fc = moveTex.width > 0 ? (moveTex.width / 40) : 1;
         int fi = (frameIndex - 1) % fc;
-        Rectangle src = { (float)(fi * 32), 0, flipX ? -32.0f : 32.0f, 32.0f };
+        float h = moveTex.height > 0 ? (float)moveTex.height : 40.0f;
+        Rectangle src = { (float)(fi * 40), 0, flipX ? -40.0f : 40.0f, h };
         DrawTexturePro(moveTex, src, dest, { drawWidth / 2.0f, drawHeight / 2.0f }, drawRotation, WHITE);
     }
 }

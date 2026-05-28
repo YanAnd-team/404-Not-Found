@@ -87,25 +87,29 @@ Ghost::~Ghost()
 void Ghost::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
 {
     animTimer += dt;
-    if (animTimer >= 0.1f)
+    if (animTimer >= 0.75f)
     {
         animTimer = 0.0f;
-        int totalFrames = texLoaded ? (tex.width / 32) : 1;
+        int totalFrames = texLoaded ? (tex.width / 40) : 1;
         frameIndex = (frameIndex + 1) % totalFrames;
     }
 
     Vector2 newPos = { position.x + dir.x * speed * dt, position.y + dir.y * speed * dt };
-    int tileX = (int)((newPos.x + 8) / level.GetTileSize());
-    int tileY = (int)((newPos.y + 8) / level.GetTileSize());
-    char tile = level.GetTileAt(tileX, tileY);
-    if (tile == '1' || tile == 'i' || tile == '-')
-    {
-        dir.x = -dir.x; dir.y = -dir.y; //Reverse direction on wall hit
-    }
+
+    bool hitWall = false;
+    if (dir.x > 0)
+        hitWall = level.IsWall(newPos.x + 31, newPos.y + 2) || level.IsWall(newPos.x + 31, newPos.y + 29);
+    else if (dir.x < 0)
+        hitWall = level.IsWall(newPos.x,      newPos.y + 2) || level.IsWall(newPos.x,      newPos.y + 29);
+    else if (dir.y > 0)
+        hitWall = level.IsWall(newPos.x + 2,  newPos.y + 31) || level.IsWall(newPos.x + 29, newPos.y + 31);
+    else if (dir.y < 0)
+        hitWall = level.IsWall(newPos.x + 2,  newPos.y)      || level.IsWall(newPos.x + 29, newPos.y);
+
+    if (hitWall)
+        { dir.x = -dir.x; dir.y = -dir.y; }
     else
-    {
         position = newPos;
-    }
 
     if (CheckCollisionRecs(player.GetBounds(), GetBounds()))
         player.Reset();
@@ -116,7 +120,7 @@ void Ghost::Draw()
     Rectangle dest = { position.x, position.y, 32, 32 };
     if (texLoaded)
     {
-        Rectangle src = { (float)(frameIndex * 32), 0, 32.0f, (float)tex.height };
+        Rectangle src = { (float)(frameIndex * 40), 0, 40.0f, (float)tex.height };
         DrawTexturePro(tex, src, dest, Vector2{0,0}, 0, WHITE);
     }
     else DrawRectangleRec(dest, MAGENTA);
@@ -145,10 +149,10 @@ GhostPlus::~GhostPlus()
 void GhostPlus::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
 {
     animTimer += dt;
-    if (animTimer >= 0.1f)
+    if (animTimer >= 0.5f)
     {
         animTimer = 0.0f;
-        int totalFrames = plusTexLoaded ? (plusTex.width / 32) : 1;
+        int totalFrames = plusTexLoaded ? (plusTex.width / 96) : 1;
         frameIndex = (frameIndex + 1) % totalFrames;
     }
 
@@ -159,7 +163,7 @@ void GhostPlus::Draw()
 {
     if (plusTexLoaded)
     {
-        Rectangle src  = { (float)(frameIndex * 32), 0, 32.0f, (float)plusTex.height };
+        Rectangle src  = { (float)(frameIndex * 96), 0, 96.0f, (float)plusTex.height };
         Rectangle dest = { position.x, position.y, 32, 32 };
         DrawTexturePro(plusTex, src, dest, Vector2{0,0}, 0, WHITE);
     }
