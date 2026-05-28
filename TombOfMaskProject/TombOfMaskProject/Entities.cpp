@@ -127,8 +127,6 @@ Rectangle Ghost::GetBounds() const { return Rectangle{ position.x + 3, position.
 // --- GhostPlus ---
 GhostPlus::GhostPlus(Vector2 pos, bool vertical) : Ghost(pos, vertical)
 {
-    blinkTimer = 0.0f;
-    visible = true;
     plusTexLoaded = false;
     if (FileExists("resources/sprites/GhostPlus.png"))
     {
@@ -154,19 +152,11 @@ void GhostPlus::Update(float dt, Player &player, std::vector<Entity*> &entities,
         frameIndex = (frameIndex + 1) % totalFrames;
     }
 
-    blinkTimer += dt;
-    if (blinkTimer >= 2.0f) //Toggle visibility every 2 seconds
-    {
-        visible = !visible;
-        blinkTimer = 0.0f;
-    }
-    if (visible)
-        Ghost::Update(dt, player, entities, level);
+    Ghost::Update(dt, player, entities, level);
 }
 
 void GhostPlus::Draw()
 {
-    if (!visible) return;
     if (plusTexLoaded)
     {
         Rectangle src  = { (float)(frameIndex * 32), 0, 32.0f, (float)plusTex.height };

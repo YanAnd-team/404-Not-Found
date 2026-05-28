@@ -53,13 +53,11 @@ private:
 
 class GhostPlus : public Ghost {
 public:
-    GhostPlus(Vector2 pos, bool vertical=false);    //Ghost variant that blinks every 2s; invisible = no movement or collision
+    GhostPlus(Vector2 pos, bool vertical=false);    //Ghost variant with a different sprite; always visible
     ~GhostPlus();                                   //Unload texture
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Toggle visibility every 2s; skip movement when invisible
-    void Draw() override;                           //Draw only when visible
+    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Draw() override;
 private:
-    float blinkTimer;
-    bool visible;
     Texture2D plusTex;
     bool plusTexLoaded;
     int frameIndex;
