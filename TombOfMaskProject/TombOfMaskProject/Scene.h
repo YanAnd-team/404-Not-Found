@@ -16,6 +16,7 @@ public:
     bool HasPlayerWon() const;          //Win when player bounds overlap the goal tile
     void LoadLevel(int levelNumber);    //Destroy all entities, reload level, respawn player and entities
     void ReloadLevel();                 //Reload the current level from scratch (resets stars, entities, and player)
+    int  GetCurrentLevelNumber() const; //Return the level number currently loaded
 
     void UpdateAudio();                 //Stream music updates; must be called every frame
     void OnEnterMenu();                 //Switch music from gameplay track to menu track

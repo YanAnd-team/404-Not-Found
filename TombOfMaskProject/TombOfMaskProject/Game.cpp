@@ -88,7 +88,7 @@ void Game::UpdateTitle()
     if (IsKeyPressed(KEY_ENTER))
     {
         currentState = GAMEPLAY;
-        scene.ReloadLevel();
+        scene.LoadLevel(1);
         scene.OnEnterGameplay();
     }
 }
@@ -99,6 +99,11 @@ void Game::UpdateGameplay(float dt)
 
     if (scene.HasPlayerWon())
     {
+        // Unlock next level when current level is completed
+        int wonLevel = scene.GetCurrentLevelNumber();
+        if (wonLevel + 1 <= 5 && wonLevel + 1 > maxUnlockedLevel)
+            maxUnlockedLevel = wonLevel + 1;
+
         currentState = WIN;
         scene.OnPlayerWon();
         return;
@@ -110,19 +115,37 @@ void Game::UpdateGameplay(float dt)
         return;
     }
 
-    if (IsKeyPressed(KEY_ONE))   scene.LoadLevel(1);
-    if (IsKeyPressed(KEY_TWO))   scene.LoadLevel(2);
-    if (IsKeyPressed(KEY_THREE)) scene.LoadLevel(3);
-    if (IsKeyPressed(KEY_FOUR))  scene.LoadLevel(4);
-    if (IsKeyPressed(KEY_FIVE))  scene.LoadLevel(5);
+    // R: reset unlock progress and restart from level 1
+    if (IsKeyPressed(KEY_R))
+    {
+        maxUnlockedLevel = 1;
+        scene.LoadLevel(1);
+        return;
+    }
+
+    // Number keys: only load unlocked levels
+    if (IsKeyPressed(KEY_ONE))                              scene.LoadLevel(1);
+    if (IsKeyPressed(KEY_TWO)   && maxUnlockedLevel >= 2)   scene.LoadLevel(2);
+    if (IsKeyPressed(KEY_THREE) && maxUnlockedLevel >= 3)   scene.LoadLevel(3);
+    if (IsKeyPressed(KEY_FOUR)  && maxUnlockedLevel >= 4)   scene.LoadLevel(4);
+    if (IsKeyPressed(KEY_FIVE)  && maxUnlockedLevel >= 5)   scene.LoadLevel(5);
 }
 
 void Game::UpdateWin()
 {
     if (IsKeyPressed(KEY_ENTER))
     {
-        currentState = TITLE;
-        scene.OnEnterMenu();
+        int nextLevel = scene.GetCurrentLevelNumber() + 1;
+        if (nextLevel <= 5)
+        {
+            scene.LoadLevel(nextLevel);
+            currentState = GAMEPLAY;
+        }
+        else
+        {
+            currentState = TITLE;
+            scene.OnEnterMenu();
+        }
     }
 }
 
@@ -204,8 +227,9 @@ void Game::DrawGameplay()
 {
     scene.DrawStarHUD();
 
-    DrawText("Arrows: Move", 10, screenHeight - 40, 15, GRAY);
-    DrawText("1 ~ 5: Load Level", 10, screenHeight - 22, 15, GRAY);
+    DrawText("Arrows: Move", 10, screenHeight - 58, 15, GRAY);
+    DrawText(TextFormat("1~%d: Load Level  |  R: Reset progress", maxUnlockedLevel), 10, screenHeight - 40, 15, GRAY);
+    DrawText(TextFormat("Level %d / 5  (Unlocked up to %d)", scene.GetCurrentLevelNumber(), maxUnlockedLevel), 10, screenHeight - 22, 15, LIGHTGRAY);
 }
 
 void Game::DrawGameOver()
@@ -243,7 +267,8 @@ void Game::DrawWin()
 
     scene.DrawWinStars();
 
-    const char* backText = "Press ENTER to return to menu";
+    bool hasNextLevel = (scene.GetCurrentLevelNumber() < 5);
+    const char* backText = hasNextLevel ? "Press ENTER to continue" : "Press ENTER to return to menu";
     Vector2 backTextSize = MeasureTextEx(font, backText, FONT_SIZE, TEXT_SPACING);
     Vector2 backPos = {
         screenWidth / 2.0f - backTextSize.x / 2.0f,

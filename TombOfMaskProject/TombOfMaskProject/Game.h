@@ -38,6 +38,8 @@ private:
 
     GameState currentState;
 
+    int maxUnlockedLevel = 1;   // highest level the player has unlocked this session
+
     int screenWidth;
     int screenHeight;
 

@@ -177,6 +177,8 @@ void Scene::LoadLevel(int levelNumber)
     }
 }
 
+int Scene::GetCurrentLevelNumber() const { return currentLevelNumber; }
+
 bool Scene::HasPlayerWon() const
 {
     Vector2 goalPos = level.GetGoalPosition();
