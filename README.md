@@ -79,7 +79,7 @@ Collect up to **3 stars** hidden in each level for a perfect run.
 
 ## Demo Video
 
-[Watch the 1-minute demo video](https://www.youtube.com/channel/UChX7OsgOiBF6U9FGsiRFZcA)
+[Watch the 1-minute demo video](https://youtu.be/FZwQznZkHI4?si=txKN5TqpRWo4ycqN)
 
 > The video shows: initial screen → title screen → gameplay → enemy/trap contact (game over) → return to title → successful run → win screen → return to title.
 
