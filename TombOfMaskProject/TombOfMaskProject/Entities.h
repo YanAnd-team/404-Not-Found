@@ -99,6 +99,7 @@ private:
     float animTimer;
     float retractTimer;
     bool retracting;
+    float spikeRotation = 0.0f;
 };
 
 class Decoration : public Entity {

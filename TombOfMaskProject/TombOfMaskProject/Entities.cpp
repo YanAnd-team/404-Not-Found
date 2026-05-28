@@ -1,6 +1,7 @@
 #include "Entities.h"
 #include "Player.h"
 #include "Level.h"
+#include <cmath>
 
 // --- Bullet ---
 Bullet::Bullet(Vector2 pos, Vector2 dir, float speed)
@@ -33,10 +34,7 @@ void Bullet::Update(float dt, Player &player, std::vector<Entity*> &entities, Le
         active = false; return;
     }
 
-    int bulletTileX = (int)((position.x + 4) / level.GetTileSize());
-    int bulletTileY = (int)((position.y + 4) / level.GetTileSize());
-    char bulletTile = level.GetTileAt(bulletTileX, bulletTileY);
-    if (bulletTile == '1' || bulletTile == '2' || bulletTile == '-')
+    if (level.IsWall(position.x + 4, position.y + 4))
     {
         active = false; return;
     }
@@ -52,10 +50,20 @@ void Bullet::Update(float dt, Player &player, std::vector<Entity*> &entities, Le
 
 void Bullet::Draw()
 {
-    Rectangle dest = { position.x, position.y, 8, 8 };
+    float rotation = 0.0f;
+    if      (direction.x > 0) rotation =   0.0f;
+    else if (direction.y > 0) rotation =  90.0f;
+    else if (direction.x < 0) rotation = 180.0f;
+    else if (direction.y < 0) rotation = 270.0f;
+
+    float w = (texLoaded ? (float)tex.width  : 16.0f) * 0.5f;
+    float h = (texLoaded ? (float)tex.height : 8.0f)  * 0.5f;
+    float sw = texLoaded ? (float)tex.width  : 16.0f;
+    float sh = texLoaded ? (float)tex.height : 8.0f;
+    Rectangle dest = { position.x + w / 2.0f, position.y + h / 2.0f, w, h };
     if (texLoaded)
-        DrawTexturePro(tex, Rectangle{0,0,16.0f,16.0f}, dest, Vector2{0,0}, 0, WHITE);
-    else DrawRectangleRec(dest, YELLOW);
+        DrawTexturePro(tex, {0, 0, sw, sh}, dest, {w / 2.0f, h / 2.0f}, rotation, WHITE);
+    else DrawRectangleRec({position.x, position.y, w, h}, YELLOW);
 }
 
 Rectangle Bullet::GetBounds() const
@@ -284,7 +292,16 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
     if (!triggered)
     {
         if (!timerStarted && playerTileX == tileX && playerTileY == tileY)
+        {
             timerStarted = true;
+            // 锁定朝向玩家的方向（四方向），触发后不再改变
+            float dx = player.position.x - position.x;
+            float dy = player.position.y - position.y;
+            if ((dx < 0 ? -dx : dx) >= (dy < 0 ? -dy : dy))
+                spikeRotation = (dx >= 0) ? 90.0f : 270.0f;
+            else
+                spikeRotation = (dy >= 0) ? 180.0f : 0.0f;
+        }
 
         if (timerStarted)
         {
@@ -337,21 +354,23 @@ void TriggerTrap::Draw()
         DrawTexturePro(tex, src, dest, Vector2{0,0}, 0, WHITE);
     }
 
-    if (spikeTexLoaded)
+    if (spikeTexLoaded && (timerStarted || triggered))
     {
         float sh = (float)spikeTex.height;
         float sw = (float)spikeTex.width;
+        Vector2 center = { position.x + 16, position.y + 16 };
+        Vector2 origin = { 16, 16 };
         if (timerStarted && !triggered)
         {
-            // 显示下半部分（刺尖刚冒出来）
-            Rectangle src  = { 0, sh / 2.0f, sw, sh / 2.0f };
-            Rectangle sdest = { position.x, position.y + 16, 32, 16 };
-            DrawTexturePro(spikeTex, src, sdest, {0,0}, 0, WHITE);
+            // 半截突刺：裁取图片上半（刺尖），缩放到半格高显示
+            Rectangle src   = { 0, 0, sw, sh / 2.0f };
+            Rectangle sdest = { center.x, center.y, 32, 16 };
+            DrawTexturePro(spikeTex, src, sdest, origin, spikeRotation, WHITE);
         }
         else if (triggered)
         {
-            Rectangle src  = { 0, 0, sw, sh };
-            DrawTexturePro(spikeTex, src, dest, {0,0}, 0, WHITE);
+            Rectangle src = { 0, 0, sw, sh };
+            DrawTexturePro(spikeTex, src, { center.x, center.y, 32, 32 }, origin, spikeRotation, WHITE);
         }
     }
 }
