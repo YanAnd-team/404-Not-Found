@@ -77,7 +77,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\packages\LDtkLoader\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\packages\LDtkLoader\include;..\packages\LDtkLoader\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -93,7 +93,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\packages\LDtkLoader\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\packages\LDtkLoader\include;..\packages\LDtkLoader\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -107,13 +107,11 @@
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\packages\LDtkLoader\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\packages\LDtkLoader\include;..\packages\LDtkLoader\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\packages\LDtkLoader\lib\x64\Debug;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LDtkLoader-d.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -125,13 +123,11 @@
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\packages\LDtkLoader\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\packages\LDtkLoader\include;..\packages\LDtkLoader\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\packages\LDtkLoader\lib\x64\Release;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>LDtkLoader.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -142,6 +138,20 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\DataTypes.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\Entity.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\EntityDef.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\Enum.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\FieldsContainer.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\Layer.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\LayerDef.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\Level.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\Project.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\TagsContainer.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\Tile.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\Tileset.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\Utils.cpp" />
+    <ClCompile Include="..\packages\LDtkLoader\src\World.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
