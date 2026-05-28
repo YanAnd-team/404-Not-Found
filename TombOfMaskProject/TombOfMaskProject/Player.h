@@ -20,24 +20,28 @@ public:
 
     void Reset();                                                   //Teleport back to start position and flag death for this frame
 
-    Vector2 GetCenter() const;      //Return the center point of the player sprite
-    Rectangle GetBounds() const;    //Return the collision rectangle of the player
-    bool IsSliding() const { return sliding; }  //Return true if the player is currently moving
+    Vector2 GetCenter() const;
+    Rectangle GetBounds() const;
+    bool IsSliding() const { return sliding; }
+    Vector2 GetLastSlideDir() const { return lastSlideDir; } //Last non-zero slide direction (kept after stopping)
 
     Vector2 position;
     float speed;
     bool diedThisFrame;
 
 private:
-    bool IsWallAhead(Vector2 dir, Level& level) const;  //Check two leading corners in the movement direction for walls
 
     Vector2 startPosition;
     Vector2 currentDir;
+    Vector2 lastSlideDir;
     bool sliding;
 
-    Texture2D texture;
+    Texture2D idleTex;
+    Texture2D moveTex;
     int frameIndex;
+    int idleFrameIdx;
     float animTimer;
+    float idleAnimTimer;
     float animSpeed;
     float drawScale;
     float drawRotation;

@@ -45,5 +45,7 @@ private:
 
     Font font;
     Scene scene;
-    Texture2D menu;
+    Texture2D bgTex;
+    Texture2D logoTex;
+    Texture2D enterTex;
 };

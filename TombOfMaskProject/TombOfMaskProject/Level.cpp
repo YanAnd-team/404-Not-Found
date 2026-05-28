@@ -14,9 +14,9 @@ Level::Level()
 
 void Level::Init()
 {
-    if (FileExists("resources/sprites/Stars and coins/star0.png"))
+    if (FileExists("resources/sprites/Stars and coins/Star.png"))
     {
-        starTex = LoadTexture("resources/sprites/Stars and coins/star0.png");
+        starTex = LoadTexture("resources/sprites/Stars and coins/Star.png");
         starLoaded = true;
     }
 
@@ -68,13 +68,16 @@ bool Level::Load(int levelNumber)
     {
         if (layer.getType() == ldtk::LayerType::IntGrid)
         {
-            for (int y = 0; y < height; ++y)
-                for (int x = 0; x < width; ++x)
-                {
-                    int val = layer.getIntGridVal(x, y).value;
-                    if      (val == 1) rows[y][x] = (char)Wall1;
-                    else if (val == 2) rows[y][x] = (char)Wall2;
-                }
+            // Use the layer's actual cell size (4px) for the wall collision grid
+            wallCellSize  = layer.getCellSize();
+            wallGridWidth  = layer.getGridSize().x;
+            wallGridHeight = layer.getGridSize().y;
+            wallRows.assign(wallGridHeight, std::string(wallGridWidth, '-'));
+
+            for (int y = 0; y < wallGridHeight; ++y)
+                for (int x = 0; x < wallGridWidth; ++x)
+                    if (layer.getIntGridVal(x, y).value == 1)
+                        wallRows[y][x] = '1';
         }
         else if (layer.getType() == ldtk::LayerType::Entities)
         {
@@ -94,20 +97,28 @@ bool Level::Load(int levelNumber)
                 else if (name == "Final")
                 {
                     goalPos      = { (float)entity.getPosition().x, (float)entity.getPosition().y };
-                    rows[gy][gx] = (char)End;
+                    rows[gy][gx] = 'f';
                 }
-                else if (name == "Star")                              { rows[gy][gx] = (char)Star;        }
-                else if (name == "Step")                              { rows[gy][gx] = (char)TrapSpike;   }
-                else if (name == "Sharp1" || name == "Sharp2")        { rows[gy][gx] = (char)Spike;       }
-                else if (name == "Monster1")                          { rows[gy][gx] = '6';               }
-                else if (name == "Monster2")                          { rows[gy][gx] = '7';               }
-                else if (name == "Arrow_trap")                        { rows[gy][gx] = (char)GunTrapTile; }
+                else if (name == "Star")       { rows[gy][gx] = 's'; }
+                else if (name == "Coin")       { rows[gy][gx] = 'c'; }
+                else if (name == "Coin1")      { rows[gy][gx] = 'k'; }
+                // "Step" is a floor decoration tile, not a trap - no entity needed
+                else if (name == "Sharp1")     { rows[gy][gx] = 'S'; }
+                else if (name == "Sharp2")     { rows[gy][gx] = '2'; }
+                else if (name == "Sharp4")     { rows[gy][gx] = '4'; }
+                else if (name == "Sharp6")     { rows[gy][gx] = 'Y'; }
+                else if (name == "Monster1")   { rows[gy][gx] = '6'; }
+                else if (name == "Monster2")   { rows[gy][gx] = '7'; }
+                else if (name == "Arrow_trap") { rows[gy][gx] = 'G'; }
+                else if (name == "Arrow_trap1"){ rows[gy][gx] = 'g'; }
+                else if (name == "Arrow_trap2"){ rows[gy][gx] = 'u'; }
+                else if (name == "Arrow_trap3"){ rows[gy][gx] = 'd'; }
+                else if (name == "Ice_box")    { rows[gy][gx] = 'i'; }
             }
         }
     }
 
-    // PNG files should be exported from LDtk and named level_1.png, level_2.png, etc.
-    std::string pngPath = "Level/level_" + std::to_string(levelNumber) + ".png";
+    std::string pngPath = "Level/level/png/Level_" + std::to_string(levelNumber - 1) + ".png";
     if (FileExists(pngPath.c_str()))
     {
         m_levelTex = LoadTexture(pngPath.c_str());
@@ -119,9 +130,9 @@ bool Level::Load(int levelNumber)
 
 char Level::GetTileAt(int tileX, int tileY) const
 {
-    if (tileY < 0 || tileY >= (int)rows.size()) return (char)Empty;
+    if (tileY < 0 || tileY >= (int)rows.size()) return '-';
     const std::string& row = rows[tileY];
-    if (tileX < 0 || tileX >= (int)row.size()) return (char)Empty;
+    if (tileX < 0 || tileX >= (int)row.size()) return '-';
     return row[tileX];
 }
 
@@ -138,11 +149,27 @@ void Level::Draw() const
         for (int x = 0; x < (int)rows[y].size(); ++x)
         {
             char t = rows[y][x];
-            if      (t == (char)Wall1) DrawRectangle(x * tileSize, y * tileSize, tileSize, tileSize, GRAY);
-            else if (t == (char)Wall2) DrawRectangle(x * tileSize, y * tileSize, tileSize, tileSize, DARKGRAY);
+            if      (t == '1') DrawRectangle(x * tileSize, y * tileSize, tileSize, tileSize, GRAY);
+            else if (t == '2') DrawRectangle(x * tileSize, y * tileSize, tileSize, tileSize, DARKGRAY);
         }
+}
+
+bool Level::IsWall(float worldX, float worldY) const
+{
+    if (wallCellSize <= 0 || wallRows.empty()) return false;
+    int cx = (int)(worldX / wallCellSize);
+    int cy = (int)(worldY / wallCellSize);
+    if (cy < 0 || cy >= (int)wallRows.size())    return false;
+    if (cx < 0 || cx >= (int)wallRows[cy].size()) return false;
+    return wallRows[cy][cx] == '1';
 }
 
 Vector2 Level::GetStartPosition() const { return startPos; }
 Vector2 Level::GetGoalPosition()  const { return goalPos;  }
 Rectangle Level::GetWorldBounds() const { return Rectangle{ 0.0f, 0.0f, (float)width * tileSize, (float)height * tileSize }; }
+
+void Level::SetTileAt(int x, int y, char v)
+{
+    if (y >= 0 && y < (int)rows.size() && x >= 0 && x < (int)rows[y].size())
+        rows[y][x] = v;
+}

@@ -3,40 +3,55 @@
 void Scene::Init()
 {
     InitAudioDevice();
-    if (FileExists("resources/SFX/Coins.wav"))
+    if (FileExists("resources/SFX/Star-pick-up.mp3"))
     {
-        sound[0] = LoadSound("resources/SFX/Coins.wav");
-		soundLoaded[0] = true;
+        sound[0] = LoadSound("resources/SFX/Star-pick-up.mp3");
+        soundLoaded[0] = true;
     }
-    if (FileExists("resources/SFX/Movement.wav"))
+    if (FileExists("resources/SFX/Player-movement.mp3"))
     {
-        sound[1] = LoadSound("resources/SFX/Movement.wav");
-		soundLoaded[1] = true;
+        sound[1] = LoadSound("resources/SFX/Player-movement.mp3");
+        soundLoaded[1] = true;
     }
-    if(FileExists("resources/SFX/PlayerDie.wav"))
+    if (FileExists("resources/SFX/Death.mp3"))
     {
-        sound[2] = LoadSound("resources/SFX/PlayerDie.wav");
-		soundLoaded[2] = true;
+        sound[2] = LoadSound("resources/SFX/Death.mp3");
+        soundLoaded[2] = true;
     }
-    if(FileExists("resources/SFX/Win.wav"))
+    if (FileExists("resources/SFX/Win.mp3"))
     {
-        sound[3] = LoadSound("resources/SFX/Win.wav");
-		soundLoaded[3] = true;
+        sound[3] = LoadSound("resources/SFX/Win.mp3");
+        soundLoaded[3] = true;
+    }
+    if (FileExists("resources/SFX/1-star.mp3"))
+    {
+        sound[4] = LoadSound("resources/SFX/1-star.mp3");
+        soundLoaded[4] = true;
+    }
+    if (FileExists("resources/SFX/2-star.mp3"))
+    {
+        sound[5] = LoadSound("resources/SFX/2-star.mp3");
+        soundLoaded[5] = true;
+    }
+    if (FileExists("resources/SFX/3-star.mp3"))
+    {
+        sound[6] = LoadSound("resources/SFX/3-star.mp3");
+        soundLoaded[6] = true;
     }
 
-    if(FileExists("resources/Music/MenuSong.mp3"))
+    if (FileExists("resources/Music/Soundtrack.mp3"))
     {
-        music[0] = LoadMusicStream("resources/Music/MenuSong.mp3");
-		music[0].looping = true;
+        music[0] = LoadMusicStream("resources/Music/Soundtrack.mp3");
+        music[0].looping = true;
         PlayMusicStream(music[0]);
-		musicLoaded[0] = true;
-	}
-    if(FileExists("resources/Music/BattleSong.mp3"))
+        musicLoaded[0] = true;
+    }
+    if (FileExists("resources/Music/InGame-soundtrack.mp3"))
     {
-		music[1] = LoadMusicStream("resources/Music/BattleSong.mp3");
+        music[1] = LoadMusicStream("resources/Music/InGame-soundtrack.mp3");
         music[1].looping = true;
-		musicLoaded[1] = true;
-	}
+        musicLoaded[1] = true;
+    }
 
     if (FileExists("resources/sprites/StarToComp.png"))
     {
@@ -76,10 +91,13 @@ void Scene::Update(float dt)
     player.Update(dt, worldBounds, level);
     camera.Update(player.GetCenter());
 
+    int prevStarCount = starCount;
     for (size_t i = 0; i < entities.size(); ++i)
     {
         if (entities[i]) entities[i]->Update(dt, player, entities, level);
     }
+    if (starCount > prevStarCount && soundLoaded[0])
+        PlaySound(sound[0]);
 
     // Remove inactive entities and free memory
     for (size_t i = 0; i < entities.size(); )
@@ -110,8 +128,35 @@ void Scene::DrawWorld()
     level.Draw();
     for (auto entity : entities) if (entity && entity->IsActive()) entity->Draw();
     player.Draw();
+    if (showHitboxes) DrawHitboxes();
 
     camera.EndWorld();
+}
+
+void Scene::DrawHitboxes() const
+{
+    int ts = level.GetTileSize();
+
+    // Walls
+    for (int y = 0; y < level.GetHeight(); ++y)
+        for (int x = 0; x < level.GetWidth(); ++x)
+        {
+            char t = level.GetTileAt(x, y);
+            if (t == '1')
+                DrawRectangleLinesEx({ (float)(x * ts), (float)(y * ts), (float)ts, (float)ts }, 1.0f, RED);
+        }
+
+    // Entities
+    for (auto e : entities)
+        if (e && e->IsActive())
+            DrawRectangleLinesEx(e->GetBounds(), 1.5f, ORANGE);
+
+    // Goal
+    Vector2 gp = level.GetGoalPosition();
+    DrawRectangleLinesEx({ gp.x, gp.y, (float)ts, (float)ts }, 2.0f, YELLOW);
+
+    // Player (drawn last so it's always on top)
+    DrawRectangleLinesEx(player.GetBounds(), 2.0f, GREEN);
 }
 
 void Scene::UpdateAudio()
@@ -143,6 +188,9 @@ void Scene::OnEnterGameplay()
 void Scene::OnPlayerWon()
 {
     if (soundLoaded[3]) PlaySound(sound[3]);
+    if      (starCount >= 3 && soundLoaded[6]) PlaySound(sound[6]);
+    else if (starCount >= 2 && soundLoaded[5]) PlaySound(sound[5]);
+    else if (starCount >= 1 && soundLoaded[4]) PlaySound(sound[4]);
 }
 
 void Scene::ReloadLevel()
@@ -236,10 +284,8 @@ void Scene::DeInit()
         StopMusicStream(music[1]);
         UnloadMusicStream(music[1]);
     }
-    if (soundLoaded[0]) { StopSound(sound[0]); UnloadSound(sound[0]); }
-    if (soundLoaded[1]) { StopSound(sound[1]); UnloadSound(sound[1]); }
-    if (soundLoaded[2]) { StopSound(sound[2]); UnloadSound(sound[2]); }
-    if (soundLoaded[3]) { StopSound(sound[3]); UnloadSound(sound[3]); }
+    for (int i = 0; i < 7; ++i)
+        if (soundLoaded[i]) { StopSound(sound[i]); UnloadSound(sound[i]); }
     if (starToCompLoaded) UnloadTexture(starToCompTex);
     UnloadFont(font);
     CloseAudioDevice();

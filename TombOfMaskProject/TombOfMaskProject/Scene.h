@@ -24,6 +24,7 @@ public:
     void OnPlayerWon();                 //Play win sound effect
     void DrawStarHUD();                 //Draw collected stars in the top-left corner
     void DrawWinStars();                //Draw 3 star slots centered on screen; filled = collected, empty icon = not collected
+    void ToggleHitboxes() { showHitboxes = !showHitboxes; }
 
     Player player;
     GameCamera camera;
@@ -32,13 +33,16 @@ public:
     int starCount = 0;
 
 private:
-    Sound sound[4];
+    void DrawHitboxes() const;          //Draw colored outlines for player, walls, entities, and goal (debug)
+
+    Sound sound[7];   // [0]=Star pickup [1]=Movement [2]=Death [3]=Win [4]=1-star [5]=2-star [6]=3-star
     Music music[2];
     Font font;
-	bool soundLoaded[4] = {};
-	bool musicLoaded[2] = {};
+    bool soundLoaded[7] = {};
+    bool musicLoaded[2] = {};
     int currentLevelNumber = 1;
     bool wasSliding = false;
+    bool showHitboxes = false;
     Texture2D starToCompTex;
     bool starToCompLoaded = false;
 };

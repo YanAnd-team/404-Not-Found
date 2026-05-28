@@ -8,16 +8,21 @@ void Game::Init()
     InitWindow(screenWidth, screenHeight, "Tomb of Mask");
     SetTargetFPS(60);
 
+    if (FileExists("resources/sprites/Icons/icon.png"))
+    {
+        Image iconImg = LoadImage("resources/sprites/Icons/icon.png");
+        SetWindowIcon(iconImg);
+        UnloadImage(iconImg);
+    }
+
     currentState = INITIAL;
 
-    if (FileExists("resources/sprites/MainMenu.png"))
-        menu = LoadTexture("resources/sprites/MainMenu.png");
-    else
-    {
-        Image img = GenImageColor(512, 360, WHITE);
-        menu = LoadTextureFromImage(img);
-        UnloadImage(img);
-    }
+    bgTex    = FileExists("resources/sprites/Background/main_background.png")
+               ? LoadTexture("resources/sprites/Background/main_background.png") : Texture2D{};
+    logoTex  = FileExists("resources/sprites/Background/logo_tomb.png")
+               ? LoadTexture("resources/sprites/Background/logo_tomb.png")       : Texture2D{};
+    enterTex = FileExists("resources/sprites/Background/Press_ENTER.png")
+               ? LoadTexture("resources/sprites/Background/Press_ENTER.png")     : Texture2D{};
 
     scene.Init();
 
@@ -66,7 +71,9 @@ void Game::DeInit()
 {
     scene.DeInit();
     UnloadFont(font);
-    UnloadTexture(menu);
+    if (bgTex.id)    UnloadTexture(bgTex);
+    if (logoTex.id)  UnloadTexture(logoTex);
+    if (enterTex.id) UnloadTexture(enterTex);
     CloseWindow();
 }
 
@@ -99,10 +106,10 @@ void Game::UpdateGameplay(float dt)
 
     if (scene.HasPlayerWon())
     {
-        // Unlock next level when current level is completed
-        int wonLevel = scene.GetCurrentLevelNumber();
-        if (wonLevel + 1 <= 5 && wonLevel + 1 > maxUnlockedLevel)
-            maxUnlockedLevel = wonLevel + 1;
+        // [UNLOCK SYSTEM DISABLED FOR TESTING]
+        // int wonLevel = scene.GetCurrentLevelNumber();
+        // if (wonLevel + 1 <= 5 && wonLevel + 1 > maxUnlockedLevel)
+        //     maxUnlockedLevel = wonLevel + 1;
 
         currentState = WIN;
         scene.OnPlayerWon();
@@ -115,20 +122,17 @@ void Game::UpdateGameplay(float dt)
         return;
     }
 
-    // R: reset unlock progress and restart from level 1
-    if (IsKeyPressed(KEY_R))
-    {
-        maxUnlockedLevel = 1;
-        scene.LoadLevel(1);
-        return;
-    }
+    if (IsKeyPressed(KEY_B)) scene.ToggleHitboxes();
 
-    // Number keys: only load unlocked levels
-    if (IsKeyPressed(KEY_ONE))                              scene.LoadLevel(1);
-    if (IsKeyPressed(KEY_TWO)   && maxUnlockedLevel >= 2)   scene.LoadLevel(2);
-    if (IsKeyPressed(KEY_THREE) && maxUnlockedLevel >= 3)   scene.LoadLevel(3);
-    if (IsKeyPressed(KEY_FOUR)  && maxUnlockedLevel >= 4)   scene.LoadLevel(4);
-    if (IsKeyPressed(KEY_FIVE)  && maxUnlockedLevel >= 5)   scene.LoadLevel(5);
+    // [UNLOCK SYSTEM DISABLED FOR TESTING] R: reset unlock progress and restart from level 1
+    // if (IsKeyPressed(KEY_R)) { maxUnlockedLevel = 1; scene.LoadLevel(1); return; }
+
+    // Number keys: load any level freely (unlock check disabled for testing)
+    if (IsKeyPressed(KEY_ONE))   scene.LoadLevel(1);
+    if (IsKeyPressed(KEY_TWO))   scene.LoadLevel(2);
+    if (IsKeyPressed(KEY_THREE)) scene.LoadLevel(3);
+    if (IsKeyPressed(KEY_FOUR))  scene.LoadLevel(4);
+    if (IsKeyPressed(KEY_FIVE))  scene.LoadLevel(5);
 }
 
 void Game::UpdateWin()
@@ -210,17 +214,34 @@ void Game::DrawInitial()
 
 void Game::DrawTitle()
 {
-	DrawTextureEx(menu, Vector2{ 0, 0 }, 0, 3.5f, Fade(WHITE, 0.8f));
+    // Background - stretch to fill screen
+    if (bgTex.id)
+        DrawTexturePro(bgTex,
+            { 0, 0, (float)bgTex.width, (float)bgTex.height },
+            { 0, 0, (float)screenWidth, (float)screenHeight },
+            { 0, 0 }, 0, WHITE);
 
-    const char* titleText = "Tomb of the Mask";
-    Vector2 titleTextSize = MeasureTextEx(font, titleText, FONT_SIZE * 2.5f, TEXT_SPACING);
-    Vector2 titlePos = { screenWidth / 2.0f - titleTextSize.x / 2.0f, screenHeight / 2.0f - titleTextSize.y / 2.0f - 170 };
-    DrawTextEx(font, titleText, titlePos, FONT_SIZE * 2.5f, TEXT_SPACING, ORANGE);
+    // Logo - 80% of screen width, centered, near top
+    if (logoTex.id)
+    {
+        float logoW = screenWidth * 0.80f;
+        float logoH = logoTex.height * (logoW / logoTex.width);
+        DrawTexturePro(logoTex,
+            { 0, 0, (float)logoTex.width, (float)logoTex.height },
+            { (screenWidth - logoW) / 2.0f, 55, logoW, logoH },
+            { 0, 0 }, 0, WHITE);
+    }
 
-    const char* promptText = "Press ENTER to start";
-    Vector2 promptTextSize = MeasureTextEx(font, promptText, FONT_SIZE, TEXT_SPACING);
-    Vector2 promptPos = { screenWidth / 2.0f - promptTextSize.x / 2.0f, screenHeight / 2.0f + 160 };
-    DrawTextEx(font, promptText, promptPos, FONT_SIZE, TEXT_SPACING, YELLOW);
+    // "Press ENTER to play" - 30% of screen width, centered, near bottom
+    if (enterTex.id)
+    {
+        float enterW = screenWidth * 0.30f;
+        float enterH = enterTex.height * (enterW / enterTex.width);
+        DrawTexturePro(enterTex,
+            { 0, 0, (float)enterTex.width, (float)enterTex.height },
+            { (screenWidth - enterW) / 2.0f, screenHeight - enterH - 55, enterW, enterH },
+            { 0, 0 }, 0, WHITE);
+    }
 }
 
 void Game::DrawGameplay()
@@ -228,7 +249,7 @@ void Game::DrawGameplay()
     scene.DrawStarHUD();
 
     DrawText("Arrows: Move", 10, screenHeight - 58, 15, GRAY);
-    DrawText(TextFormat("1~%d: Load Level  |  R: Reset progress", maxUnlockedLevel), 10, screenHeight - 40, 15, GRAY);
+    DrawText(TextFormat("1~%d: Load Level  |  R: Reset  |  B: Hitboxes", maxUnlockedLevel), 10, screenHeight - 40, 15, GRAY);
     DrawText(TextFormat("Level %d / 5  (Unlocked up to %d)", scene.GetCurrentLevelNumber(), maxUnlockedLevel), 10, screenHeight - 22, 15, LIGHTGRAY);
 }
 

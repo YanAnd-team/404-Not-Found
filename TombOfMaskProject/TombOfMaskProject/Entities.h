@@ -66,8 +66,8 @@ private:
 
 class GunTrap : public Entity {
 public:
-    GunTrap(Vector2 pos);   //Fires a bullet every 2s toward the nearest open tile direction
-    ~GunTrap();             //Unload texture
+    GunTrap(Vector2 pos, Vector2 dir);  //Fires a bullet every 2s in the given direction
+    ~GunTrap();                         //Unload texture
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Detect fire direction once, then spawn bullets on cooldown
     void Draw() override;                   //Draw trap sprite
     Rectangle GetBounds() const override;   //Return 32x32 collision rectangle
@@ -101,11 +101,36 @@ private:
 
 class FixedTrap : public Entity {
 public:
-    FixedTrap(Vector2 pos); //Static spike; kills on contact
+    FixedTrap(Vector2 pos, const char* spritePath = "resources/sprites/Traps/Sharp/Sharp1.png"); //Static spike; kills on contact
     ~FixedTrap();           //Unload texture
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Reset player on contact
     void Draw() override;                   //Draw spike sprite
     Rectangle GetBounds() const override;   //Return 32x32 collision rectangle
+private:
+    Vector2 position;
+    Texture2D tex;
+    bool texLoaded = false;
+};
+
+class CoinCollectible : public Entity {
+public:
+    CoinCollectible(Vector2 pos, const char* spritePath); //Coin; disappears when collected
+    ~CoinCollectible();
+    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Draw() override;
+    Rectangle GetBounds() const override;
+private:
+    Vector2 position;
+    Texture2D tex;
+    bool texLoaded = false;
+};
+
+class IceBox : public Entity {
+public:
+    IceBox(Vector2 pos);
+    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Draw() override;
+    Rectangle GetBounds() const override;
 private:
     Vector2 position;
     Texture2D tex;

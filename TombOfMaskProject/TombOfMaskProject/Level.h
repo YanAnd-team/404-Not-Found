@@ -3,7 +3,6 @@
 #include <vector>
 #include <LDtkLoader/Project.hpp>
 
-enum Map { Empty='-', Wall1='1', Wall2='2', Spike='S', TrapSpike='T', GunTrapTile='G', End='f', Star='s' };
 
 class Level
 {
@@ -16,7 +15,9 @@ public:
 
     void Draw() const;   //Draw the level PNG; falls back to colored rectangles if PNG is missing
 
-    char GetTileAt(int tileX, int tileY) const;   //Return tile char at grid coords; returns '-' (Empty) if out of bounds
+    char GetTileAt(int tileX, int tileY) const;    //Return tile char at grid coords; returns '-' if out of bounds
+    void SetTileAt(int tileX, int tileY, char v); //Overwrite a tile (used by IceBox)
+    bool IsWall(float worldX, float worldY) const; //True if the 4px wall grid has a wall at the given world pixel position
 
     Vector2 GetStartPosition() const;
     Vector2 GetGoalPosition() const;
@@ -33,7 +34,11 @@ private:
     int tileSize;
     Vector2 startPos;
     Vector2 goalPos;
-    std::vector<std::string> rows;
+    std::vector<std::string> rows;      // 16px entity grid
+    std::vector<std::string> wallRows; // 4px collision grid
+    int wallCellSize = 4;
+    int wallGridWidth  = 0;
+    int wallGridHeight = 0;
 
     ldtk::Project ldtkProject;
     bool projectLoaded;

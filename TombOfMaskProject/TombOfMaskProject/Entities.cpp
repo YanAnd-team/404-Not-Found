@@ -9,9 +9,9 @@ Bullet::Bullet(Vector2 pos, Vector2 dir, float speed)
     direction = dir;
     this->speed = speed;
     texLoaded = false;
-    if (FileExists("resources/sprites/Traps/Dart Trap/Arrow.png"))
+    if (FileExists("resources/sprites/Traps/Arrow Trap/Arrow.png"))
     {
-        tex = LoadTexture("resources/sprites/Traps/Dart Trap/Arrow.png");
+        tex = LoadTexture("resources/sprites/Traps/Arrow Trap/Arrow.png");
         texLoaded = true;
     }
 }
@@ -36,7 +36,7 @@ void Bullet::Update(float dt, Player &player, std::vector<Entity*> &entities, Le
     int bulletTileX = (int)((position.x + 4) / level.GetTileSize());
     int bulletTileY = (int)((position.y + 4) / level.GetTileSize());
     char bulletTile = level.GetTileAt(bulletTileX, bulletTileY);
-    if (bulletTile == '1' || bulletTile == '2' || bulletTile == (char)Empty)
+    if (bulletTile == '1' || bulletTile == '2' || bulletTile == '-')
     {
         active = false; return;
     }
@@ -70,9 +70,9 @@ Ghost::Ghost(Vector2 pos, bool vertical)
     speed = 60.0f;
     if (vertical) dir = {0,1}; else dir = {1,0};
     texLoaded = false;
-    if (FileExists("resources/sprites/Ghost.png"))
+    if (FileExists("resources/sprites/Enemy/Monster1.png"))
     {
-        tex = LoadTexture("resources/sprites/Ghost.png");
+        tex = LoadTexture("resources/sprites/Enemy/Monster1.png");
         texLoaded = true;
     }
     frameIndex = 0;
@@ -98,7 +98,7 @@ void Ghost::Update(float dt, Player &player, std::vector<Entity*> &entities, Lev
     int tileX = (int)((newPos.x + 8) / level.GetTileSize());
     int tileY = (int)((newPos.y + 8) / level.GetTileSize());
     char tile = level.GetTileAt(tileX, tileY);
-    if (tile == (char)Wall1 || tile == (char)Wall2 || tile == (char)Empty)
+    if (tile == '1' || tile == 'i' || tile == '-')
     {
         dir.x = -dir.x; dir.y = -dir.y; //Reverse direction on wall hit
     }
@@ -128,9 +128,9 @@ Rectangle Ghost::GetBounds() const { return Rectangle{ position.x + 3, position.
 GhostPlus::GhostPlus(Vector2 pos, bool vertical) : Ghost(pos, vertical)
 {
     plusTexLoaded = false;
-    if (FileExists("resources/sprites/GhostPlus.png"))
+    if (FileExists("resources/sprites/Enemy/Monster2.png"))
     {
-        plusTex = LoadTexture("resources/sprites/GhostPlus.png");
+        plusTex = LoadTexture("resources/sprites/Enemy/Monster2.png");
         plusTexLoaded = true;
     }
     frameIndex = 0;
@@ -172,9 +172,9 @@ StarCollectible::StarCollectible(Vector2 pos, int* countPtr)
     position = pos;
     this->countPtr = countPtr;
     texLoaded = false;
-    if (FileExists("resources/sprites/Star.png"))
+    if (FileExists("resources/sprites/Stars and coins/Star.png"))
     {
-        tex = LoadTexture("resources/sprites/Star.png");
+        tex = LoadTexture("resources/sprites/Stars and coins/Star.png");
         texLoaded = true;
     }
 }
@@ -208,30 +208,19 @@ Rectangle StarCollectible::GetBounds() const
 }
 
 // --- GunTrap ---
-GunTrap::GunTrap(Vector2 pos)
+GunTrap::GunTrap(Vector2 pos, Vector2 initialDir)
 {
     position = pos;
     shootCooldown = 2.0f;
-    dir = {0,0};
+    dir = initialDir;
     texLoaded = false;
-    if (FileExists("resources/sprites/GunTrap.png")) { tex = LoadTexture("resources/sprites/GunTrap.png"); texLoaded = true; }
+    if (FileExists("resources/sprites/Traps/Arrow Trap/Arrow_trap.png")) { tex = LoadTexture("resources/sprites/Traps/Arrow Trap/Arrow_trap.png"); texLoaded = true; }
 }
 
 GunTrap::~GunTrap() { if (texLoaded) UnloadTexture(tex); }
 
 void GunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
 {
-    // Determine fire direction once by scanning neighbors for an open tile ('0')
-    if (dir.x == 0 && dir.y == 0)
-    {
-        int tileX = (int)(position.x / level.GetTileSize());
-        int tileY = (int)(position.y / level.GetTileSize());
-        if      (level.GetTileAt(tileX + 1, tileY) == '0') dir = { 1,  0};
-        else if (level.GetTileAt(tileX - 1, tileY) == '0') dir = {-1,  0};
-        else if (level.GetTileAt(tileX, tileY + 1) == '0') dir = { 0,  1};
-        else if (level.GetTileAt(tileX, tileY - 1) == '0') dir = { 0, -1};
-    }
-
     shootCooldown -= dt;
     if (shootCooldown <= 0.0f)
     {
@@ -261,7 +250,7 @@ TriggerTrap::TriggerTrap(Vector2 pos)
     triggered = false;
     timerStarted = false;
     texLoaded = false;
-    if (FileExists("resources/sprites/SpikeTrap.png")) { tex = LoadTexture("resources/sprites/SpikeTrap.png"); texLoaded = true; }
+    if (FileExists("resources/sprites/Traps/Sharp/Spike-trap-spike.png")) { tex = LoadTexture("resources/sprites/Traps/Sharp/Spike-trap-spike.png"); texLoaded = true; }
     frameIndex = 0;
     animTimer = 0.0f;
     retractTimer = 0.0f;
@@ -324,10 +313,14 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
 
 void TriggerTrap::Draw()
 {
+    if (frameIndex == 0 && !triggered) return; // hidden when dormant
     Rectangle dest = { position.x, position.y, 32, 32 };
     if (texLoaded)
     {
-        Rectangle src = { (float)(frameIndex * 32), 0, 32.0f, 32.0f };
+        int totalFrames = tex.width / 32;
+        if (totalFrames < 1) totalFrames = 1;
+        int fi = frameIndex < totalFrames ? frameIndex : totalFrames - 1;
+        Rectangle src = { (float)(fi * 32), 0, 32.0f, (float)tex.height };
         DrawTexturePro(tex, src, dest, Vector2{0,0}, 0, WHITE);
     }
     else DrawRectangleRec(dest, RED);
@@ -336,11 +329,11 @@ void TriggerTrap::Draw()
 Rectangle TriggerTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 
 // --- FixedTrap ---
-FixedTrap::FixedTrap(Vector2 pos)
+FixedTrap::FixedTrap(Vector2 pos, const char* spritePath)
 {
     position = pos;
     texLoaded = false;
-    if (FileExists("resources/sprites/Spike.png")) { tex = LoadTexture("resources/sprites/Spike.png"); texLoaded = true; }
+    if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
 }
 
 FixedTrap::~FixedTrap() { if (texLoaded) UnloadTexture(tex); }
@@ -360,31 +353,82 @@ void FixedTrap::Draw()
 
 Rectangle FixedTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 
+// --- CoinCollectible ---
+CoinCollectible::CoinCollectible(Vector2 pos, const char* spritePath)
+{
+    position = pos;
+    if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
+}
+CoinCollectible::~CoinCollectible() { if (texLoaded) UnloadTexture(tex); }
+void CoinCollectible::Update(float dt, Player &player, std::vector<Entity*>&, Level&)
+{
+    if (CheckCollisionRecs(player.GetBounds(), GetBounds()))
+        active = false;
+}
+void CoinCollectible::Draw()
+{
+    Rectangle dest = { position.x, position.y, 32, 32 };
+    if (texLoaded)
+        DrawTexturePro(tex, {0,0,(float)tex.width,(float)tex.height}, dest, {0,0}, 0, WHITE);
+    else DrawRectangleRec(dest, GOLD);
+}
+Rectangle CoinCollectible::GetBounds() const { return {position.x, position.y, 32, 32}; }
+
+// --- IceBox ---
+IceBox::IceBox(Vector2 pos)
+{
+    position = pos;
+    if (FileExists("resources/sprites/Final and IceBox/Ice_box.png"))
+    { tex = LoadTexture("resources/sprites/Final and IceBox/Ice_box.png"); texLoaded = true; }
+}
+void IceBox::Update(float dt, Player &player, std::vector<Entity*>&, Level &level)
+{
+    // Player walks through: IceBox disappears and tile is cleared
+    if (CheckCollisionRecs(player.GetBounds(), GetBounds()))
+    {
+        int ts = level.GetTileSize();
+        level.SetTileAt((int)(position.x / ts), (int)(position.y / ts), '-');
+        active = false;
+    }
+}
+void IceBox::Draw()
+{
+    Rectangle dest = { position.x, position.y, 32, 32 };
+    if (texLoaded)
+        DrawTexturePro(tex, {0,0,(float)tex.width,(float)tex.height}, dest, {0,0}, 0, WHITE);
+    else DrawRectangleRec(dest, SKYBLUE);
+}
+Rectangle IceBox::GetBounds() const { return {position.x, position.y, 32, 32}; }
+
 Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCountPtr)
 {
+    int tx = (int)(pos.x / level.GetTileSize());
+    int ty = (int)(pos.y / level.GetTileSize());
     switch (tile)
     {
-    case '3': return new TriggerTrap(pos);
-    case '4': return new FixedTrap(pos);
-    case '5': return new GunTrap(pos);
+    case 'T': return new TriggerTrap(pos);
+    case 'S': return new FixedTrap(pos, "resources/sprites/Traps/Sharp/Sharp1.png");
+    case '2': return new FixedTrap(pos, "resources/sprites/Traps/Sharp/Sharp2.png");
+    case '4': return new FixedTrap(pos, "resources/sprites/Traps/Sharp/Sharp4.png");
+    case 'Y': return new FixedTrap(pos, "resources/sprites/Traps/Sharp/Sharp6.png");
+    case 'G': return new GunTrap(pos, { 1,  0});
+    case 'g': return new GunTrap(pos, {-1,  0});
+    case 'u': return new GunTrap(pos, { 0, -1});
+    case 'd': return new GunTrap(pos, { 0,  1});
     case '6':
     {
-        // Horizontal if neighbors to the left/right are open, otherwise vertical
-        bool isHorizontal = false;
-        int tileX = (int)(pos.x / level.GetTileSize());
-        int tileY = (int)(pos.y / level.GetTileSize());
-        if (level.GetTileAt(tileX - 1, tileY) == '0' || level.GetTileAt(tileX + 1, tileY) == '0') isHorizontal = true;
-        return new Ghost(pos, !isHorizontal);
+        bool horiz = level.GetTileAt(tx-1, ty) == '-' || level.GetTileAt(tx+1, ty) == '-';
+        return new Ghost(pos, !horiz);
     }
     case '7':
     {
-        bool isHorizontal = false;
-        int tileX = (int)(pos.x / level.GetTileSize());
-        int tileY = (int)(pos.y / level.GetTileSize());
-        if (level.GetTileAt(tileX - 1, tileY) == '0' || level.GetTileAt(tileX + 1, tileY) == '0') isHorizontal = true;
-        return new GhostPlus(pos, !isHorizontal);
+        bool horiz = level.GetTileAt(tx-1, ty) == '-' || level.GetTileAt(tx+1, ty) == '-';
+        return new GhostPlus(pos, !horiz);
     }
     case 's': return new StarCollectible(pos, starCountPtr);
-    default: return nullptr;
+    case 'c': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin.png");
+    case 'k': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin1.png");
+    case 'i': return new IceBox(pos);
+    default:  return nullptr;
     }
 }
