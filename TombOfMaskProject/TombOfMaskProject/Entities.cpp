@@ -235,8 +235,16 @@ void GunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, L
 
 void GunTrap::Draw()
 {
+    float rotation = 0.0f;
+    if      (dir.x < 0) rotation =   0.0f;
+    else if (dir.y > 0) rotation =  90.0f;
+    else if (dir.x > 0) rotation = 180.0f;
+    else if (dir.y < 0) rotation = 270.0f;
+
     Rectangle dest = { position.x, position.y, 32, 32 };
-    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,32.0f,32.0f}, dest, Vector2{0,0}, 0, WHITE);
+    Vector2 origin = { 16, 16 };
+    Rectangle centeredDest = { position.x + 16, position.y + 16, 32, 32 };
+    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,32.0f,32.0f}, centeredDest, origin, rotation, WHITE);
     else DrawRectangleRec(dest, BROWN);
 }
 
@@ -410,10 +418,10 @@ Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCoun
     case '2': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp2.png");
     case 'Y': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp6.png");
     case '4': return new FixedTrap(pos,   "resources/sprites/Traps/Sharp/Sharp4.png");
-    case 'G': return new GunTrap(pos, { 1,  0});
-    case 'g': return new GunTrap(pos, {-1,  0});
-    case 'u': return new GunTrap(pos, { 0, -1});
-    case 'd': return new GunTrap(pos, { 0,  1});
+    case 'G': return new GunTrap(pos, {-1,  0});  // Arrow_trap  → left
+    case 'g': return new GunTrap(pos, { 0,  1});  // Arrow_trap1 → down
+    case 'u': return new GunTrap(pos, { 1,  0});  // Arrow_trap2 → right
+    case 'd': return new GunTrap(pos, { 0, -1});  // Arrow_trap3 → up
     case '6':
     {
         bool horiz = level.GetTileAt(tx-1, ty) == '-' || level.GetTileAt(tx+1, ty) == '-';
