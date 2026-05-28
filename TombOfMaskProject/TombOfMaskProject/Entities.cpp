@@ -243,14 +243,14 @@ void GunTrap::Draw()
 Rectangle GunTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 
 // --- TriggerTrap ---
-TriggerTrap::TriggerTrap(Vector2 pos)
+TriggerTrap::TriggerTrap(Vector2 pos, const char* spritePath)
 {
     position = pos;
     timer = 0.0f;
     triggered = false;
     timerStarted = false;
     texLoaded = false;
-    if (FileExists("resources/sprites/Traps/Sharp/Spike-trap-spike.png")) { tex = LoadTexture("resources/sprites/Traps/Sharp/Spike-trap-spike.png"); texLoaded = true; }
+    if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
     frameIndex = 0;
     animTimer = 0.0f;
     retractTimer = 0.0f;
@@ -406,11 +406,10 @@ Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCoun
     int ty = (int)(pos.y / level.GetTileSize());
     switch (tile)
     {
-    case 'T': return new TriggerTrap(pos);
-    case 'S': return new FixedTrap(pos, "resources/sprites/Traps/Sharp/Sharp1.png");
-    case '2': return new FixedTrap(pos, "resources/sprites/Traps/Sharp/Sharp2.png");
-    case '4': return new FixedTrap(pos, "resources/sprites/Traps/Sharp/Sharp4.png");
-    case 'Y': return new FixedTrap(pos, "resources/sprites/Traps/Sharp/Sharp6.png");
+    case 'S': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp1.png");
+    case '2': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp2.png");
+    case 'Y': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp6.png");
+    case '4': return new FixedTrap(pos,   "resources/sprites/Traps/Sharp/Sharp4.png");
     case 'G': return new GunTrap(pos, { 1,  0});
     case 'g': return new GunTrap(pos, {-1,  0});
     case 'u': return new GunTrap(pos, { 0, -1});

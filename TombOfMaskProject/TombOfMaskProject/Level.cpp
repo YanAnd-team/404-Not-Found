@@ -118,7 +118,7 @@ bool Level::Load(int levelNumber)
         }
     }
 
-    std::string pngPath = "Level/level/png/Level_" + std::to_string(levelNumber - 1) + ".png";
+    std::string pngPath = "Level/level/png/Level_" + std::to_string(levelNumber - 1) + "_Tiles" + std::to_string(levelNumber) + ".png";
     if (FileExists(pngPath.c_str()))
     {
         m_levelTex = LoadTexture(pngPath.c_str());

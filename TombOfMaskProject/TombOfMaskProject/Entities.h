@@ -81,7 +81,7 @@ private:
 
 class TriggerTrap : public Entity {
 public:
-    TriggerTrap(Vector2 pos);   //Activates when player steps on this tile; spikes out after 0.6s, holds, then retracts
+    TriggerTrap(Vector2 pos, const char* spritePath = "resources/sprites/Traps/Sharp/Spike-trap-spike.png"); //Activates when player steps on this tile; spikes out after 0.6s, holds, then retracts
     ~TriggerTrap();             //Unload texture
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Check if player is on this tile, run spike animation and player kill
     void Draw() override;                   //Draw current spike animation frame
