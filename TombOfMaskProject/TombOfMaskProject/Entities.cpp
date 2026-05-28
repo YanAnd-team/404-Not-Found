@@ -325,7 +325,7 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
 
 void TriggerTrap::Draw()
 {
-    if (frameIndex == 0 && !triggered) return; // hidden when dormant
+    if (frameIndex == 0 && !triggered && !texLoaded) return;
     Rectangle dest = { position.x, position.y, 32, 32 };
     if (texLoaded)
     {
@@ -339,6 +339,42 @@ void TriggerTrap::Draw()
 }
 
 Rectangle TriggerTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
+
+// --- Decoration ---
+Decoration::Decoration(Vector2 pos, const char* spritePath, int fw)
+{
+    position = pos;
+    frameWidth = fw;
+    texLoaded = false;
+    if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
+}
+Decoration::~Decoration() { if (texLoaded) UnloadTexture(tex); }
+void Decoration::Update(float dt, Player &player, std::vector<Entity*>&, Level&)
+{
+    if (frameWidth > 0 && texLoaded)
+    {
+        animTimer += dt;
+        if (animTimer >= 0.1f)
+        {
+            animTimer = 0.0f;
+            int fc = tex.width / frameWidth;
+            frameIndex = (frameIndex + 1) % fc;
+        }
+    }
+    if (CheckCollisionRecs(player.GetBounds(), GetBounds())) active = false;
+}
+void Decoration::Draw()
+{
+    Rectangle dest = { position.x + 8, position.y + 8, 16, 16 };
+    if (!texLoaded) return;
+    if (frameWidth > 0)
+    {
+        Rectangle src = { (float)(frameIndex * frameWidth), 0, (float)frameWidth, (float)tex.height };
+        DrawTexturePro(tex, src, dest, {0,0}, 0, WHITE);
+    }
+    else
+        DrawTexturePro(tex, {0,0,(float)tex.width,(float)tex.height}, dest, {0,0}, 0, WHITE);
+}
 
 // --- FixedTrap ---
 FixedTrap::FixedTrap(Vector2 pos, const char* spritePath)
@@ -390,8 +426,8 @@ Rectangle CoinCollectible::GetBounds() const { return {position.x, position.y, 3
 IceBox::IceBox(Vector2 pos)
 {
     position = pos;
-    if (FileExists("resources/sprites/Final and IceBox/Ice_box.png"))
-    { tex = LoadTexture("resources/sprites/Final and IceBox/Ice_box.png"); texLoaded = true; }
+    if (FileExists("resources/sprites/Exit/Ice_box.png"))
+    { tex = LoadTexture("resources/sprites/Exit/Ice_box.png"); texLoaded = true; }
 }
 void IceBox::Update(float dt, Player &player, std::vector<Entity*>&, Level &level)
 {
@@ -418,9 +454,10 @@ Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCoun
     int ty = (int)(pos.y / level.GetTileSize());
     switch (tile)
     {
+    case 'P': return new Decoration(pos,  "resources/sprites/Stars and coins/Step.png");
     case 'S': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp1.png");
     case '2': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp2.png");
-    case 'Y': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp6.png");
+    case '3': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp3.png");
     case '4': return new FixedTrap(pos,   "resources/sprites/Traps/Sharp/Sharp4.png");
     case 'G': return new GunTrap(pos, {-1,  0});  // Arrow_trap  → left
     case 'g': return new GunTrap(pos, { 0,  1});  // Arrow_trap1 → down
@@ -440,6 +477,7 @@ Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCoun
     case 'c': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin.png");
     case 'k': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin1.png");
     case 'i': return new IceBox(pos);
+    case 'f': return new Decoration(pos, "resources/sprites/Exit/Final.png", 40);
     default:  return nullptr;
     }
 }

@@ -102,11 +102,11 @@ bool Level::Load(int levelNumber)
                 else if (name == "Star")       { rows[gy][gx] = 's'; }
                 else if (name == "Coin")       { rows[gy][gx] = 'c'; }
                 else if (name == "Coin1")      { rows[gy][gx] = 'k'; }
-                // "Step" is a floor decoration tile, not a trap - no entity needed
+                else if (name == "Step")       { rows[gy][gx] = 'P'; }
                 else if (name == "Sharp1")     { rows[gy][gx] = 'S'; }
                 else if (name == "Sharp2")     { rows[gy][gx] = '2'; }
+                else if (name == "Sharp3")     { rows[gy][gx] = '3'; }
                 else if (name == "Sharp4")     { rows[gy][gx] = '4'; }
-                else if (name == "Sharp6")     { rows[gy][gx] = 'Y'; }
                 else if (name == "Monster1")   { rows[gy][gx] = '6'; }
                 else if (name == "Monster2")   { rows[gy][gx] = '7'; }
                 else if (name == "Arrow_trap") { rows[gy][gx] = 'G'; }

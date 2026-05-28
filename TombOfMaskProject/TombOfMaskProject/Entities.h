@@ -99,6 +99,22 @@ private:
     bool retracting;
 };
 
+class Decoration : public Entity {
+public:
+    Decoration(Vector2 pos, const char* spritePath, int frameWidth = 0);
+    ~Decoration();
+    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Draw() override;
+    Rectangle GetBounds() const override { return {position.x + 8, position.y + 8, 16, 16}; }
+private:
+    Vector2 position;
+    Texture2D tex;
+    bool texLoaded = false;
+    int frameWidth;
+    int frameIndex = 0;
+    float animTimer = 0.0f;
+};
+
 class FixedTrap : public Entity {
 public:
     FixedTrap(Vector2 pos, const char* spritePath = "resources/sprites/Traps/Sharp/Sharp1.png"); //Static spike; kills on contact
