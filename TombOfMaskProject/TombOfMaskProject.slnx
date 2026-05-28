@@ -4,5 +4,4 @@
     <Platform Name="x86" />
   </Configurations>
   <Project Path="TombOfMaskProject/TombOfMaskProject.vcxproj" Id="36486833-7df7-4146-b008-8f3fcdb3411a" />
-  <Project Path="packages/LDtkLoader/LDtkLoader.vcxproj" Id="7A3F9E2B-4C81-4D6E-A5B8-9F2C1E7D3A0F" />
 </Solution>
