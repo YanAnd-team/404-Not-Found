@@ -263,13 +263,15 @@ TriggerTrap::TriggerTrap(Vector2 pos, const char* spritePath)
     timerStarted = false;
     texLoaded = false;
     if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
+    const char* spikePath = "resources/sprites/Traps/Sharp/Spike-trap-spike.png";
+    if (FileExists(spikePath)) { spikeTex = LoadTexture(spikePath); spikeTexLoaded = true; }
     frameIndex = 0;
     animTimer = 0.0f;
     retractTimer = 0.0f;
     retracting = false;
 }
 
-TriggerTrap::~TriggerTrap() { if (texLoaded) UnloadTexture(tex); }
+TriggerTrap::~TriggerTrap() { if (texLoaded) UnloadTexture(tex); if (spikeTexLoaded) UnloadTexture(spikeTex); }
 
 void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
 //Activate when player steps on this tile; animate spike out after 0.6s delay, hold 1.5s, then retract
@@ -325,7 +327,6 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
 
 void TriggerTrap::Draw()
 {
-    if (frameIndex == 0 && !triggered && !texLoaded) return;
     Rectangle dest = { position.x, position.y, 32, 32 };
     if (texLoaded)
     {
@@ -335,16 +336,34 @@ void TriggerTrap::Draw()
         Rectangle src = { (float)(fi * 32), 0, 32.0f, (float)tex.height };
         DrawTexturePro(tex, src, dest, Vector2{0,0}, 0, WHITE);
     }
-    else DrawRectangleRec(dest, RED);
+
+    if (spikeTexLoaded)
+    {
+        float sh = (float)spikeTex.height;
+        float sw = (float)spikeTex.width;
+        if (timerStarted && !triggered)
+        {
+            // 显示下半部分（刺尖刚冒出来）
+            Rectangle src  = { 0, sh / 2.0f, sw, sh / 2.0f };
+            Rectangle sdest = { position.x, position.y + 16, 32, 16 };
+            DrawTexturePro(spikeTex, src, sdest, {0,0}, 0, WHITE);
+        }
+        else if (triggered)
+        {
+            Rectangle src  = { 0, 0, sw, sh };
+            DrawTexturePro(spikeTex, src, dest, {0,0}, 0, WHITE);
+        }
+    }
 }
 
 Rectangle TriggerTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 
 // --- Decoration ---
-Decoration::Decoration(Vector2 pos, const char* spritePath, int fw)
+Decoration::Decoration(Vector2 pos, const char* spritePath, int fw, float ds)
 {
     position = pos;
     frameWidth = fw;
+    drawSize = ds;
     texLoaded = false;
     if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
 }
@@ -365,7 +384,8 @@ void Decoration::Update(float dt, Player &player, std::vector<Entity*>&, Level&)
 }
 void Decoration::Draw()
 {
-    Rectangle dest = { position.x + 8, position.y + 8, 16, 16 };
+    float offset = (32.0f - drawSize) / 2.0f;
+    Rectangle dest = { position.x + offset, position.y + offset, drawSize, drawSize };
     if (!texLoaded) return;
     if (frameWidth > 0)
     {
@@ -477,7 +497,7 @@ Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCoun
     case 'c': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin.png");
     case 'k': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin1.png");
     case 'i': return new IceBox(pos);
-    case 'f': return new Decoration(pos, "resources/sprites/Exit/Final.png", 40);
+    case 'f': return new Decoration(pos, "resources/sprites/Exit/Final.png", 40, 48.0f);
     default:  return nullptr;
     }
 }

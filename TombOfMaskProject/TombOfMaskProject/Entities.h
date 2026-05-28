@@ -93,6 +93,8 @@ private:
     bool timerStarted;
     Texture2D tex;
     bool texLoaded = false;
+    Texture2D spikeTex;
+    bool spikeTexLoaded = false;
     int frameIndex;
     float animTimer;
     float retractTimer;
@@ -101,7 +103,7 @@ private:
 
 class Decoration : public Entity {
 public:
-    Decoration(Vector2 pos, const char* spritePath, int frameWidth = 0);
+    Decoration(Vector2 pos, const char* spritePath, int frameWidth = 0, float drawSize = 16.0f);
     ~Decoration();
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
     void Draw() override;
@@ -111,6 +113,7 @@ private:
     Texture2D tex;
     bool texLoaded = false;
     int frameWidth;
+    float drawSize;
     int frameIndex = 0;
     float animTimer = 0.0f;
 };
