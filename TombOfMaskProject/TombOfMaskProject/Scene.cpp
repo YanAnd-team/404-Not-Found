@@ -137,14 +137,12 @@ void Scene::DrawHitboxes() const
 {
     int ts = level.GetTileSize();
 
-    // Walls
-    for (int y = 0; y < level.GetHeight(); ++y)
-        for (int x = 0; x < level.GetWidth(); ++x)
-        {
-            char t = level.GetTileAt(x, y);
-            if (t == '1')
-                DrawRectangleLinesEx({ (float)(x * ts), (float)(y * ts), (float)ts, (float)ts }, 1.0f, RED);
-        }
+    // Walls (drawn using the 4px collision grid, not the 16px entity grid)
+    int wcs = level.GetWallCellSize();
+    for (int y = 0; y < level.GetWallGridHeight(); ++y)
+        for (int x = 0; x < level.GetWallGridWidth(); ++x)
+            if (level.IsWallCell(x, y))
+                DrawRectangleLinesEx({ (float)(x * wcs), (float)(y * wcs), (float)wcs, (float)wcs }, 0.5f, RED);
 
     // Entities
     for (auto e : entities)
@@ -153,7 +151,7 @@ void Scene::DrawHitboxes() const
 
     // Goal
     Vector2 gp = level.GetGoalPosition();
-    DrawRectangleLinesEx({ gp.x, gp.y, (float)ts, (float)ts }, 2.0f, YELLOW);
+    DrawRectangleLinesEx({ gp.x, gp.y, 16.0f, 16.0f }, 2.0f, YELLOW);
 
     // Player (drawn last so it's always on top)
     DrawRectangleLinesEx(player.GetBounds(), 2.0f, GREEN);

@@ -39,7 +39,7 @@ public:
     ~Ghost();                                   //Unload texture
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Move and animate; reverse on wall hit, reset player on contact
     void Draw() override;                       //Draw current animation frame
-    Rectangle GetBounds() const override;       //Return collision rectangle with slight horizontal inset
+    Rectangle GetBounds() const override { return Rectangle{ position.x + 2, position.y, 36, 40 }; } //Return collision rectangle with slight horizontal inset
 protected:
     Vector2 position;
 private:
@@ -57,6 +57,7 @@ public:
     ~GhostPlus();                                   //Unload texture
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
     void Draw() override;
+    Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, 96, 96 }; }
 private:
     Texture2D plusTex;
     bool plusTexLoaded;
@@ -70,7 +71,7 @@ public:
     ~GunTrap();                         //Unload texture
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Detect fire direction once, then spawn bullets on cooldown
     void Draw() override;                   //Draw trap sprite
-    Rectangle GetBounds() const override;   //Return 32x32 collision rectangle
+    Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, 32, 32 }; }
 private:
     Vector2 position;
     Vector2 dir;
@@ -81,12 +82,13 @@ private:
 
 class TriggerTrap : public Entity {
 public:
-    TriggerTrap(Vector2 pos, const char* spritePath = "resources/sprites/Traps/Sharp/Spike-trap-spike.png"); //Activates when player steps on this tile; spikes out after 0.6s, holds, then retracts
+    TriggerTrap(Vector2 pos, const char* spritePath = "resources/sprites/Traps/Sharp/Spike-trap-spike.png", int w = 40, int h = 40); //Activates when player steps on this tile; spikes out after 0.6s, holds, then retracts
     ~TriggerTrap();             //Unload texture
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Check if player is on this tile, run spike animation and player kill
     void Draw() override;                   //Draw current spike animation frame
-    Rectangle GetBounds() const override;   //Return 32x32 collision rectangle
+    Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, (float)drawW, (float)drawH }; }
 private:
+    int drawW, drawH;
     Vector2 position;
     float timer;
     bool triggered;
@@ -108,7 +110,7 @@ public:
     ~Decoration();
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
     void Draw() override;
-    Rectangle GetBounds() const override { return {position.x + 8, position.y + 8, 16, 16}; }
+    Rectangle GetBounds() const override { return {position.x, position.y, 16, 16}; }
 private:
     Vector2 position;
     Texture2D tex;
@@ -121,12 +123,13 @@ private:
 
 class FixedTrap : public Entity {
 public:
-    FixedTrap(Vector2 pos, const char* spritePath = "resources/sprites/Traps/Sharp/Sharp1.png"); //Static spike; kills on contact
+    FixedTrap(Vector2 pos, const char* spritePath = "resources/sprites/Traps/Sharp/Sharp1.png", int w = 24, int h = 38); //Static spike; kills on contact
     ~FixedTrap();           //Unload texture
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Reset player on contact
     void Draw() override;                   //Draw spike sprite
-    Rectangle GetBounds() const override;   //Return 32x32 collision rectangle
+    Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, (float)drawW, (float)drawH }; }
 private:
+    int drawW, drawH;
     Vector2 position;
     Texture2D tex;
     bool texLoaded = false;
@@ -163,7 +166,7 @@ public:
     ~StarCollectible();                             //Unload texture
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Deactivate and increment count when player overlaps
     void Draw() override;                   //Draw star sprite
-    Rectangle GetBounds() const override;   //Return 32x32 collision rectangle
+    Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, 32, 32 }; }
 private:
     Vector2 position;
     int* countPtr;

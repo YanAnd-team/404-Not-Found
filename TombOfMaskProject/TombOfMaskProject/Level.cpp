@@ -91,12 +91,12 @@ bool Level::Load(int levelNumber)
 
                 if (name == "Start")
                 {
-                    startPos     = { (float)entity.getPosition().x, (float)entity.getPosition().y };
+                    startPos     = { (float)(gx * tileSize), (float)(gy * tileSize) };
                     rows[gy][gx] = 'x';
                 }
                 else if (name == "Final")
                 {
-                    goalPos      = { (float)entity.getPosition().x, (float)entity.getPosition().y };
+                    goalPos      = { (float)(gx * tileSize), (float)(gy * tileSize) };
                     rows[gy][gx] = 'f';
                 }
                 else if (name == "Star")       { rows[gy][gx] = 's'; }
@@ -160,6 +160,13 @@ bool Level::IsWall(float worldX, float worldY) const
     int cx = (int)(worldX / wallCellSize);
     int cy = (int)(worldY / wallCellSize);
     if (cy < 0 || cy >= (int)wallRows.size())    return false;
+    if (cx < 0 || cx >= (int)wallRows[cy].size()) return false;
+    return wallRows[cy][cx] == '1';
+}
+
+bool Level::IsWallCell(int cx, int cy) const
+{
+    if (cy < 0 || cy >= (int)wallRows.size()) return false;
     if (cx < 0 || cx >= (int)wallRows[cy].size()) return false;
     return wallRows[cy][cx] == '1';
 }

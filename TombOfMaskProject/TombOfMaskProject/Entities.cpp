@@ -106,13 +106,13 @@ void Ghost::Update(float dt, Player &player, std::vector<Entity*> &entities, Lev
 
     bool hitWall = false;
     if (dir.x > 0)
-        hitWall = level.IsWall(newPos.x + 31, newPos.y + 2) || level.IsWall(newPos.x + 31, newPos.y + 29);
+        hitWall = level.IsWall(newPos.x + 39, newPos.y + 2) || level.IsWall(newPos.x + 39, newPos.y + 37);
     else if (dir.x < 0)
-        hitWall = level.IsWall(newPos.x,      newPos.y + 2) || level.IsWall(newPos.x,      newPos.y + 29);
+        hitWall = level.IsWall(newPos.x,      newPos.y + 2) || level.IsWall(newPos.x,      newPos.y + 37);
     else if (dir.y > 0)
-        hitWall = level.IsWall(newPos.x + 2,  newPos.y + 31) || level.IsWall(newPos.x + 29, newPos.y + 31);
+        hitWall = level.IsWall(newPos.x + 2,  newPos.y + 39) || level.IsWall(newPos.x + 37, newPos.y + 39);
     else if (dir.y < 0)
-        hitWall = level.IsWall(newPos.x + 2,  newPos.y)      || level.IsWall(newPos.x + 29, newPos.y);
+        hitWall = level.IsWall(newPos.x + 2,  newPos.y)      || level.IsWall(newPos.x + 37, newPos.y);
 
     if (hitWall)
         { dir.x = -dir.x; dir.y = -dir.y; }
@@ -125,7 +125,7 @@ void Ghost::Update(float dt, Player &player, std::vector<Entity*> &entities, Lev
 
 void Ghost::Draw()
 {
-    Rectangle dest = { position.x, position.y, 32, 32 };
+    Rectangle dest = { position.x, position.y, 40, 40 };
     if (texLoaded)
     {
         Rectangle src = { (float)(frameIndex * 40), 0, 40.0f, (float)tex.height };
@@ -134,7 +134,6 @@ void Ghost::Draw()
     else DrawRectangleRec(dest, MAGENTA);
 }
 
-Rectangle Ghost::GetBounds() const { return Rectangle{ position.x + 3, position.y, 26, 32 }; }
 
 // --- GhostPlus ---
 GhostPlus::GhostPlus(Vector2 pos, bool vertical) : Ghost(pos, vertical)
@@ -172,7 +171,7 @@ void GhostPlus::Draw()
     if (plusTexLoaded)
     {
         Rectangle src  = { (float)(frameIndex * 96), 0, 96.0f, (float)plusTex.height };
-        Rectangle dest = { position.x, position.y, 32, 32 };
+        Rectangle dest = { position.x, position.y, 96, 96 };
         DrawTexturePro(plusTex, src, dest, Vector2{0,0}, 0, WHITE);
     }
     else Ghost::Draw();
@@ -214,10 +213,6 @@ void StarCollectible::Draw()
         DrawRectangleRec(dest, YELLOW);
 }
 
-Rectangle StarCollectible::GetBounds() const
-{
-    return Rectangle{ position.x, position.y, 32, 32 };
-}
 
 // --- GunTrap ---
 GunTrap::GunTrap(Vector2 pos, Vector2 initialDir)
@@ -239,7 +234,7 @@ void GunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, L
         shootCooldown = 2.0f;
         if (dir.x != 0 || dir.y != 0)
         {
-            Vector2 bulletPos = { position.x + dir.x * 8.0f, position.y + dir.y * 8.0f };
+            Vector2 bulletPos = { position.x + 16.0f + dir.x * 16.0f, position.y + 16.0f + dir.y * 16.0f };
             entities.push_back(new Bullet(bulletPos, dir, 200.0f));
         }
     }
@@ -256,15 +251,15 @@ void GunTrap::Draw()
     Rectangle dest = { position.x, position.y, 32, 32 };
     Vector2 origin = { 16, 16 };
     Rectangle centeredDest = { position.x + 16, position.y + 16, 32, 32 };
-    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,32.0f,32.0f}, centeredDest, origin, rotation, WHITE);
+    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, centeredDest, origin, rotation, WHITE);
     else DrawRectangleRec(dest, BROWN);
 }
 
-Rectangle GunTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 
 // --- TriggerTrap ---
-TriggerTrap::TriggerTrap(Vector2 pos, const char* spritePath)
+TriggerTrap::TriggerTrap(Vector2 pos, const char* spritePath, int w, int h)
 {
+    drawW = w; drawH = h;
     position = pos;
     timer = 0.0f;
     triggered = false;
@@ -344,13 +339,15 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
 
 void TriggerTrap::Draw()
 {
-    Rectangle dest = { position.x, position.y, 32, 32 };
+    float cx = position.x + drawW * 0.5f;
+    float cy = position.y + drawH * 0.5f;
+    Rectangle dest = { position.x, position.y, (float)drawW, (float)drawH };
     if (texLoaded)
     {
-        int totalFrames = tex.width / 32;
+        int totalFrames = tex.width / drawW;
         if (totalFrames < 1) totalFrames = 1;
         int fi = frameIndex < totalFrames ? frameIndex : totalFrames - 1;
-        Rectangle src = { (float)(fi * 32), 0, 32.0f, (float)tex.height };
+        Rectangle src = { (float)(fi * drawW), 0, (float)drawW, (float)tex.height };
         DrawTexturePro(tex, src, dest, Vector2{0,0}, 0, WHITE);
     }
 
@@ -358,24 +355,22 @@ void TriggerTrap::Draw()
     {
         float sh = (float)spikeTex.height;
         float sw = (float)spikeTex.width;
-        Vector2 center = { position.x + 16, position.y + 16 };
-        Vector2 origin = { 16, 16 };
+        Vector2 center = { cx, cy };
+        Vector2 origin = { cx - position.x, cy - position.y };
         if (timerStarted && !triggered)
         {
-            // 半截突刺：裁取图片上半（刺尖），缩放到半格高显示
             Rectangle src   = { 0, 0, sw, sh / 2.0f };
-            Rectangle sdest = { center.x, center.y, 32, 16 };
+            Rectangle sdest = { center.x, center.y, (float)drawW, drawH * 0.5f };
             DrawTexturePro(spikeTex, src, sdest, origin, spikeRotation, WHITE);
         }
         else if (triggered)
         {
             Rectangle src = { 0, 0, sw, sh };
-            DrawTexturePro(spikeTex, src, { center.x, center.y, 32, 32 }, origin, spikeRotation, WHITE);
+            DrawTexturePro(spikeTex, src, { center.x, center.y, (float)drawW, (float)drawH }, origin, spikeRotation, WHITE);
         }
     }
 }
 
-Rectangle TriggerTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 
 // --- Decoration ---
 Decoration::Decoration(Vector2 pos, const char* spritePath, int fw, float ds)
@@ -403,7 +398,7 @@ void Decoration::Update(float dt, Player &player, std::vector<Entity*>&, Level&)
 }
 void Decoration::Draw()
 {
-    float offset = (32.0f - drawSize) / 2.0f;
+    float offset = (16.0f - drawSize) / 2.0f;
     Rectangle dest = { position.x + offset, position.y + offset, drawSize, drawSize };
     if (!texLoaded) return;
     if (frameWidth > 0)
@@ -416,8 +411,9 @@ void Decoration::Draw()
 }
 
 // --- FixedTrap ---
-FixedTrap::FixedTrap(Vector2 pos, const char* spritePath)
+FixedTrap::FixedTrap(Vector2 pos, const char* spritePath, int w, int h)
 {
+    drawW = w; drawH = h;
     position = pos;
     texLoaded = false;
     if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
@@ -433,12 +429,11 @@ void FixedTrap::Update(float dt, Player &player, std::vector<Entity*> &entities,
 
 void FixedTrap::Draw()
 {
-    Rectangle dest = { position.x, position.y, 32, 32 };
+    Rectangle dest = { position.x, position.y, (float)drawW, (float)drawH };
     if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
     else DrawRectangleRec(dest, ORANGE);
 }
 
-Rectangle FixedTrap::GetBounds() const { return Rectangle{ position.x, position.y, 32, 32 }; }
 
 // --- CoinCollectible ---
 CoinCollectible::CoinCollectible(Vector2 pos, const char* spritePath)
@@ -480,12 +475,12 @@ void IceBox::Update(float dt, Player &player, std::vector<Entity*>&, Level &leve
 }
 void IceBox::Draw()
 {
-    Rectangle dest = { position.x, position.y, 32, 32 };
+    Rectangle dest = { position.x, position.y, 40, 40 };
     if (texLoaded)
         DrawTexturePro(tex, {0,0,(float)tex.width,(float)tex.height}, dest, {0,0}, 0, WHITE);
     else DrawRectangleRec(dest, SKYBLUE);
 }
-Rectangle IceBox::GetBounds() const { return {position.x, position.y, 32, 32}; }
+Rectangle IceBox::GetBounds() const { return {position.x, position.y, 40, 40}; }
 
 Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCountPtr)
 {
@@ -494,10 +489,10 @@ Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCoun
     switch (tile)
     {
     case 'P': return new Decoration(pos,  "resources/sprites/Stars and coins/Step.png");
-    case 'S': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp1.png");
-    case '2': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp2.png");
-    case '3': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp3.png");
-    case '4': return new FixedTrap(pos,   "resources/sprites/Traps/Sharp/Sharp4.png");
+    case 'S': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp1.png", 40, 40);
+    case '2': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp2.png", 24, 15);
+    case '3': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp3.png", 16, 25);
+    case '4': return new FixedTrap(pos,   "resources/sprites/Traps/Sharp/Sharp4.png", 24, 38);
     case 'G': return new GunTrap(pos, {-1,  0});  // Arrow_trap  → left
     case 'g': return new GunTrap(pos, { 0,  1});  // Arrow_trap1 → down
     case 'u': return new GunTrap(pos, { 1,  0});  // Arrow_trap2 → right
@@ -516,7 +511,7 @@ Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCoun
     case 'c': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin.png");
     case 'k': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin1.png");
     case 'i': return new IceBox(pos);
-    case 'f': return new Decoration(pos, "resources/sprites/Exit/Final.png", 40, 48.0f);
+    case 'f': return new Decoration(pos, "resources/sprites/Exit/Final.png", 40, 46.0f);
     default:  return nullptr;
     }
 }

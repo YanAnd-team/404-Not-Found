@@ -27,6 +27,10 @@ public:
     int GetTileSize() const { return tileSize; }
     Texture2D GetStarTex() const { return starTex; }
     bool IsStarLoaded() const { return starLoaded; }
+    int GetWallCellSize() const { return wallCellSize; }
+    int GetWallGridWidth() const { return wallGridWidth; }
+    int GetWallGridHeight() const { return wallGridHeight; }
+    bool IsWallCell(int cx, int cy) const;
 
 private:
     int width;
