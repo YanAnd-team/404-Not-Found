@@ -137,6 +137,8 @@ void Game::UpdateGameplay(float dt)
 
 void Game::UpdateWin()
 {
+    scene.UpdateWinStars(GetFrameTime());
+
     if (IsKeyPressed(KEY_ENTER))
     {
         int nextLevel = scene.GetCurrentLevelNumber() + 1;

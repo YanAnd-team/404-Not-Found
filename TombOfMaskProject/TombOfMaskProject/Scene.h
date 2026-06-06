@@ -21,9 +21,10 @@ public:
     void UpdateAudio();                 //Stream music updates; must be called every frame
     void OnEnterMenu();                 //Switch music from gameplay track to menu track
     void OnEnterGameplay();             //Switch music from menu track to gameplay track
-    void OnPlayerWon();                 //Play win sound effect
+    void OnPlayerWon();                 //Play win sound; reset star reveal state
+    void UpdateWinStars(float dt);      //Reveal stars one by one, playing per-star sounds
     void DrawStarHUD();                 //Draw collected stars in the top-left corner
-    void DrawWinStars();                //Draw 3 star slots centered on screen; filled = collected, empty icon = not collected
+    void DrawWinStars();                //Draw 3 star slots centered on screen; filled = revealed, empty icon = not yet
     void ToggleHitboxes() { showHitboxes = !showHitboxes; }
 
     Player player;
@@ -45,4 +46,6 @@ private:
     bool showHitboxes = false;
     Texture2D starToCompTex;
     bool starToCompLoaded = false;
+    int starsRevealed = 0;
+    float starRevealTimer = 0.0f;
 };

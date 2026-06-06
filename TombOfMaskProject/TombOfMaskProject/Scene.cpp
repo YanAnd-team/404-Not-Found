@@ -186,9 +186,23 @@ void Scene::OnEnterGameplay()
 void Scene::OnPlayerWon()
 {
     if (soundLoaded[3]) PlaySound(sound[3]);
-    if      (starCount >= 3 && soundLoaded[6]) PlaySound(sound[6]);
-    else if (starCount >= 2 && soundLoaded[5]) PlaySound(sound[5]);
-    else if (starCount >= 1 && soundLoaded[4]) PlaySound(sound[4]);
+    starsRevealed = 0;
+    starRevealTimer = 0.0f;
+}
+
+void Scene::UpdateWinStars(float dt)
+{
+    if (starsRevealed >= starCount) return;
+    starRevealTimer += dt;
+    const float revealDelay = 0.7f;
+    if (starRevealTimer >= revealDelay)
+    {
+        starRevealTimer -= revealDelay;
+        starsRevealed++;
+        int soundIdx = 3 + starsRevealed; // 4=1-star, 5=2-star, 6=3-star
+        if (soundIdx <= 6 && soundLoaded[soundIdx])
+            PlaySound(sound[soundIdx]);
+    }
 }
 
 void Scene::ReloadLevel()
@@ -257,7 +271,7 @@ void Scene::DrawWinStars()
     for (int i = 0; i < 3; ++i)
     {
         Rectangle dest = { startX + i * (slotSize + gap), startY, slotSize, slotSize };
-        if (i < starCount && hasStar)
+        if (i < starsRevealed && hasStar)
             DrawTexturePro(starTex, Rectangle{0,0,(float)starTex.width,(float)starTex.height}, dest, Vector2{0,0}, 0, WHITE);
         else if (starToCompLoaded)
             DrawTexturePro(starToCompTex, Rectangle{0,0,(float)starToCompTex.width,(float)starToCompTex.height}, dest, Vector2{0,0}, 0, WHITE);
