@@ -35,7 +35,8 @@ void Bullet::Update(float dt, Player& player, std::vector<Entity*>& entities, Le
         active = false; return;
     }
 
-    if (level.IsWall(position.x + 4, position.y + 4))
+    Rectangle b = GetBounds();
+    if (level.IsWall(b.x + b.width * 0.5f, b.y + b.height * 0.5f))
     {
         active = false; return;
     }
@@ -61,15 +62,22 @@ void Bullet::Draw()
     float h = (texLoaded ? (float)tex.height : 8.0f) * 0.5f;
     float sw = texLoaded ? (float)tex.width : 16.0f;
     float sh = texLoaded ? (float)tex.height : 8.0f;
-    Rectangle dest = { position.x + w / 2.0f, position.y + h / 2.0f, w, h };
+    Rectangle dest = { position.x, position.y, w, h };
     if (texLoaded)
         DrawTexturePro(tex, { 0, 0, sw, sh }, dest, { w / 2.0f, h / 2.0f }, rotation, WHITE);
-    else DrawRectangleRec({ position.x, position.y, w, h }, YELLOW);
+    else DrawRectangleRec({ position.x - w * 0.5f, position.y - h * 0.5f, w, h }, YELLOW);
 }
 
 Rectangle Bullet::GetBounds() const
 {
-    return Rectangle{ position.x, position.y, 8, 8 };
+    float w  = (texLoaded ? (float)tex.width  : 16.0f) * 0.5f;
+    float h  = (texLoaded ? (float)tex.height : 8.0f)  * 0.5f;
+    float cx = position.x;
+    float cy = position.y;
+    bool vertical = fabsf(direction.y) > fabsf(direction.x);
+    float bw = vertical ? h : w;
+    float bh = vertical ? w : h;
+    return { cx - bw * 0.5f, cy - bh * 0.5f, bw, bh };
 }
 
 // --- Ghost ---
@@ -279,14 +287,13 @@ TriggerTrap::~TriggerTrap() { if (texLoaded) UnloadTexture(tex); if (spikeTexLoa
 
 void TriggerTrap::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
-    int tileX = (int)(position.x / level.GetTileSize());
-    int tileY = (int)(position.y / level.GetTileSize());
-    int playerTileX = (int)(player.position.x / level.GetTileSize());
-    int playerTileY = (int)(player.position.y / level.GetTileSize());
+    Rectangle triggerZone = horizontal
+        ? Rectangle{ position.x,      position.y - 32,   (float)drawW,      (float)drawH + 64 }
+        : Rectangle{ position.x - 32, position.y,        (float)drawW + 64, (float)drawH };
 
     if (!triggered)
     {
-        if (!timerStarted && playerTileX == tileX && playerTileY == tileY)
+        if (!timerStarted && CheckCollisionRecs(player.GetBounds(), triggerZone))
         {
             timerStarted = true;
             if (horizontal)
