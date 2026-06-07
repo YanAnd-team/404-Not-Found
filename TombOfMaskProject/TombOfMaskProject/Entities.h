@@ -82,7 +82,7 @@ private:
 
 class TriggerTrap : public Entity {
 public:
-    TriggerTrap(Vector2 pos, const char* spritePath = "resources/sprites/Traps/Sharp/Spike-trap-spike.png", int w = 40, int h = 40); //Activates when player steps on this tile; spikes out after 0.6s, holds, then retracts
+    TriggerTrap(Vector2 pos, bool horizontal, const char* spritePath, int w, int h); //Activates when player steps on this tile; spikes out after 0.6s, holds, then retracts; horizontal=true restricts spike to left/right, false to up/down
     ~TriggerTrap();             //Unload texture
     void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Check if player is on this tile, run spike animation and player kill
     void Draw() override;                   //Draw current spike animation frame
@@ -102,6 +102,7 @@ private:
     float retractTimer;
     bool retracting;
     float spikeRotation = 0.0f;
+    bool horizontal;
 };
 
 class Decoration : public Entity {

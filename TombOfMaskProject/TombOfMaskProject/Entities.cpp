@@ -257,9 +257,10 @@ void GunTrap::Draw()
 
 
 // --- TriggerTrap ---
-TriggerTrap::TriggerTrap(Vector2 pos, const char* spritePath, int w, int h)
+TriggerTrap::TriggerTrap(Vector2 pos, bool horizontal, const char* spritePath, int w, int h)
 {
     drawW = w; drawH = h;
+    this->horizontal = horizontal;
     position = pos;
     timer = 0.0f;
     triggered = false;
@@ -289,13 +290,10 @@ void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entitie
         if (!timerStarted && playerTileX == tileX && playerTileY == tileY)
         {
             timerStarted = true;
-            // 锁定朝向玩家的方向（四方向），触发后不再改变
-            float dx = player.position.x - position.x;
-            float dy = player.position.y - position.y;
-            if ((dx < 0 ? -dx : dx) >= (dy < 0 ? -dy : dy))
-                spikeRotation = (dx >= 0) ? 90.0f : 270.0f;
+            if (horizontal)
+                spikeRotation = (player.position.x >= position.x) ? 90.0f : 270.0f;
             else
-                spikeRotation = (dy >= 0) ? 180.0f : 0.0f;
+                spikeRotation = (player.position.y >= position.y) ? 180.0f : 0.0f;
         }
 
         if (timerStarted)
@@ -489,9 +487,8 @@ Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCoun
     switch (tile)
     {
     case 'P': return new Decoration(pos,  "resources/sprites/Stars and coins/Step.png");
-    case 'S': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp1.png", 40, 40);
-    case '2': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp2.png", 24, 15);
-    case '3': return new TriggerTrap(pos, "resources/sprites/Traps/Sharp/Sharp3.png", 16, 25);
+    case '2': return new TriggerTrap(pos, true,  "resources/sprites/Traps/Sharp/Sharp2.png", 24, 15);
+    case '3': return new TriggerTrap(pos, false, "resources/sprites/Traps/Sharp/Sharp3.png", 16, 25);
     case '4': return new FixedTrap(pos,   "resources/sprites/Traps/Sharp/Sharp4.png", 24, 38);
     case 'G': return new GunTrap(pos, {-1,  0});  // Arrow_trap  → left
     case 'g': return new GunTrap(pos, { 0,  1});  // Arrow_trap1 → down
