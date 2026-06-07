@@ -10,7 +10,7 @@ Built with **C++** and **raylib** as part of the Game Design and Development Bac
 
 ## Gameplay Video
 
-<iframe width="100%" height="420" src="https://www.youtube.com/mO_NcVncqi4" frameborder="0" allowfullscreen></iframe>
+<iframe width="100%" height="420" src="https://www.youtube.com/embed/mO_NcVncqi4" frameborder="0" allowfullscreen></iframe>
 
 ---
 
