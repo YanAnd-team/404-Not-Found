@@ -1,20 +1,14 @@
 #include "Player.h"
 
-static const int framePositions[] = {
-    PLAYER_IDLE,
-    PLAYER_START_MOVE,
-    PLAYER_MOVE_1,
-    PLAYER_MOVE_2,
-    PLAYER_MOVE_3,
-    PLAYER_MOVE_4
-};
-static const int FRAME_COUNT_DEFINED = 6;
+static const int moveFrameX[]     = {   0,  32, 128, 288, 480 };
+static const int moveFrameWidth[] = {  32,  96, 160, 192, 192 };
+static const int MOVE_FRAME_COUNT = 5;
 
 void Player::Init(Vector2 startPos)
 {
     startPosition = startPos;
     position = startPos;
-    speed = 700.0f;
+    speed = 1400.0f;
     currentDir   = { 0, 0 };
     lastSlideDir = { 0, 0 };
     sliding = false;
@@ -31,7 +25,7 @@ void Player::Init(Vector2 startPos)
     idleFrameIdx  = 0;
     animTimer     = 0.0f;
     idleAnimTimer = 0.0f;
-    animSpeed     = 0.12f;
+    animSpeed     = 0.06f;
     drawScale = 1.0f;
     drawRotation = 0.0f;
     flipX = false;
@@ -122,7 +116,7 @@ void Player::Update(float dt, Rectangle worldBounds, Level& level)
         if (idleAnimTimer >= 0.15f)
         {
             idleAnimTimer = 0.0f;
-            int fc = idleTex.width > 0 ? (idleTex.width / 40) : 1;
+            int fc = idleTex.width > 0 ? (idleTex.width / 32) : 1;
             idleFrameIdx = (idleFrameIdx + 1) % fc;
         }
         frameIndex = 0;
@@ -143,7 +137,7 @@ void Player::Update(float dt, Rectangle worldBounds, Level& level)
         {
             animTimer = 0.0f;
             frameIndex++;
-            if (frameIndex >= FRAME_COUNT_DEFINED) frameIndex = 1;
+            if (frameIndex > MOVE_FRAME_COUNT) frameIndex = 1;
         }
     }
 }
@@ -152,23 +146,26 @@ void Player::Draw()
 {
     float drawWidth  = 32.0f * drawScale;
     float drawHeight = 32.0f * drawScale;
-    Rectangle dest = { position.x + drawWidth / 2.0f, position.y + drawHeight / 2.0f, drawWidth, drawHeight };
+    float cx = position.x + drawWidth * 0.5f;
+    float cy = position.y + drawHeight * 0.5f;
 
     if (frameIndex == 0)
     {
-        int fc = idleTex.width > 0 ? (idleTex.width / 40) : 1;
+        int fc = idleTex.width > 0 ? (idleTex.width / 32) : 1;
         int fi = idleFrameIdx % fc;
-        float h = idleTex.height > 0 ? (float)idleTex.height : 40.0f;
-        Rectangle src = { (float)(fi * 40), 0, flipX ? -40.0f : 40.0f, h };
-        DrawTexturePro(idleTex, src, dest, { drawWidth / 2.0f, drawHeight / 2.0f }, drawRotation, WHITE);
+        float h = idleTex.height > 0 ? (float)idleTex.height : 32.0f;
+        Rectangle src  = { (float)(fi * 32), 0, flipX ? -32.0f : 32.0f, h };
+        Rectangle dest = { cx, cy, drawWidth, drawHeight };
+        DrawTexturePro(idleTex, src, dest, { drawWidth * 0.5f, drawHeight * 0.5f }, drawRotation, WHITE);
     }
     else
     {
-        int fc = moveTex.width > 0 ? (moveTex.width / 40) : 1;
-        int fi = (frameIndex - 1) % fc;
-        float h = moveTex.height > 0 ? (float)moveTex.height : 40.0f;
-        Rectangle src = { (float)(fi * 40), 0, flipX ? -40.0f : 40.0f, h };
-        DrawTexturePro(moveTex, src, dest, { drawWidth / 2.0f, drawHeight / 2.0f }, drawRotation, WHITE);
+        int fi   = (frameIndex - 1) % MOVE_FRAME_COUNT;
+        float fw = (float)moveFrameWidth[fi] * drawScale;
+        float h  = moveTex.height > 0 ? (float)moveTex.height : 32.0f;
+        Rectangle src  = { (float)moveFrameX[fi], 0, flipX ? -(float)moveFrameWidth[fi] : (float)moveFrameWidth[fi], h };
+        Rectangle dest = { cx, cy, fw, drawHeight };
+        DrawTexturePro(moveTex, src, dest, { fw * 0.5f, drawHeight * 0.5f }, drawRotation, WHITE);
     }
 }
 

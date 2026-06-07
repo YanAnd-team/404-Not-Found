@@ -1,6 +1,6 @@
 #include "Scene.h"
 
-void Scene::Init()
+void Scene::InitAudio()
 {
     InitAudioDevice();
     if (FileExists("resources/SFX/Star-pick-up.mp3"))
@@ -52,13 +52,10 @@ void Scene::Init()
         music[1].looping = true;
         musicLoaded[1] = true;
     }
+}
 
-    if (FileExists("resources/sprites/StarToComp.png"))
-    {
-        starToCompTex = LoadTexture("resources/sprites/StarToComp.png");
-        starToCompLoaded = true;
-    }
-
+void Scene::InitGameplay()
+{
     font = LoadFontEx("resources/fonts/easvhs.ttf", 32, NULL, 0);
 
     camera.Init(GetScreenWidth(), GetScreenHeight());
@@ -273,8 +270,6 @@ void Scene::DrawWinStars()
         Rectangle dest = { startX + i * (slotSize + gap), startY, slotSize, slotSize };
         if (i < starsRevealed && hasStar)
             DrawTexturePro(starTex, Rectangle{0,0,(float)starTex.width,(float)starTex.height}, dest, Vector2{0,0}, 0, WHITE);
-        else if (starToCompLoaded)
-            DrawTexturePro(starToCompTex, Rectangle{0,0,(float)starToCompTex.width,(float)starToCompTex.height}, dest, Vector2{0,0}, 0, WHITE);
         else
             DrawRectangleRec(dest, Fade(WHITE, 0.3f));
     }
@@ -298,7 +293,6 @@ void Scene::DeInit()
     }
     for (int i = 0; i < 7; ++i)
         if (soundLoaded[i]) { StopSound(sound[i]); UnloadSound(sound[i]); }
-    if (starToCompLoaded) UnloadTexture(starToCompTex);
     UnloadFont(font);
     CloseAudioDevice();
 }

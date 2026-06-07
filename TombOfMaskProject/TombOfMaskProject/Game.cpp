@@ -8,15 +8,23 @@ void Game::Init()
     InitWindow(screenWidth, screenHeight, "Tomb of Mask");
     SetTargetFPS(60);
 
+    auto drawLoading = [&](int dots) {
+        const char* labels[] = { "Loading.", "Loading..", "Loading..." };
+        const char* text = labels[dots - 1];
+        BeginDrawing();
+        ClearBackground(BLACK);
+        int tw = MeasureText(text, 30);
+        DrawText(text, screenWidth / 2 - tw / 2, screenHeight / 2 - 15, 30, WHITE);
+        EndDrawing();
+    };
+
+    drawLoading(1);
     if (FileExists("resources/sprites/Icons/icon.png"))
     {
         Image iconImg = LoadImage("resources/sprites/Icons/icon.png");
         SetWindowIcon(iconImg);
         UnloadImage(iconImg);
     }
-
-    currentState = INITIAL;
-
     bgTex    = FileExists("resources/sprites/Background/main_background.png")
                ? LoadTexture("resources/sprites/Background/main_background.png") : Texture2D{};
     logoTex  = FileExists("resources/sprites/Background/logo_tomb.png")
@@ -24,11 +32,17 @@ void Game::Init()
     enterTex = FileExists("resources/sprites/Background/Press_ENTER.png")
                ? LoadTexture("resources/sprites/Background/Press_ENTER.png")     : Texture2D{};
 
-    scene.Init();
+    drawLoading(2);
+    scene.InitAudio();
+
+    drawLoading(3);
+    scene.InitGameplay();
 
     font = LoadFontEx("resources/fonts/easvhs.ttf", FONT_SIZE, NULL, 0);
     if (font.texture.id == 0)
         font = GetFontDefault();
+
+    currentState = INITIAL;
 }
 
 void Game::Update()

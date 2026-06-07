@@ -8,7 +8,8 @@
 class Scene
 {
 public:
-    void Init();                        //Load audio, font, camera, level 1, and spawn all tile entities
+    void InitAudio();                    //Load audio device, sounds, and music streams
+    void InitGameplay();                 //Load textures, font, camera, level 1, and spawn all tile entities
     void Update(float dt);              //Update player, camera, entities, and audio state
     void DrawWorld();                   //Draw level, entities, and player through the camera
     void DeInit();                      //Unload all assets, entities, audio, and close audio device
@@ -44,8 +45,6 @@ private:
     int currentLevelNumber = 1;
     bool wasSliding = false;
     bool showHitboxes = false;
-    Texture2D starToCompTex;
-    bool starToCompLoaded = false;
-    int starsRevealed = 0;
+int starsRevealed = 0;
     float starRevealTimer = 0.0f;
 };
