@@ -283,6 +283,7 @@ void Scene::DeInit()
     level.DeInit();
     for (auto entity : entities) { if (entity) delete entity; }
     entities.clear();
+    ClearEntityTextureCache();
     if (musicLoaded[0])
     {
         StopMusicStream(music[0]);

@@ -19,6 +19,7 @@ protected:
 
 // ������������������ CoinSystem* ����
 Entity* CreateEntityFromTile(char tile, Vector2 pos, Level& level, int* starCountPtr = nullptr, CoinSystem* coinSys = nullptr);
+void ClearEntityTextureCache();
 
 class Bullet : public Entity {
 public:

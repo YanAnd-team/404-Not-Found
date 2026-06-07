@@ -8,17 +8,6 @@ void Game::Init()
     InitWindow(screenWidth, screenHeight, "Tomb of Mask");
     SetTargetFPS(60);
 
-    auto drawLoading = [&](int dots) {
-        const char* labels[] = { "Loading.", "Loading..", "Loading..." };
-        const char* text = labels[dots - 1];
-        BeginDrawing();
-        ClearBackground(BLACK);
-        int tw = MeasureText(text, 30);
-        DrawText(text, screenWidth / 2 - tw / 2, screenHeight / 2 - 15, 30, WHITE);
-        EndDrawing();
-        };
-
-    drawLoading(1);
     if (FileExists("resources/sprites/Icons/icon.png"))
     {
         Image iconImg = LoadImage("resources/sprites/Icons/icon.png");
@@ -32,17 +21,20 @@ void Game::Init()
     enterTex = FileExists("resources/sprites/Background/Press_ENTER.png")
         ? LoadTexture("resources/sprites/Background/Press_ENTER.png") : Texture2D{};
 
-    drawLoading(2);
-    scene.InitAudio();
-
-    drawLoading(3);
-    scene.InitGameplay();
-
     font = LoadFontEx("resources/fonts/easvhs.ttf", FONT_SIZE, NULL, 0);
     if (font.texture.id == 0)
         font = GetFontDefault();
 
+    // Draw the initial screen once so it's visible during the heavy load below
     currentState = INITIAL;
+    BeginDrawing();
+    ClearBackground(BLACK);
+    DrawInitial();
+    EndDrawing();
+
+    // Heavy loading: ~2.5s, but user sees the initial screen above while waiting
+    scene.InitAudio();
+    scene.InitGameplay();
 }
 
 void Game::Update()
@@ -248,7 +240,7 @@ void Game::DrawGameplay()
 {
     scene.DrawStarHUD();
 
-    // ÏÔÊ¾½ð±ÒÊýÁ¿
+    // ï¿½ï¿½Ê¾ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
     int coins = scene.getCoinSystem().getCoins();
     DrawText(TextFormat("Coins: %d", coins), 10, screenHeight - 76, 15, GOLD);
 

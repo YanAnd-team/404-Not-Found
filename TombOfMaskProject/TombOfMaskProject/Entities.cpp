@@ -3,6 +3,27 @@
 #include "Level.h"
 #include "CoinSystem.h"   // 新增
 #include <cmath>
+#include <unordered_map>
+#include <string>
+
+static std::unordered_map<std::string, Texture2D> s_texCache;
+
+static Texture2D GetOrLoadTexture(const char* path)
+{
+    auto it = s_texCache.find(path);
+    if (it != s_texCache.end()) return it->second;
+    if (!FileExists(path)) return Texture2D{};
+    Texture2D t = LoadTexture(path);
+    s_texCache[path] = t;
+    return t;
+}
+
+void ClearEntityTextureCache()
+{
+    for (auto& p : s_texCache)
+        if (p.second.id > 0) UnloadTexture(p.second);
+    s_texCache.clear();
+}
 
 // --- Bullet ---
 Bullet::Bullet(Vector2 pos, Vector2 dir, float speed)
@@ -10,18 +31,11 @@ Bullet::Bullet(Vector2 pos, Vector2 dir, float speed)
     position = pos;
     direction = dir;
     this->speed = speed;
-    texLoaded = false;
-    if (FileExists("resources/sprites/Traps/Arrow Trap/Arrow.png"))
-    {
-        tex = LoadTexture("resources/sprites/Traps/Arrow Trap/Arrow.png");
-        texLoaded = true;
-    }
+    tex = GetOrLoadTexture("resources/sprites/Traps/Arrow Trap/Arrow.png");
+    texLoaded = (tex.id > 0);
 }
 
-Bullet::~Bullet()
-{
-    if (texLoaded) UnloadTexture(tex);
-}
+Bullet::~Bullet() {}
 
 void Bullet::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
@@ -86,20 +100,13 @@ Ghost::Ghost(Vector2 pos, bool vertical)
     position = pos;
     speed = 60.0f;
     if (vertical) dir = { 0,1 }; else dir = { 1,0 };
-    texLoaded = false;
-    if (FileExists("resources/sprites/Enemy/Monster1.png"))
-    {
-        tex = LoadTexture("resources/sprites/Enemy/Monster1.png");
-        texLoaded = true;
-    }
+    tex = GetOrLoadTexture("resources/sprites/Enemy/Monster1.png");
+    texLoaded = (tex.id > 0);
     frameIndex = 0;
     animTimer = 0.0f;
 }
 
-Ghost::~Ghost()
-{
-    if (texLoaded) UnloadTexture(tex);
-}
+Ghost::~Ghost() {}
 
 void Ghost::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
@@ -148,20 +155,13 @@ void Ghost::Draw()
 // --- GhostPlus ---
 GhostPlus::GhostPlus(Vector2 pos, bool vertical) : Ghost(pos, vertical)
 {
-    plusTexLoaded = false;
-    if (FileExists("resources/sprites/Enemy/Monster2.png"))
-    {
-        plusTex = LoadTexture("resources/sprites/Enemy/Monster2.png");
-        plusTexLoaded = true;
-    }
+    plusTex = GetOrLoadTexture("resources/sprites/Enemy/Monster2.png");
+    plusTexLoaded = (plusTex.id > 0);
     frameIndex = 0;
     animTimer = 0.0f;
 }
 
-GhostPlus::~GhostPlus()
-{
-    if (plusTexLoaded) UnloadTexture(plusTex);
-}
+GhostPlus::~GhostPlus() {}
 
 void GhostPlus::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
@@ -192,18 +192,11 @@ StarCollectible::StarCollectible(Vector2 pos, int* countPtr)
 {
     position = pos;
     this->countPtr = countPtr;
-    texLoaded = false;
-    if (FileExists("resources/sprites/Stars and coins/Star.png"))
-    {
-        tex = LoadTexture("resources/sprites/Stars and coins/Star.png");
-        texLoaded = true;
-    }
+    tex = GetOrLoadTexture("resources/sprites/Stars and coins/Star.png");
+    texLoaded = (tex.id > 0);
 }
 
-StarCollectible::~StarCollectible()
-{
-    if (texLoaded) UnloadTexture(tex);
-}
+StarCollectible::~StarCollectible() {}
 
 void StarCollectible::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
@@ -229,11 +222,11 @@ GunTrap::GunTrap(Vector2 pos, Vector2 initialDir)
     position = pos;
     shootCooldown = 2.0f;
     dir = initialDir;
-    texLoaded = false;
-    if (FileExists("resources/sprites/Traps/Arrow Trap/Arrow_trap.png")) { tex = LoadTexture("resources/sprites/Traps/Arrow Trap/Arrow_trap.png"); texLoaded = true; }
+    tex = GetOrLoadTexture("resources/sprites/Traps/Arrow Trap/Arrow_trap.png");
+    texLoaded = (tex.id > 0);
 }
 
-GunTrap::~GunTrap() { if (texLoaded) UnloadTexture(tex); }
+GunTrap::~GunTrap() {}
 
 void GunTrap::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
@@ -273,17 +266,17 @@ TriggerTrap::TriggerTrap(Vector2 pos, bool horizontal, const char* spritePath, i
     timer = 0.0f;
     triggered = false;
     timerStarted = false;
-    texLoaded = false;
-    if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
-    const char* spikePath = "resources/sprites/Traps/Sharp/Spike-trap-spike.png";
-    if (FileExists(spikePath)) { spikeTex = LoadTexture(spikePath); spikeTexLoaded = true; }
+    tex = GetOrLoadTexture(spritePath);
+    texLoaded = (tex.id > 0);
+    spikeTex = GetOrLoadTexture("resources/sprites/Traps/Sharp/Spike-trap-spike.png");
+    spikeTexLoaded = (spikeTex.id > 0);
     frameIndex = 0;
     animTimer = 0.0f;
     retractTimer = 0.0f;
     retracting = false;
 }
 
-TriggerTrap::~TriggerTrap() { if (texLoaded) UnloadTexture(tex); if (spikeTexLoaded) UnloadTexture(spikeTex); }
+TriggerTrap::~TriggerTrap() {}
 
 void TriggerTrap::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
@@ -404,10 +397,10 @@ Decoration::Decoration(Vector2 pos, const char* spritePath, int fw, float ds)
     position = pos;
     frameWidth = fw;
     drawSize = ds;
-    texLoaded = false;
-    if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
+    tex = GetOrLoadTexture(spritePath);
+    texLoaded = (tex.id > 0);
 }
-Decoration::~Decoration() { if (texLoaded) UnloadTexture(tex); }
+Decoration::~Decoration() {}
 void Decoration::Update(float dt, Player& player, std::vector<Entity*>&, Level&)
 {
     if (frameWidth > 0 && texLoaded)
@@ -441,11 +434,11 @@ FixedTrap::FixedTrap(Vector2 pos, const char* spritePath, int w, int h)
 {
     drawW = w; drawH = h;
     position = pos;
-    texLoaded = false;
-    if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
+    tex = GetOrLoadTexture(spritePath);
+    texLoaded = (tex.id > 0);
 }
 
-FixedTrap::~FixedTrap() { if (texLoaded) UnloadTexture(tex); }
+FixedTrap::~FixedTrap() {}
 
 void FixedTrap::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
@@ -464,10 +457,11 @@ void FixedTrap::Draw()
 CoinCollectible::CoinCollectible(Vector2 pos, const char* spritePath, CoinSystem* coinSys)
     : position(pos), coinSystem(coinSys)
 {
-    if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
+    tex = GetOrLoadTexture(spritePath);
+    texLoaded = (tex.id > 0);
 }
 
-CoinCollectible::~CoinCollectible() { if (texLoaded) UnloadTexture(tex); }
+CoinCollectible::~CoinCollectible() {}
 
 void CoinCollectible::Update(float dt, Player& player, std::vector<Entity*>&, Level&)
 {
@@ -494,10 +488,8 @@ Rectangle CoinCollectible::GetBounds() const { return { position.x, position.y, 
 IceBox::IceBox(Vector2 pos)
 {
     position = pos;
-    if (FileExists("resources/sprites/Exit/Ice_box.png"))
-    {
-        tex = LoadTexture("resources/sprites/Exit/Ice_box.png"); texLoaded = true;
-    }
+    tex = GetOrLoadTexture("resources/sprites/Exit/Ice_box.png");
+    texLoaded = (tex.id > 0);
 }
 
 void IceBox::Update(float dt, Player& player, std::vector<Entity*>&, Level& level)
