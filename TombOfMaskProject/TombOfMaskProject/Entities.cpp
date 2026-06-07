@@ -366,6 +366,31 @@ void TriggerTrap::Draw()
     }
 }
 
+bool TriggerTrap::GetSpikeHitbox(Rectangle& out) const
+{
+    if (frameIndex <= 0 || retracting) return false;
+    float progress  = frameIndex / 4.0f;
+    float extendLen = progress * 32.0f;
+    float cx    = position.x + drawW * 0.5f;
+    float cy    = position.y + drawH * 0.5f;
+    float rad   = spikeRotation * DEG2RAD;
+    float dirX  = sinf(rad);
+    float dirY  = -cosf(rad);
+    float edgeX = cx + dirX * drawW * 0.5f;
+    float edgeY = cy + dirY * drawH * 0.5f;
+    if (fabsf(dirX) > fabsf(dirY))
+    {
+        float x0 = dirX > 0 ? edgeX : edgeX - extendLen;
+        out = { x0, edgeY - 6.0f, extendLen, 12.0f };
+    }
+    else
+    {
+        float y0 = dirY > 0 ? edgeY : edgeY - extendLen;
+        out = { edgeX - 6.0f, y0, 12.0f, extendLen };
+    }
+    return true;
+}
+
 // --- Decoration ---
 Decoration::Decoration(Vector2 pos, const char* spritePath, int fw, float ds)
 {
