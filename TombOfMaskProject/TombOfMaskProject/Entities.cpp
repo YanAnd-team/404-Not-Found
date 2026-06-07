@@ -290,9 +290,9 @@ void TriggerTrap::Update(float dt, Player& player, std::vector<Entity*>& entitie
         {
             timerStarted = true;
             if (horizontal)
-                spikeRotation = (player.position.x >= position.x) ? 90.0f : 270.0f;
-            else
                 spikeRotation = (player.position.y >= position.y) ? 180.0f : 0.0f;
+            else
+                spikeRotation = (player.position.x >= position.x) ? 90.0f : 270.0f;
         }
 
         if (timerStarted)
@@ -327,10 +327,9 @@ void TriggerTrap::Update(float dt, Player& player, std::vector<Entity*>& entitie
             timerStarted = false;
         }
 
-        if (!retracting)
-        {
-            if (CheckCollisionRecs(player.GetBounds(), GetBounds())) player.Reset();
-        }
+        Rectangle spikeHit;
+        if (GetSpikeHitbox(spikeHit) && CheckCollisionRecs(player.GetBounds(), spikeHit))
+            player.Reset();
     }
 }
 
@@ -348,23 +347,22 @@ void TriggerTrap::Draw()
         DrawTexturePro(tex, src, dest, Vector2{ 0,0 }, 0, WHITE);
     }
 
-    if (spikeTexLoaded && (timerStarted || triggered))
+    if (spikeTexLoaded && frameIndex > 0)
     {
-        float sh = (float)spikeTex.height;
-        float sw = (float)spikeTex.width;
-        Vector2 center = { cx, cy };
-        Vector2 origin = { cx - position.x, cy - position.y };
-        if (timerStarted && !triggered)
-        {
-            Rectangle src = { 0, 0, sw, sh / 2.0f };
-            Rectangle sdest = { center.x, center.y, (float)drawW, drawH * 0.5f };
-            DrawTexturePro(spikeTex, src, sdest, origin, spikeRotation, WHITE);
-        }
-        else if (triggered)
-        {
-            Rectangle src = { 0, 0, sw, sh };
-            DrawTexturePro(spikeTex, src, { center.x, center.y, (float)drawW, (float)drawH }, origin, spikeRotation, WHITE);
-        }
+        float progress  = frameIndex / 4.0f;
+        float extendLen = progress * 32.0f;
+        float sw        = (float)spikeTex.width;
+        float sh        = (float)spikeTex.height;
+        float rad       = spikeRotation * DEG2RAD;
+        float dirX      = sinf(rad);
+        float dirY      = -cosf(rad);
+        float edgeX     = cx + dirX * drawW * 0.5f;
+        float edgeY     = cy + dirY * drawH * 0.5f;
+        float spikeCX   = edgeX + dirX * extendLen * 0.5f;
+        float spikeCY   = edgeY + dirY * extendLen * 0.5f;
+        Rectangle src   = { 0, 0, sw, sh };
+        Rectangle dest  = { spikeCX, spikeCY, sw, extendLen };
+        DrawTexturePro(spikeTex, src, dest, { sw * 0.5f, extendLen * 0.5f }, spikeRotation, WHITE);
     }
 }
 
