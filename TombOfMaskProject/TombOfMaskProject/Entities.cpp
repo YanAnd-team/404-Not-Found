@@ -280,14 +280,13 @@ TriggerTrap::~TriggerTrap() { if (texLoaded) UnloadTexture(tex); if (spikeTexLoa
 void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
 //Activate when player steps on this tile; animate spike out after 0.6s delay, hold 1.5s, then retract
 {
-    int tileX = (int)(position.x / level.GetTileSize());
-    int tileY = (int)(position.y / level.GetTileSize());
-    int playerTileX = (int)(player.position.x / level.GetTileSize());
-    int playerTileY = (int)(player.position.y / level.GetTileSize());
+    Rectangle triggerZone = horizontal
+        ? Rectangle{ position.x,      position.y - 32,   (float)drawW,      (float)drawH + 64 }
+        : Rectangle{ position.x - 32, position.y,        (float)drawW + 64, (float)drawH };
 
     if (!triggered)
     {
-        if (!timerStarted && playerTileX == tileX && playerTileY == tileY)
+        if (!timerStarted && CheckCollisionRecs(player.GetBounds(), triggerZone))
         {
             timerStarted = true;
             if (horizontal)

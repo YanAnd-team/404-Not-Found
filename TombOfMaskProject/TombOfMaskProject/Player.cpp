@@ -25,7 +25,7 @@ void Player::Init(Vector2 startPos)
     idleFrameIdx  = 0;
     animTimer     = 0.0f;
     idleAnimTimer = 0.0f;
-    animSpeed     = 0.06f;
+    animSpeed     = 0.04f;
     drawScale = 1.0f;
     drawRotation = 0.0f;
     flipX = false;
