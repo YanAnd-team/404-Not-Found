@@ -139,7 +139,15 @@ void Scene::DrawHitboxes() const
 
     for (auto e : entities)
         if (e && e->IsActive())
+        {
             DrawRectangleLinesEx(e->GetBounds(), 1.5f, ORANGE);
+            if (auto* trap = dynamic_cast<TriggerTrap*>(e))
+            {
+                Rectangle spikeHit;
+                if (trap->GetSpikeHitbox(spikeHit))
+                    DrawRectangleLinesEx(spikeHit, 1.5f, RED);
+            }
+        }
 
     Vector2 gp = level.GetGoalPosition();
     DrawRectangleLinesEx({ gp.x, gp.y, 16.0f, 16.0f }, 2.0f, YELLOW);
@@ -206,7 +214,7 @@ void Scene::LoadLevel(int levelNumber)
     for (auto entity : entities) { if (entity) delete entity; }
     entities.clear();
     starCount = 0;
-    coinSystem.reset();   // ÖØÖÃ½ð±Ò
+    coinSystem.reset();   // ï¿½ï¿½ï¿½Ã½ï¿½ï¿½
 
     if (!level.Load(levelNumber))
         return;

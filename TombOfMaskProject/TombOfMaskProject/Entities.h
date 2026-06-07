@@ -4,7 +4,7 @@
 
 class Level;
 class Player;
-class CoinSystem;   // ÐÂÔö
+class CoinSystem;   // ï¿½ï¿½ï¿½ï¿½
 
 class Entity {
 public:
@@ -17,7 +17,7 @@ protected:
     bool active = true;
 };
 
-// ¹¤³§º¯ÊýÉùÃ÷£¬Ôö¼Ó CoinSystem* ²ÎÊý
+// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ CoinSystem* ï¿½ï¿½ï¿½ï¿½
 Entity* CreateEntityFromTile(char tile, Vector2 pos, Level& level, int* starCountPtr = nullptr, CoinSystem* coinSys = nullptr);
 
 class Bullet : public Entity {
@@ -89,6 +89,7 @@ public:
     void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
     void Draw() override;
     Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, (float)drawW, (float)drawH }; }
+    bool GetSpikeHitbox(Rectangle& out) const;
 private:
     int drawW, drawH;
     Vector2 position;
@@ -149,7 +150,7 @@ private:
     Vector2 position;
     Texture2D tex;
     bool texLoaded = false;
-    CoinSystem* coinSystem;   // ÐÂÔö
+    CoinSystem* coinSystem;   // ï¿½ï¿½ï¿½ï¿½
 };
 
 class IceBox : public Entity {
