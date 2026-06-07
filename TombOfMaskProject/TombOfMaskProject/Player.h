@@ -1,6 +1,7 @@
 #pragma once
 #include "raylib.h"
-#include "Level.h"
+
+class Level;
 
 
 class Player
@@ -8,15 +9,14 @@ class Player
 public:
     void Init(Vector2 startPos);                                    //Initialize player state, texture, and animation vars
     void Update(float dt, Rectangle worldBounds, Level& level);    //Handle input, slide physics, snap-to-tile on wall hit, and animation
-    void Draw();                                                    //Render with rotation and flip; pivot pinned to sprite center
-    void DeInit();                                                  //Unload texture
+    void Draw();                                                    //Render with rotation and flip; origin pinned to the head centre so the body trails behind
+    void DeInit();                                                  //Unload textures
 
     void Reset();                                                   //Teleport back to start position and flag death for this frame
 
     Vector2 GetCenter() const;
     Rectangle GetBounds() const;
     bool IsSliding() const { return sliding; }
-    Vector2 GetLastSlideDir() const { return lastSlideDir; } //Last non-zero slide direction (kept after stopping)
 
     Vector2 position;
     float speed;

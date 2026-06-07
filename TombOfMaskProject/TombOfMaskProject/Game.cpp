@@ -240,7 +240,6 @@ void Game::DrawGameplay()
 {
     scene.DrawStarHUD();
 
-    // ��ʾ�������
     int coins = scene.getCoinSystem().getCoins();
     DrawText(TextFormat("Coins: %d", coins), 10, screenHeight - 76, 15, GOLD);
 

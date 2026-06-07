@@ -4,7 +4,7 @@
 
 class Level;
 class Player;
-class CoinSystem;   // ����
+class CoinSystem;
 
 class Entity {
 public:
@@ -17,7 +17,6 @@ protected:
     bool active = true;
 };
 
-// ������������������ CoinSystem* ����
 Entity* CreateEntityFromTile(char tile, Vector2 pos, Level& level, int* starCountPtr = nullptr, CoinSystem* coinSys = nullptr);
 void ClearEntityTextureCache();
 
@@ -54,19 +53,6 @@ private:
     float animTimer;
 };
 
-class GhostPlus : public Ghost {
-public:
-    GhostPlus(Vector2 pos, bool vertical = false);
-    ~GhostPlus();
-    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
-    void Draw() override;
-    Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, 96, 96 }; }
-private:
-    Texture2D plusTex;
-    bool plusTexLoaded;
-    int frameIndex;
-    float animTimer;
-};
 
 class GunTrap : public Entity {
 public:
@@ -151,7 +137,7 @@ private:
     Vector2 position;
     Texture2D tex;
     bool texLoaded = false;
-    CoinSystem* coinSystem;   // ����
+    CoinSystem* coinSystem;
 };
 
 class IceBox : public Entity {

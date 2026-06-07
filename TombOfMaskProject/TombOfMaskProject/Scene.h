@@ -4,7 +4,7 @@
 #include "Camera.h"
 #include "Level.h"
 #include "Entities.h"
-#include "CoinSystem.h"   // 新增
+#include "CoinSystem.h"
 
 class Scene
 {
@@ -29,7 +29,7 @@ public:
     void DrawWinStars();
     void ToggleHitboxes() { showHitboxes = !showHitboxes; }
 
-    CoinSystem& getCoinSystem() { return coinSystem; }   // 新增
+    CoinSystem& getCoinSystem() { return coinSystem; }
 
     Player player;
     GameCamera camera;
@@ -42,7 +42,6 @@ private:
 
     Sound sound[7];
     Music music[2];
-    Font font;
     bool soundLoaded[7] = {};
     bool musicLoaded[2] = {};
     int currentLevelNumber = 1;
@@ -51,5 +50,5 @@ private:
     int starsRevealed = 0;
     float starRevealTimer = 0.0f;
 
-    CoinSystem coinSystem;   // 新增
+    CoinSystem coinSystem;
 };

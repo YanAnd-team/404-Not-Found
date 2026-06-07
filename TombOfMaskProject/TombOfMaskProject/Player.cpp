@@ -1,4 +1,5 @@
 #include "Player.h"
+#include "Level.h"
 
 static const int moveFrameX[]     = {   0,  32, 128, 288, 480 };
 static const int moveFrameWidth[] = {  32,  96, 160, 192, 192 };
@@ -112,7 +113,6 @@ void Player::Update(float dt, Rectangle worldBounds, Level& level)
 
     if (!sliding)
     {
-        // Cycle idle animation
         idleAnimTimer += dt;
         if (idleAnimTimer >= 0.15f)
         {
@@ -127,7 +127,6 @@ void Player::Update(float dt, Rectangle worldBounds, Level& level)
     {
         idleFrameIdx = 0;
 
-        // Set rotation and flip based on direction
         if (currentDir.x > 0) { drawRotation = 0.0f;   flipX = true; }
         else if (currentDir.x < 0) { drawRotation = 0.0f;   flipX = false; }
         else if (currentDir.y < 0) { drawRotation = 90.0f;  flipX = false; }

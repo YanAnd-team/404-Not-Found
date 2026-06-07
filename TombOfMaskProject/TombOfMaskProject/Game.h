@@ -28,11 +28,11 @@ private:
     void UpdateTitle();             //Wait for ENTER to start gameplay
     void UpdateGameplay(float dt);  //Check win/death transitions; number keys 1-5 load levels directly
     void UpdateGameOver();          //Wait for ENTER to return to the title screen
-    void UpdateWin();               //Wait for ENTER to return to the title screen
+    void UpdateWin();               //Wait for ENTER to advance to the next level, or return to title after the last level
 
     void DrawInitial();     //Draw the credits and project info screen
     void DrawTitle();       //Draw the main menu with background and title text
-    void DrawGameplay();    //Draw HUD: star count and control hints
+    void DrawGameplay();    //Draw HUD: stars, coin count, and control hints
     void DrawGameOver();    //Draw red overlay with GAME OVER text
     void DrawWin();         //Draw green overlay with YOU WIN text and star results
 

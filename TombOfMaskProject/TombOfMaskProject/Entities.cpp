@@ -1,7 +1,7 @@
 #include "Entities.h"
 #include "Player.h"
 #include "Level.h"
-#include "CoinSystem.h"   // 新增
+#include "CoinSystem.h"
 #include <cmath>
 #include <unordered_map>
 #include <string>
@@ -152,40 +152,6 @@ void Ghost::Draw()
     else DrawRectangleRec(dest, MAGENTA);
 }
 
-// --- GhostPlus ---
-GhostPlus::GhostPlus(Vector2 pos, bool vertical) : Ghost(pos, vertical)
-{
-    plusTex = GetOrLoadTexture("resources/sprites/Enemy/Monster2.png");
-    plusTexLoaded = (plusTex.id > 0);
-    frameIndex = 0;
-    animTimer = 0.0f;
-}
-
-GhostPlus::~GhostPlus() {}
-
-void GhostPlus::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
-{
-    animTimer += dt;
-    if (animTimer >= 0.5f)
-    {
-        animTimer = 0.0f;
-        int totalFrames = plusTexLoaded ? (plusTex.width / 96) : 1;
-        frameIndex = (frameIndex + 1) % totalFrames;
-    }
-
-    Ghost::Update(dt, player, entities, level);
-}
-
-void GhostPlus::Draw()
-{
-    if (plusTexLoaded)
-    {
-        Rectangle src = { (float)(frameIndex * 96), 0, 96.0f, (float)plusTex.height };
-        Rectangle dest = { position.x, position.y, 96, 96 };
-        DrawTexturePro(plusTex, src, dest, Vector2{ 0,0 }, 0, WHITE);
-    }
-    else Ghost::Draw();
-}
 
 // --- StarCollectible ---
 StarCollectible::StarCollectible(Vector2 pos, int* countPtr)
@@ -470,7 +436,7 @@ void FixedTrap::Draw()
     else DrawRectangleRec(dest, ORANGE);
 }
 
-// --- CoinCollectible (修改) ---
+// --- CoinCollectible ---
 CoinCollectible::CoinCollectible(Vector2 pos, const char* spritePath, CoinSystem* coinSys)
     : position(pos), coinSystem(coinSys)
 {
@@ -647,7 +613,7 @@ void Monster2::Draw()
     DrawTexturePro(tex, src, dest, { 0, 0 }, 0, WHITE);
 }
 
-// --- 工厂函数 (修改) ---
+// --- Entity factory ---
 Entity* CreateEntityFromTile(char tile, Vector2 pos, Level& level, int* starCountPtr, CoinSystem* coinSys)
 {
     int tx = (int)(pos.x / level.GetTileSize());

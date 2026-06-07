@@ -56,8 +56,6 @@ void Scene::InitAudio()
 
 void Scene::InitGameplay()
 {
-    font = LoadFontEx("resources/fonts/easvhs.ttf", 32, NULL, 0);
-
     camera.Init(GetScreenWidth(), GetScreenHeight());
 
     level.Init();
@@ -214,7 +212,7 @@ void Scene::LoadLevel(int levelNumber)
     for (auto entity : entities) { if (entity) delete entity; }
     entities.clear();
     starCount = 0;
-    coinSystem.reset();   // ���ý��
+    coinSystem.reset();
 
     if (!level.Load(levelNumber))
         return;
@@ -296,6 +294,5 @@ void Scene::DeInit()
     }
     for (int i = 0; i < 7; ++i)
         if (soundLoaded[i]) { StopSound(sound[i]); UnloadSound(sound[i]); }
-    UnloadFont(font);
     CloseAudioDevice();
 }
