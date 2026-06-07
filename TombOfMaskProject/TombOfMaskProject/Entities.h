@@ -179,3 +179,34 @@ private:
     Texture2D tex;
     bool texLoaded = false;
 };
+
+class Monster2Ball : public Entity {
+public:
+    explicit Monster2Ball(Vector2 pos);
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
+    void Draw() override;
+    Rectangle GetBounds() const override;
+private:
+    Vector2 position;
+    Texture2D tex;
+    bool texLoaded = false;
+};
+
+class Monster2 : public Entity {
+public:
+    explicit Monster2(Vector2 pos);
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
+    void Draw() override;
+    Rectangle GetBounds() const override { return { position.x, position.y, 96.0f, 96.0f }; }
+private:
+    enum class State { Waiting, Floating, Launching };
+    Vector2 position;
+    Texture2D tex;
+    bool texLoaded = false;
+    bool assetsLoaded = false;
+    State state = State::Waiting;
+    float stateTimer = 0.0f;
+    int frameIndex = 0;
+    float animTimer = 0.0f;
+    bool ballDropped = false;
+};

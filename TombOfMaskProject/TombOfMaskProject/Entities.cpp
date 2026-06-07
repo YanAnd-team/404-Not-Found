@@ -347,6 +347,23 @@ void TriggerTrap::Draw()
         DrawTexturePro(tex, src, dest, Vector2{ 0,0 }, 0, WHITE);
     }
 
+    if (spikeTexLoaded && timerStarted && !triggered)
+    {
+        const float peekLen = 4.0f;
+        float sw      = (float)spikeTex.width;
+        float sh      = (float)spikeTex.height;
+        float rad     = spikeRotation * DEG2RAD;
+        float dirX    = sinf(rad);
+        float dirY    = -cosf(rad);
+        float edgeX   = cx + dirX * drawW * 0.5f;
+        float edgeY   = cy + dirY * drawH * 0.5f;
+        float spikeCX = edgeX + dirX * peekLen * 0.5f;
+        float spikeCY = edgeY + dirY * peekLen * 0.5f;
+        DrawTexturePro(spikeTex, { 0, 0, sw, sh },
+                       { spikeCX, spikeCY, sw, peekLen },
+                       { sw * 0.5f, peekLen * 0.5f }, spikeRotation, WHITE);
+    }
+
     if (spikeTexLoaded && frameIndex > 0)
     {
         float progress  = frameIndex / 4.0f;
@@ -360,9 +377,9 @@ void TriggerTrap::Draw()
         float edgeY     = cy + dirY * drawH * 0.5f;
         float spikeCX   = edgeX + dirX * extendLen * 0.5f;
         float spikeCY   = edgeY + dirY * extendLen * 0.5f;
-        Rectangle src   = { 0, 0, sw, sh };
-        Rectangle dest  = { spikeCX, spikeCY, sw, extendLen };
-        DrawTexturePro(spikeTex, src, dest, { sw * 0.5f, extendLen * 0.5f }, spikeRotation, WHITE);
+        DrawTexturePro(spikeTex, { 0, 0, sw, sh },
+                       { spikeCX, spikeCY, sw, extendLen },
+                       { sw * 0.5f, extendLen * 0.5f }, spikeRotation, WHITE);
     }
 }
 
@@ -512,6 +529,124 @@ void IceBox::Draw()
 
 Rectangle IceBox::GetBounds() const { return { position.x, position.y, 40, 40 }; }
 
+// --- Monster2Ball ---
+Monster2Ball::Monster2Ball(Vector2 pos)
+{
+    position = pos;
+    tex = GetOrLoadTexture("resources/sprites/Enemy/Monster2_Ball.png");
+    texLoaded = (tex.id > 0);
+}
+
+void Monster2Ball::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
+{
+    const float FALL_SPEED = 360.0f;
+    position.y += FALL_SPEED * dt;
+
+    Vector2 pc  = player.GetCenter();
+    float camBottom = pc.y - GetScreenHeight() / 3.0f + GetScreenHeight();
+    if (position.y > camBottom + 300.0f) { active = false; return; }
+
+    if (CheckCollisionRecs(player.GetBounds(), GetBounds()))
+        player.Reset();
+}
+
+void Monster2Ball::Draw()
+{
+    float w = texLoaded ? (float)tex.width  : 32.0f;
+    float h = texLoaded ? (float)tex.height : 32.0f;
+    Rectangle dest = { position.x, position.y, w, h };
+    if (texLoaded)
+        DrawTexturePro(tex, { 0, 0, w, h }, dest, { 0, 0 }, 0, WHITE);
+    else
+        DrawRectangleRec(dest, RED);
+}
+
+Rectangle Monster2Ball::GetBounds() const
+{
+    float w = texLoaded ? (float)tex.width  : 32.0f;
+    float h = texLoaded ? (float)tex.height : 32.0f;
+    return { position.x, position.y, w, h };
+}
+
+// --- Monster2 ---
+Monster2::Monster2(Vector2 pos)
+    : position(pos), tex{}, texLoaded(false), assetsLoaded(false),
+      state(State::Waiting), stateTimer(0.0f), frameIndex(0), animTimer(0.0f), ballDropped(false)
+{
+}
+
+void Monster2::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
+{
+    Vector2 pc   = player.GetCenter();
+    float camX   = pc.x - GetScreenWidth()  / 3.0f;
+    float camY   = pc.y - GetScreenHeight() / 3.0f;
+    Rectangle camView = { camX, camY, (float)GetScreenWidth(), (float)GetScreenHeight() };
+    Rectangle myBounds = GetBounds();
+
+    if (state == State::Waiting)
+    {
+        if (!CheckCollisionRecs(myBounds, camView)) return;
+        if (!assetsLoaded)
+        {
+            tex = GetOrLoadTexture("resources/sprites/Enemy/Monster2.png");
+            texLoaded   = (tex.id > 0);
+            assetsLoaded = true;
+        }
+        state      = State::Floating;
+        stateTimer = 0.0f;
+        frameIndex = 0;
+        animTimer  = 0.0f;
+    }
+
+    if (state == State::Floating)
+    {
+        stateTimer += dt;
+        animTimer  += dt;
+        if (animTimer >= 0.4f) { animTimer = 0.0f; frameIndex = (frameIndex + 1) % 2; }
+
+        if (stateTimer >= 3.0f)
+        {
+            state      = State::Launching;
+            stateTimer = 0.0f;
+            frameIndex = 2;
+            animTimer  = 0.0f;
+        }
+    }
+    else if (state == State::Launching)
+    {
+        if (!ballDropped)
+        {
+            ballDropped = true;
+            entities.push_back(new Monster2Ball({ position.x, position.y + 96.0f }));
+        }
+
+        if (frameIndex < 4)
+        {
+            animTimer += dt;
+            if (animTimer >= 0.1f) { animTimer = 0.0f; frameIndex++; }
+        }
+
+        const float RISE_SPEED = 60.0f;
+        position.y -= RISE_SPEED * dt;
+        if (position.y + 96.0f < camView.y) { active = false; return; }
+    }
+
+    if (CheckCollisionRecs(player.GetBounds(), myBounds))
+        player.Reset();
+}
+
+void Monster2::Draw()
+{
+    if (state == State::Waiting || !texLoaded) return;
+
+    float bobY = (state == State::Floating) ? sinf(stateTimer * 2.0f) * 10.0f : 0.0f;
+    float fw   = (float)tex.width / 5.0f;
+    float fh   = (float)tex.height;
+    Rectangle src  = { (float)frameIndex * fw, 0, fw, fh };
+    Rectangle dest = { position.x, position.y + bobY, 96.0f, 96.0f };
+    DrawTexturePro(tex, src, dest, { 0, 0 }, 0, WHITE);
+}
+
 // --- 工厂函数 (修改) ---
 Entity* CreateEntityFromTile(char tile, Vector2 pos, Level& level, int* starCountPtr, CoinSystem* coinSys)
 {
@@ -532,11 +667,7 @@ Entity* CreateEntityFromTile(char tile, Vector2 pos, Level& level, int* starCoun
         bool horiz = level.GetTileAt(tx - 1, ty) == '-' || level.GetTileAt(tx + 1, ty) == '-';
         return new Ghost(pos, !horiz);
     }
-    case '7':
-    {
-        bool horiz = level.GetTileAt(tx - 1, ty) == '-' || level.GetTileAt(tx + 1, ty) == '-';
-        return new GhostPlus(pos, !horiz);
-    }
+    case '7': return new Monster2(pos);
     case 's': return new StarCollectible(pos, starCountPtr);
     case 'c': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin.png", coinSys);
     case 'k': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin1.png", coinSys);

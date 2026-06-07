@@ -2,6 +2,7 @@
 
 static const int moveFrameX[]     = {   0,  32, 128, 288, 480 };
 static const int moveFrameWidth[] = {  32,  96, 160, 192, 192 };
+static const int moveHeadW[]      = {  32,  32,  36,  36,  36 };
 static const int MOVE_FRAME_COUNT = 5;
 
 void Player::Init(Vector2 startPos)
@@ -25,7 +26,7 @@ void Player::Init(Vector2 startPos)
     idleFrameIdx  = 0;
     animTimer     = 0.0f;
     idleAnimTimer = 0.0f;
-    animSpeed     = 0.04f;
+    animSpeed     = 0.02667f;
     drawScale = 1.0f;
     drawRotation = 0.0f;
     flipX = false;
@@ -127,17 +128,17 @@ void Player::Update(float dt, Rectangle worldBounds, Level& level)
         idleFrameIdx = 0;
 
         // Set rotation and flip based on direction
-        if (currentDir.x > 0) { drawRotation = 0.0f;   flipX = false; }
-        else if (currentDir.x < 0) { drawRotation = 0.0f;   flipX = true; }
-        else if (currentDir.y < 0) { drawRotation = -90.0f; flipX = false; }
-        else if (currentDir.y > 0) { drawRotation = 90.0f;  flipX = false; }
+        if (currentDir.x > 0) { drawRotation = 0.0f;   flipX = true; }
+        else if (currentDir.x < 0) { drawRotation = 0.0f;   flipX = false; }
+        else if (currentDir.y < 0) { drawRotation = 90.0f;  flipX = false; }
+        else if (currentDir.y > 0) { drawRotation = -90.0f; flipX = false; }
 
         animTimer += dt;
         if (animTimer >= animSpeed)
         {
             animTimer = 0.0f;
             frameIndex++;
-            if (frameIndex > MOVE_FRAME_COUNT) frameIndex = 1;
+            if (frameIndex > MOVE_FRAME_COUNT) frameIndex = 2;
         }
     }
 }
@@ -165,7 +166,9 @@ void Player::Draw()
         float h  = moveTex.height > 0 ? (float)moveTex.height : 32.0f;
         Rectangle src  = { (float)moveFrameX[fi], 0, flipX ? -(float)moveFrameWidth[fi] : (float)moveFrameWidth[fi], h };
         Rectangle dest = { cx, cy, fw, drawHeight };
-        DrawTexturePro(moveTex, src, dest, { fw * 0.5f, drawHeight * 0.5f }, drawRotation, WHITE);
+        float hw = (float)moveHeadW[fi] * 0.5f * drawScale;
+        float ow = flipX ? (fw - hw) : hw;
+        DrawTexturePro(moveTex, src, dest, { ow, drawHeight * 0.5f }, drawRotation, WHITE);
     }
 }
 
