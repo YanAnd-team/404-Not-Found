@@ -4,29 +4,32 @@
 #include "Camera.h"
 #include "Level.h"
 #include "Entities.h"
+#include "CoinSystem.h"   // 新增
 
 class Scene
 {
 public:
-    void InitAudio();                    //Load audio device, sounds, and music streams
-    void InitGameplay();                 //Load textures, font, camera, level 1, and spawn all tile entities
-    void Update(float dt);              //Update player, camera, entities, and audio state
-    void DrawWorld();                   //Draw level, entities, and player through the camera
-    void DeInit();                      //Unload all assets, entities, audio, and close audio device
+    void InitAudio();
+    void InitGameplay();
+    void Update(float dt);
+    void DrawWorld();
+    void DeInit();
 
-    bool HasPlayerWon() const;          //Win when player bounds overlap the goal tile
-    void LoadLevel(int levelNumber);    //Destroy all entities, reload level, respawn player and entities
-    void ReloadLevel();                 //Reload the current level from scratch (resets stars, entities, and player)
-    int  GetCurrentLevelNumber() const; //Return the level number currently loaded
+    bool HasPlayerWon() const;
+    void LoadLevel(int levelNumber);
+    void ReloadLevel();
+    int  GetCurrentLevelNumber() const;
 
-    void UpdateAudio();                 //Stream music updates; must be called every frame
-    void OnEnterMenu();                 //Switch music from gameplay track to menu track
-    void OnEnterGameplay();             //Switch music from menu track to gameplay track
-    void OnPlayerWon();                 //Play win sound; reset star reveal state
-    void UpdateWinStars(float dt);      //Reveal stars one by one, playing per-star sounds
-    void DrawStarHUD();                 //Draw collected stars in the top-left corner
-    void DrawWinStars();                //Draw 3 star slots centered on screen; filled = revealed, empty icon = not yet
+    void UpdateAudio();
+    void OnEnterMenu();
+    void OnEnterGameplay();
+    void OnPlayerWon();
+    void UpdateWinStars(float dt);
+    void DrawStarHUD();
+    void DrawWinStars();
     void ToggleHitboxes() { showHitboxes = !showHitboxes; }
+
+    CoinSystem& getCoinSystem() { return coinSystem; }   // 新增
 
     Player player;
     GameCamera camera;
@@ -35,9 +38,9 @@ public:
     int starCount = 0;
 
 private:
-    void DrawHitboxes() const;          //Draw colored outlines for player, walls, entities, and goal (debug)
+    void DrawHitboxes() const;
 
-    Sound sound[7];   // [0]=Star pickup [1]=Movement [2]=Death [3]=Win [4]=1-star [5]=2-star [6]=3-star
+    Sound sound[7];
     Music music[2];
     Font font;
     bool soundLoaded[7] = {};
@@ -45,6 +48,8 @@ private:
     int currentLevelNumber = 1;
     bool wasSliding = false;
     bool showHitboxes = false;
-int starsRevealed = 0;
+    int starsRevealed = 0;
     float starRevealTimer = 0.0f;
+
+    CoinSystem coinSystem;   // 新增
 };

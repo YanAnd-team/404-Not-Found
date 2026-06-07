@@ -16,7 +16,7 @@ void Game::Init()
         int tw = MeasureText(text, 30);
         DrawText(text, screenWidth / 2 - tw / 2, screenHeight / 2 - 15, 30, WHITE);
         EndDrawing();
-    };
+        };
 
     drawLoading(1);
     if (FileExists("resources/sprites/Icons/icon.png"))
@@ -25,12 +25,12 @@ void Game::Init()
         SetWindowIcon(iconImg);
         UnloadImage(iconImg);
     }
-    bgTex    = FileExists("resources/sprites/Background/main_background.png")
-               ? LoadTexture("resources/sprites/Background/main_background.png") : Texture2D{};
-    logoTex  = FileExists("resources/sprites/Background/logo_tomb.png")
-               ? LoadTexture("resources/sprites/Background/logo_tomb.png")       : Texture2D{};
+    bgTex = FileExists("resources/sprites/Background/main_background.png")
+        ? LoadTexture("resources/sprites/Background/main_background.png") : Texture2D{};
+    logoTex = FileExists("resources/sprites/Background/logo_tomb.png")
+        ? LoadTexture("resources/sprites/Background/logo_tomb.png") : Texture2D{};
     enterTex = FileExists("resources/sprites/Background/Press_ENTER.png")
-               ? LoadTexture("resources/sprites/Background/Press_ENTER.png")     : Texture2D{};
+        ? LoadTexture("resources/sprites/Background/Press_ENTER.png") : Texture2D{};
 
     drawLoading(2);
     scene.InitAudio();
@@ -96,8 +96,6 @@ bool Game::ShouldClose() const
     return WindowShouldClose();
 }
 
-// --- State Updates ---
-
 void Game::UpdateInitial()
 {
     if (IsKeyPressed(KEY_ENTER))
@@ -120,11 +118,6 @@ void Game::UpdateGameplay(float dt)
 
     if (scene.HasPlayerWon())
     {
-        // [UNLOCK SYSTEM DISABLED FOR TESTING]
-        // int wonLevel = scene.GetCurrentLevelNumber();
-        // if (wonLevel + 1 <= 5 && wonLevel + 1 > maxUnlockedLevel)
-        //     maxUnlockedLevel = wonLevel + 1;
-
         currentState = WIN;
         scene.OnPlayerWon();
         return;
@@ -138,10 +131,6 @@ void Game::UpdateGameplay(float dt)
 
     if (IsKeyPressed(KEY_B)) scene.ToggleHitboxes();
 
-    // [UNLOCK SYSTEM DISABLED FOR TESTING] R: reset unlock progress and restart from level 1
-    // if (IsKeyPressed(KEY_R)) { maxUnlockedLevel = 1; scene.LoadLevel(1); return; }
-
-    // Number keys: load any level freely (unlock check disabled for testing)
     if (IsKeyPressed(KEY_ONE))   scene.LoadLevel(1);
     if (IsKeyPressed(KEY_TWO))   scene.LoadLevel(2);
     if (IsKeyPressed(KEY_THREE)) scene.LoadLevel(3);
@@ -178,14 +167,12 @@ void Game::UpdateGameOver()
     }
 }
 
-// --- State Draws ---
-
 void Game::DrawInitial()
 {
-    DrawRectangle(0, 0, screenWidth, screenHeight, Color{5, 5, 25, 255});
+    DrawRectangle(0, 0, screenWidth, screenHeight, Color{ 5, 5, 25, 255 });
 
     float centerX = screenWidth * 0.5f;
-    Vector2 textSize; //Reused to measure text width for center-alignment
+    Vector2 textSize;
 
     textSize = MeasureTextEx(font, "TOMB OF MASK", 40, TEXT_SPACING);
     DrawTextEx(font, "TOMB OF MASK", { centerX - textSize.x * 0.5f, 30 }, 40, TEXT_SPACING, ORANGE);
@@ -230,14 +217,12 @@ void Game::DrawInitial()
 
 void Game::DrawTitle()
 {
-    // Background - stretch to fill screen
     if (bgTex.id)
         DrawTexturePro(bgTex,
             { 0, 0, (float)bgTex.width, (float)bgTex.height },
             { 0, 0, (float)screenWidth, (float)screenHeight },
             { 0, 0 }, 0, WHITE);
 
-    // Logo - 80% of screen width, centered, near top
     if (logoTex.id)
     {
         float logoW = screenWidth * 0.80f;
@@ -248,7 +233,6 @@ void Game::DrawTitle()
             { 0, 0 }, 0, WHITE);
     }
 
-    // "Press ENTER to play" - 30% of screen width, centered, near bottom
     if (enterTex.id)
     {
         float enterW = screenWidth * 0.30f;
@@ -263,6 +247,10 @@ void Game::DrawTitle()
 void Game::DrawGameplay()
 {
     scene.DrawStarHUD();
+
+    // 显示金币数量
+    int coins = scene.getCoinSystem().getCoins();
+    DrawText(TextFormat("Coins: %d", coins), 10, screenHeight - 76, 15, GOLD);
 
     DrawText("Arrows: Move", 10, screenHeight - 58, 15, GRAY);
     DrawText(TextFormat("1~%d: Load Level  |  R: Reset  |  B: Hitboxes", maxUnlockedLevel), 10, screenHeight - 40, 15, GRAY);

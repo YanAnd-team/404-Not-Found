@@ -66,17 +66,16 @@ void Scene::InitGameplay()
     else
         player.Init(level.GetStartPosition());
 
-    // Iterate all tiles and create matching entities
-    int levelWidth  = level.GetWidth();
+    int levelWidth = level.GetWidth();
     int levelHeight = level.GetHeight();
-    int tileSize    = level.GetTileSize();
+    int tileSize = level.GetTileSize();
     for (int y = 0; y < levelHeight; ++y)
     {
         for (int x = 0; x < levelWidth; ++x)
         {
             char tile = level.GetTileAt(x, y);
             Vector2 pos = { (float)(x * tileSize), (float)(y * tileSize) };
-            Entity* entity = CreateEntityFromTile(tile, pos, level, &starCount);
+            Entity* entity = CreateEntityFromTile(tile, pos, level, &starCount, &coinSystem);
             if (entity) entities.push_back(entity);
         }
     }
@@ -96,7 +95,6 @@ void Scene::Update(float dt)
     if (starCount > prevStarCount && soundLoaded[0])
         PlaySound(sound[0]);
 
-    // Remove inactive entities and free memory
     for (size_t i = 0; i < entities.size(); )
     {
         if (!entities[i] || !entities[i]->IsActive())
@@ -107,7 +105,6 @@ void Scene::Update(float dt)
         else ++i;
     }
 
-    // Play movement sound on slide start
     bool nowSliding = player.IsSliding();
     if (nowSliding && !wasSliding && soundLoaded[1])
         PlaySound(sound[1]);
@@ -134,23 +131,19 @@ void Scene::DrawHitboxes() const
 {
     int ts = level.GetTileSize();
 
-    // Walls (drawn using the 4px collision grid, not the 16px entity grid)
     int wcs = level.GetWallCellSize();
     for (int y = 0; y < level.GetWallGridHeight(); ++y)
         for (int x = 0; x < level.GetWallGridWidth(); ++x)
             if (level.IsWallCell(x, y))
                 DrawRectangleLinesEx({ (float)(x * wcs), (float)(y * wcs), (float)wcs, (float)wcs }, 0.5f, RED);
 
-    // Entities
     for (auto e : entities)
         if (e && e->IsActive())
             DrawRectangleLinesEx(e->GetBounds(), 1.5f, ORANGE);
 
-    // Goal
     Vector2 gp = level.GetGoalPosition();
     DrawRectangleLinesEx({ gp.x, gp.y, 16.0f, 16.0f }, 2.0f, YELLOW);
 
-    // Player (drawn last so it's always on top)
     DrawRectangleLinesEx(player.GetBounds(), 2.0f, GREEN);
 }
 
@@ -196,7 +189,7 @@ void Scene::UpdateWinStars(float dt)
     {
         starRevealTimer -= revealDelay;
         starsRevealed++;
-        int soundIdx = 3 + starsRevealed; // 4=1-star, 5=2-star, 6=3-star
+        int soundIdx = 3 + starsRevealed;
         if (soundIdx <= 6 && soundLoaded[soundIdx])
             PlaySound(sound[soundIdx]);
     }
@@ -213,22 +206,23 @@ void Scene::LoadLevel(int levelNumber)
     for (auto entity : entities) { if (entity) delete entity; }
     entities.clear();
     starCount = 0;
+    coinSystem.reset();   // ÖØÖÃ½ð±Ò
 
     if (!level.Load(levelNumber))
         return;
 
     player.Init(level.GetStartPosition());
 
-    int levelWidth  = level.GetWidth();
+    int levelWidth = level.GetWidth();
     int levelHeight = level.GetHeight();
-    int tileSize    = level.GetTileSize();
+    int tileSize = level.GetTileSize();
     for (int y = 0; y < levelHeight; ++y)
     {
         for (int x = 0; x < levelWidth; ++x)
         {
             char tile = level.GetTileAt(x, y);
             Vector2 pos = { (float)(x * tileSize), (float)(y * tileSize) };
-            Entity* entity = CreateEntityFromTile(tile, pos, level, &starCount);
+            Entity* entity = CreateEntityFromTile(tile, pos, level, &starCount, &coinSystem);
             if (entity) entities.push_back(entity);
         }
     }
@@ -250,7 +244,7 @@ void Scene::DrawStarHUD()
     for (int i = 0; i < starCount && i < 3; ++i)
     {
         Rectangle dest = { 10.0f + i * 42.0f, 10.0f, 32.0f, 32.0f };
-        DrawTexturePro(starTex, Rectangle{0,0,(float)starTex.width,(float)starTex.height}, dest, Vector2{0,0}, 0, WHITE);
+        DrawTexturePro(starTex, Rectangle{ 0,0,(float)starTex.width,(float)starTex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
     }
 }
 
@@ -269,7 +263,7 @@ void Scene::DrawWinStars()
     {
         Rectangle dest = { startX + i * (slotSize + gap), startY, slotSize, slotSize };
         if (i < starsRevealed && hasStar)
-            DrawTexturePro(starTex, Rectangle{0,0,(float)starTex.width,(float)starTex.height}, dest, Vector2{0,0}, 0, WHITE);
+            DrawTexturePro(starTex, Rectangle{ 0,0,(float)starTex.width,(float)starTex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
         else
             DrawRectangleRec(dest, Fade(WHITE, 0.3f));
     }
@@ -286,7 +280,7 @@ void Scene::DeInit()
         StopMusicStream(music[0]);
         UnloadMusicStream(music[0]);
     }
-	if (musicLoaded[1])
+    if (musicLoaded[1])
     {
         StopMusicStream(music[1]);
         UnloadMusicStream(music[1]);

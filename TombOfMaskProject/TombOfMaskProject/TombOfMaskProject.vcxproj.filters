@@ -36,6 +36,51 @@
     <ClCompile Include="Entities.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\DataTypes.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Entity.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\EntityDef.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Enum.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\FieldsContainer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Layer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\LayerDef.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Level.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Project.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\TagsContainer.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Tile.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Tileset.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\Utils.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="..\packages\LDtkLoader\src\World.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="CoinSystem.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -57,6 +102,9 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="Entities.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="CoinSystem.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

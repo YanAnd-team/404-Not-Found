@@ -1,6 +1,7 @@
 #include "Entities.h"
 #include "Player.h"
 #include "Level.h"
+#include "CoinSystem.h"   // 新增
 #include <cmath>
 
 // --- Bullet ---
@@ -22,7 +23,7 @@ Bullet::~Bullet()
     if (texLoaded) UnloadTexture(tex);
 }
 
-void Bullet::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
+void Bullet::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
     position.x += direction.x * speed * dt;
     position.y += direction.y * speed * dt;
@@ -51,19 +52,19 @@ void Bullet::Update(float dt, Player &player, std::vector<Entity*> &entities, Le
 void Bullet::Draw()
 {
     float rotation = 0.0f;
-    if      (direction.x > 0) rotation =   0.0f;
-    else if (direction.y > 0) rotation =  90.0f;
+    if (direction.x > 0) rotation = 0.0f;
+    else if (direction.y > 0) rotation = 90.0f;
     else if (direction.x < 0) rotation = 180.0f;
     else if (direction.y < 0) rotation = 270.0f;
 
-    float w = (texLoaded ? (float)tex.width  : 16.0f) * 0.5f;
-    float h = (texLoaded ? (float)tex.height : 8.0f)  * 0.5f;
-    float sw = texLoaded ? (float)tex.width  : 16.0f;
+    float w = (texLoaded ? (float)tex.width : 16.0f) * 0.5f;
+    float h = (texLoaded ? (float)tex.height : 8.0f) * 0.5f;
+    float sw = texLoaded ? (float)tex.width : 16.0f;
     float sh = texLoaded ? (float)tex.height : 8.0f;
     Rectangle dest = { position.x + w / 2.0f, position.y + h / 2.0f, w, h };
     if (texLoaded)
-        DrawTexturePro(tex, {0, 0, sw, sh}, dest, {w / 2.0f, h / 2.0f}, rotation, WHITE);
-    else DrawRectangleRec({position.x, position.y, w, h}, YELLOW);
+        DrawTexturePro(tex, { 0, 0, sw, sh }, dest, { w / 2.0f, h / 2.0f }, rotation, WHITE);
+    else DrawRectangleRec({ position.x, position.y, w, h }, YELLOW);
 }
 
 Rectangle Bullet::GetBounds() const
@@ -76,7 +77,7 @@ Ghost::Ghost(Vector2 pos, bool vertical)
 {
     position = pos;
     speed = 60.0f;
-    if (vertical) dir = {0,1}; else dir = {1,0};
+    if (vertical) dir = { 0,1 }; else dir = { 1,0 };
     texLoaded = false;
     if (FileExists("resources/sprites/Enemy/Monster1.png"))
     {
@@ -92,7 +93,7 @@ Ghost::~Ghost()
     if (texLoaded) UnloadTexture(tex);
 }
 
-void Ghost::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
+void Ghost::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
     animTimer += dt;
     if (animTimer >= 0.75f)
@@ -108,14 +109,16 @@ void Ghost::Update(float dt, Player &player, std::vector<Entity*> &entities, Lev
     if (dir.x > 0)
         hitWall = level.IsWall(newPos.x + 39, newPos.y + 2) || level.IsWall(newPos.x + 39, newPos.y + 37);
     else if (dir.x < 0)
-        hitWall = level.IsWall(newPos.x,      newPos.y + 2) || level.IsWall(newPos.x,      newPos.y + 37);
+        hitWall = level.IsWall(newPos.x, newPos.y + 2) || level.IsWall(newPos.x, newPos.y + 37);
     else if (dir.y > 0)
-        hitWall = level.IsWall(newPos.x + 2,  newPos.y + 39) || level.IsWall(newPos.x + 37, newPos.y + 39);
+        hitWall = level.IsWall(newPos.x + 2, newPos.y + 39) || level.IsWall(newPos.x + 37, newPos.y + 39);
     else if (dir.y < 0)
-        hitWall = level.IsWall(newPos.x + 2,  newPos.y)      || level.IsWall(newPos.x + 37, newPos.y);
+        hitWall = level.IsWall(newPos.x + 2, newPos.y) || level.IsWall(newPos.x + 37, newPos.y);
 
     if (hitWall)
-        { dir.x = -dir.x; dir.y = -dir.y; }
+    {
+        dir.x = -dir.x; dir.y = -dir.y;
+    }
     else
         position = newPos;
 
@@ -129,11 +132,10 @@ void Ghost::Draw()
     if (texLoaded)
     {
         Rectangle src = { (float)(frameIndex * 40), 0, 40.0f, (float)tex.height };
-        DrawTexturePro(tex, src, dest, Vector2{0,0}, 0, WHITE);
+        DrawTexturePro(tex, src, dest, Vector2{ 0,0 }, 0, WHITE);
     }
     else DrawRectangleRec(dest, MAGENTA);
 }
-
 
 // --- GhostPlus ---
 GhostPlus::GhostPlus(Vector2 pos, bool vertical) : Ghost(pos, vertical)
@@ -153,7 +155,7 @@ GhostPlus::~GhostPlus()
     if (plusTexLoaded) UnloadTexture(plusTex);
 }
 
-void GhostPlus::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
+void GhostPlus::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
     animTimer += dt;
     if (animTimer >= 0.5f)
@@ -170,9 +172,9 @@ void GhostPlus::Draw()
 {
     if (plusTexLoaded)
     {
-        Rectangle src  = { (float)(frameIndex * 96), 0, 96.0f, (float)plusTex.height };
+        Rectangle src = { (float)(frameIndex * 96), 0, 96.0f, (float)plusTex.height };
         Rectangle dest = { position.x, position.y, 96, 96 };
-        DrawTexturePro(plusTex, src, dest, Vector2{0,0}, 0, WHITE);
+        DrawTexturePro(plusTex, src, dest, Vector2{ 0,0 }, 0, WHITE);
     }
     else Ghost::Draw();
 }
@@ -195,7 +197,7 @@ StarCollectible::~StarCollectible()
     if (texLoaded) UnloadTexture(tex);
 }
 
-void StarCollectible::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
+void StarCollectible::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
     if (CheckCollisionRecs(player.GetBounds(), GetBounds()))
     {
@@ -208,11 +210,10 @@ void StarCollectible::Draw()
 {
     Rectangle dest = { position.x, position.y, 32, 32 };
     if (texLoaded)
-        DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
+        DrawTexturePro(tex, Rectangle{ 0,0,(float)tex.width,(float)tex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
     else
         DrawRectangleRec(dest, YELLOW);
 }
-
 
 // --- GunTrap ---
 GunTrap::GunTrap(Vector2 pos, Vector2 initialDir)
@@ -226,7 +227,7 @@ GunTrap::GunTrap(Vector2 pos, Vector2 initialDir)
 
 GunTrap::~GunTrap() { if (texLoaded) UnloadTexture(tex); }
 
-void GunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
+void GunTrap::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
     shootCooldown -= dt;
     if (shootCooldown <= 0.0f)
@@ -243,18 +244,17 @@ void GunTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, L
 void GunTrap::Draw()
 {
     float rotation = 0.0f;
-    if      (dir.x < 0) rotation =   0.0f;
-    else if (dir.y > 0) rotation =  90.0f;
+    if (dir.x < 0) rotation = 0.0f;
+    else if (dir.y > 0) rotation = 90.0f;
     else if (dir.x > 0) rotation = 180.0f;
     else if (dir.y < 0) rotation = 270.0f;
 
     Rectangle dest = { position.x, position.y, 32, 32 };
     Vector2 origin = { 16, 16 };
     Rectangle centeredDest = { position.x + 16, position.y + 16, 32, 32 };
-    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, centeredDest, origin, rotation, WHITE);
+    if (texLoaded) DrawTexturePro(tex, Rectangle{ 0,0,(float)tex.width,(float)tex.height }, centeredDest, origin, rotation, WHITE);
     else DrawRectangleRec(dest, BROWN);
 }
-
 
 // --- TriggerTrap ---
 TriggerTrap::TriggerTrap(Vector2 pos, bool horizontal, const char* spritePath, int w, int h)
@@ -277,16 +277,16 @@ TriggerTrap::TriggerTrap(Vector2 pos, bool horizontal, const char* spritePath, i
 
 TriggerTrap::~TriggerTrap() { if (texLoaded) UnloadTexture(tex); if (spikeTexLoaded) UnloadTexture(spikeTex); }
 
-void TriggerTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
-//Activate when player steps on this tile; animate spike out after 0.6s delay, hold 1.5s, then retract
+void TriggerTrap::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
-    Rectangle triggerZone = horizontal
-        ? Rectangle{ position.x,      position.y - 32,   (float)drawW,      (float)drawH + 64 }
-        : Rectangle{ position.x - 32, position.y,        (float)drawW + 64, (float)drawH };
+    int tileX = (int)(position.x / level.GetTileSize());
+    int tileY = (int)(position.y / level.GetTileSize());
+    int playerTileX = (int)(player.position.x / level.GetTileSize());
+    int playerTileY = (int)(player.position.y / level.GetTileSize());
 
     if (!triggered)
     {
-        if (!timerStarted && CheckCollisionRecs(player.GetBounds(), triggerZone))
+        if (!timerStarted && playerTileX == tileX && playerTileY == tileY)
         {
             timerStarted = true;
             if (horizontal)
@@ -345,7 +345,7 @@ void TriggerTrap::Draw()
         if (totalFrames < 1) totalFrames = 1;
         int fi = frameIndex < totalFrames ? frameIndex : totalFrames - 1;
         Rectangle src = { (float)(fi * drawW), 0, (float)drawW, (float)tex.height };
-        DrawTexturePro(tex, src, dest, Vector2{0,0}, 0, WHITE);
+        DrawTexturePro(tex, src, dest, Vector2{ 0,0 }, 0, WHITE);
     }
 
     if (spikeTexLoaded && (timerStarted || triggered))
@@ -356,7 +356,7 @@ void TriggerTrap::Draw()
         Vector2 origin = { cx - position.x, cy - position.y };
         if (timerStarted && !triggered)
         {
-            Rectangle src   = { 0, 0, sw, sh / 2.0f };
+            Rectangle src = { 0, 0, sw, sh / 2.0f };
             Rectangle sdest = { center.x, center.y, (float)drawW, drawH * 0.5f };
             DrawTexturePro(spikeTex, src, sdest, origin, spikeRotation, WHITE);
         }
@@ -368,7 +368,6 @@ void TriggerTrap::Draw()
     }
 }
 
-
 // --- Decoration ---
 Decoration::Decoration(Vector2 pos, const char* spritePath, int fw, float ds)
 {
@@ -379,7 +378,7 @@ Decoration::Decoration(Vector2 pos, const char* spritePath, int fw, float ds)
     if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
 }
 Decoration::~Decoration() { if (texLoaded) UnloadTexture(tex); }
-void Decoration::Update(float dt, Player &player, std::vector<Entity*>&, Level&)
+void Decoration::Update(float dt, Player& player, std::vector<Entity*>&, Level&)
 {
     if (frameWidth > 0 && texLoaded)
     {
@@ -401,10 +400,10 @@ void Decoration::Draw()
     if (frameWidth > 0)
     {
         Rectangle src = { (float)(frameIndex * frameWidth), 0, (float)frameWidth, (float)tex.height };
-        DrawTexturePro(tex, src, dest, {0,0}, 0, WHITE);
+        DrawTexturePro(tex, src, dest, { 0,0 }, 0, WHITE);
     }
     else
-        DrawTexturePro(tex, {0,0,(float)tex.width,(float)tex.height}, dest, {0,0}, 0, WHITE);
+        DrawTexturePro(tex, { 0,0,(float)tex.width,(float)tex.height }, dest, { 0,0 }, 0, WHITE);
 }
 
 // --- FixedTrap ---
@@ -418,7 +417,7 @@ FixedTrap::FixedTrap(Vector2 pos, const char* spritePath, int w, int h)
 
 FixedTrap::~FixedTrap() { if (texLoaded) UnloadTexture(tex); }
 
-void FixedTrap::Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level)
+void FixedTrap::Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level)
 {
     if (CheckCollisionRecs(player.GetBounds(), GetBounds()))
         player.Reset();
@@ -427,42 +426,52 @@ void FixedTrap::Update(float dt, Player &player, std::vector<Entity*> &entities,
 void FixedTrap::Draw()
 {
     Rectangle dest = { position.x, position.y, (float)drawW, (float)drawH };
-    if (texLoaded) DrawTexturePro(tex, Rectangle{0,0,(float)tex.width,(float)tex.height}, dest, Vector2{0,0}, 0, WHITE);
+    if (texLoaded) DrawTexturePro(tex, Rectangle{ 0,0,(float)tex.width,(float)tex.height }, dest, Vector2{ 0,0 }, 0, WHITE);
     else DrawRectangleRec(dest, ORANGE);
 }
 
-
-// --- CoinCollectible ---
-CoinCollectible::CoinCollectible(Vector2 pos, const char* spritePath)
+// --- CoinCollectible (修改) ---
+CoinCollectible::CoinCollectible(Vector2 pos, const char* spritePath, CoinSystem* coinSys)
+    : position(pos), coinSystem(coinSys)
 {
-    position = pos;
     if (FileExists(spritePath)) { tex = LoadTexture(spritePath); texLoaded = true; }
 }
+
 CoinCollectible::~CoinCollectible() { if (texLoaded) UnloadTexture(tex); }
-void CoinCollectible::Update(float dt, Player &player, std::vector<Entity*>&, Level&)
+
+void CoinCollectible::Update(float dt, Player& player, std::vector<Entity*>&, Level&)
 {
     if (CheckCollisionRecs(player.GetBounds(), GetBounds()))
+    {
+        if (coinSystem != nullptr) {
+            coinSystem->addCoins(1);
+        }
         active = false;
+    }
 }
+
 void CoinCollectible::Draw()
 {
     Rectangle dest = { position.x, position.y, 32, 32 };
     if (texLoaded)
-        DrawTexturePro(tex, {0,0,(float)tex.width,(float)tex.height}, dest, {0,0}, 0, WHITE);
+        DrawTexturePro(tex, { 0,0,(float)tex.width,(float)tex.height }, dest, { 0,0 }, 0, WHITE);
     else DrawRectangleRec(dest, GOLD);
 }
-Rectangle CoinCollectible::GetBounds() const { return {position.x, position.y, 32, 32}; }
+
+Rectangle CoinCollectible::GetBounds() const { return { position.x, position.y, 32, 32 }; }
 
 // --- IceBox ---
 IceBox::IceBox(Vector2 pos)
 {
     position = pos;
     if (FileExists("resources/sprites/Exit/Ice_box.png"))
-    { tex = LoadTexture("resources/sprites/Exit/Ice_box.png"); texLoaded = true; }
+    {
+        tex = LoadTexture("resources/sprites/Exit/Ice_box.png"); texLoaded = true;
+    }
 }
-void IceBox::Update(float dt, Player &player, std::vector<Entity*>&, Level &level)
+
+void IceBox::Update(float dt, Player& player, std::vector<Entity*>&, Level& level)
 {
-    // Player walks through: IceBox disappears and tile is cleared
     if (CheckCollisionRecs(player.GetBounds(), GetBounds()))
     {
         int ts = level.GetTileSize();
@@ -470,42 +479,45 @@ void IceBox::Update(float dt, Player &player, std::vector<Entity*>&, Level &leve
         active = false;
     }
 }
+
 void IceBox::Draw()
 {
     Rectangle dest = { position.x, position.y, 40, 40 };
     if (texLoaded)
-        DrawTexturePro(tex, {0,0,(float)tex.width,(float)tex.height}, dest, {0,0}, 0, WHITE);
+        DrawTexturePro(tex, { 0,0,(float)tex.width,(float)tex.height }, dest, { 0,0 }, 0, WHITE);
     else DrawRectangleRec(dest, SKYBLUE);
 }
-Rectangle IceBox::GetBounds() const { return {position.x, position.y, 40, 40}; }
 
-Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCountPtr)
+Rectangle IceBox::GetBounds() const { return { position.x, position.y, 40, 40 }; }
+
+// --- 工厂函数 (修改) ---
+Entity* CreateEntityFromTile(char tile, Vector2 pos, Level& level, int* starCountPtr, CoinSystem* coinSys)
 {
     int tx = (int)(pos.x / level.GetTileSize());
     int ty = (int)(pos.y / level.GetTileSize());
     switch (tile)
     {
-    case 'P': return new Decoration(pos,  "resources/sprites/Stars and coins/Step.png");
-    case '2': return new TriggerTrap(pos, true,  "resources/sprites/Traps/Sharp/Sharp2.png", 24, 15);
+    case 'P': return new Decoration(pos, "resources/sprites/Stars and coins/Step.png");
+    case '2': return new TriggerTrap(pos, true, "resources/sprites/Traps/Sharp/Sharp2.png", 24, 15);
     case '3': return new TriggerTrap(pos, false, "resources/sprites/Traps/Sharp/Sharp3.png", 16, 25);
-    case '4': return new FixedTrap(pos,   "resources/sprites/Traps/Sharp/Sharp4.png", 24, 38);
-    case 'G': return new GunTrap(pos, {-1,  0});  // Arrow_trap  → left
-    case 'g': return new GunTrap(pos, { 0,  1});  // Arrow_trap1 → down
-    case 'u': return new GunTrap(pos, { 1,  0});  // Arrow_trap2 → right
-    case 'd': return new GunTrap(pos, { 0, -1});  // Arrow_trap3 → up
+    case '4': return new FixedTrap(pos, "resources/sprites/Traps/Sharp/Sharp4.png", 24, 38);
+    case 'G': return new GunTrap(pos, { -1,  0 });
+    case 'g': return new GunTrap(pos, { 0,  1 });
+    case 'u': return new GunTrap(pos, { 1,  0 });
+    case 'd': return new GunTrap(pos, { 0, -1 });
     case '6':
     {
-        bool horiz = level.GetTileAt(tx-1, ty) == '-' || level.GetTileAt(tx+1, ty) == '-';
+        bool horiz = level.GetTileAt(tx - 1, ty) == '-' || level.GetTileAt(tx + 1, ty) == '-';
         return new Ghost(pos, !horiz);
     }
     case '7':
     {
-        bool horiz = level.GetTileAt(tx-1, ty) == '-' || level.GetTileAt(tx+1, ty) == '-';
+        bool horiz = level.GetTileAt(tx - 1, ty) == '-' || level.GetTileAt(tx + 1, ty) == '-';
         return new GhostPlus(pos, !horiz);
     }
     case 's': return new StarCollectible(pos, starCountPtr);
-    case 'c': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin.png");
-    case 'k': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin1.png");
+    case 'c': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin.png", coinSys);
+    case 'k': return new CoinCollectible(pos, "resources/sprites/Stars and coins/Coin1.png", coinSys);
     case 'i': return new IceBox(pos);
     case 'f': return new Decoration(pos, "resources/sprites/Exit/Final.png", 40, 46.0f);
     default:  return nullptr;

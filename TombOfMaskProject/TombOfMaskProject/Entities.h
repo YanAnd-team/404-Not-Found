@@ -4,27 +4,29 @@
 
 class Level;
 class Player;
+class CoinSystem;   // 新增
 
 class Entity {
 public:
     virtual ~Entity() {}
-    virtual void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) = 0;  //Update logic each frame
-    virtual void Draw() = 0;                        //Draw the entity
-    virtual Rectangle GetBounds() const = 0;        //Return collision rectangle
-    virtual bool IsActive() const { return active; }//Return false when the entity should be removed
+    virtual void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) = 0;
+    virtual void Draw() = 0;
+    virtual Rectangle GetBounds() const = 0;
+    virtual bool IsActive() const { return active; }
 protected:
     bool active = true;
 };
 
-Entity* CreateEntityFromTile(char tile, Vector2 pos, Level &level, int* starCountPtr = nullptr); //Factory: map tile char to the correct entity type
+// 工厂函数声明，增加 CoinSystem* 参数
+Entity* CreateEntityFromTile(char tile, Vector2 pos, Level& level, int* starCountPtr = nullptr, CoinSystem* coinSys = nullptr);
 
 class Bullet : public Entity {
 public:
-    Bullet(Vector2 pos, Vector2 dir, float speed);  //Spawned by GunTrap; moves in one direction until hitting a wall or the player
-    ~Bullet();                                       //Unload texture
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Move bullet; deactivate on wall hit or player collision
-    void Draw() override;                            //Draw bullet sprite
-    Rectangle GetBounds() const override;            //Return 8x8 collision rectangle
+    Bullet(Vector2 pos, Vector2 dir, float speed);
+    ~Bullet();
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
+    void Draw() override;
+    Rectangle GetBounds() const override;
 private:
     Vector2 position;
     Vector2 direction;
@@ -35,11 +37,11 @@ private:
 
 class Ghost : public Entity {
 public:
-    Ghost(Vector2 pos, bool vertical=false);    //Patrol enemy; bounces off walls, kills on contact
-    ~Ghost();                                   //Unload texture
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Move and animate; reverse on wall hit, reset player on contact
-    void Draw() override;                       //Draw current animation frame
-    Rectangle GetBounds() const override { return Rectangle{ position.x + 2, position.y, 36, 40 }; } //Return collision rectangle with slight horizontal inset
+    Ghost(Vector2 pos, bool vertical = false);
+    ~Ghost();
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
+    void Draw() override;
+    Rectangle GetBounds() const override { return Rectangle{ position.x + 2, position.y, 36, 40 }; }
 protected:
     Vector2 position;
 private:
@@ -53,9 +55,9 @@ private:
 
 class GhostPlus : public Ghost {
 public:
-    GhostPlus(Vector2 pos, bool vertical=false);    //Ghost variant with a different sprite; always visible
-    ~GhostPlus();                                   //Unload texture
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    GhostPlus(Vector2 pos, bool vertical = false);
+    ~GhostPlus();
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
     void Draw() override;
     Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, 96, 96 }; }
 private:
@@ -67,10 +69,10 @@ private:
 
 class GunTrap : public Entity {
 public:
-    GunTrap(Vector2 pos, Vector2 dir);  //Fires a bullet every 2s in the given direction
-    ~GunTrap();                         //Unload texture
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Detect fire direction once, then spawn bullets on cooldown
-    void Draw() override;                   //Draw trap sprite
+    GunTrap(Vector2 pos, Vector2 dir);
+    ~GunTrap();
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
+    void Draw() override;
     Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, 32, 32 }; }
 private:
     Vector2 position;
@@ -82,10 +84,10 @@ private:
 
 class TriggerTrap : public Entity {
 public:
-    TriggerTrap(Vector2 pos, bool horizontal, const char* spritePath, int w, int h); //Activates when player steps on this tile; spikes out after 0.6s, holds, then retracts; horizontal=true restricts spike to left/right, false to up/down
-    ~TriggerTrap();             //Unload texture
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Check if player is on this tile, run spike animation and player kill
-    void Draw() override;                   //Draw current spike animation frame
+    TriggerTrap(Vector2 pos, bool horizontal, const char* spritePath, int w, int h);
+    ~TriggerTrap();
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
+    void Draw() override;
     Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, (float)drawW, (float)drawH }; }
 private:
     int drawW, drawH;
@@ -109,9 +111,9 @@ class Decoration : public Entity {
 public:
     Decoration(Vector2 pos, const char* spritePath, int frameWidth = 0, float drawSize = 16.0f);
     ~Decoration();
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
     void Draw() override;
-    Rectangle GetBounds() const override { return {position.x, position.y, 16, 16}; }
+    Rectangle GetBounds() const override { return { position.x, position.y, 16, 16 }; }
 private:
     Vector2 position;
     Texture2D tex;
@@ -124,10 +126,10 @@ private:
 
 class FixedTrap : public Entity {
 public:
-    FixedTrap(Vector2 pos, const char* spritePath = "resources/sprites/Traps/Sharp/Sharp1.png", int w = 24, int h = 38); //Static spike; kills on contact
-    ~FixedTrap();           //Unload texture
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Reset player on contact
-    void Draw() override;                   //Draw spike sprite
+    FixedTrap(Vector2 pos, const char* spritePath = "resources/sprites/Traps/Sharp/Sharp1.png", int w = 24, int h = 38);
+    ~FixedTrap();
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
+    void Draw() override;
     Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, (float)drawW, (float)drawH }; }
 private:
     int drawW, drawH;
@@ -138,21 +140,22 @@ private:
 
 class CoinCollectible : public Entity {
 public:
-    CoinCollectible(Vector2 pos, const char* spritePath); //Coin; disappears when collected
+    CoinCollectible(Vector2 pos, const char* spritePath, CoinSystem* coinSys = nullptr);
     ~CoinCollectible();
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
     void Draw() override;
     Rectangle GetBounds() const override;
 private:
     Vector2 position;
     Texture2D tex;
     bool texLoaded = false;
+    CoinSystem* coinSystem;   // 新增
 };
 
 class IceBox : public Entity {
 public:
     IceBox(Vector2 pos);
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
     void Draw() override;
     Rectangle GetBounds() const override;
 private:
@@ -163,10 +166,10 @@ private:
 
 class StarCollectible : public Entity {
 public:
-    StarCollectible(Vector2 pos, int* countPtr);    //Collected on contact; increments star count up to 3
-    ~StarCollectible();                             //Unload texture
-    void Update(float dt, Player &player, std::vector<Entity*> &entities, Level &level) override;  //Deactivate and increment count when player overlaps
-    void Draw() override;                   //Draw star sprite
+    StarCollectible(Vector2 pos, int* countPtr);
+    ~StarCollectible();
+    void Update(float dt, Player& player, std::vector<Entity*>& entities, Level& level) override;
+    void Draw() override;
     Rectangle GetBounds() const override { return Rectangle{ position.x, position.y, 32, 32 }; }
 private:
     Vector2 position;
