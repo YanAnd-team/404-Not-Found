@@ -35,8 +35,9 @@ Full task breakdown: [Tasks.pdf](https://github.com/YanAnd-team/404-Not-Found/bl
 | Arrow Left  | Slide left until hitting a wall  |
 | Arrow Up    | Slide up until hitting a wall    |
 | Arrow Down  | Slide down until hitting a wall  |
-| 1 – 5       | Load level 1 through 5 directly  |
 | Enter       | Confirm / advance screen         |
+| 1 – 5       | (Debug) Load level 1–5 directly  |
+| B           | (Debug) Toggle hitbox overlay    |
 
 ### Objective
 
@@ -49,7 +50,7 @@ Collect up to **3 stars** hidden in each level for a perfect run.
 | Element | Behaviour |
 |---------|-----------|
 | Bat | Bounces back and forth between walls |
-| Monkey | Throw bombs vertically outside the game map |
+| Monster2 (Boss) | Floats in Level 4; drops a ball straight down after 3 seconds, then ascends off-screen |
 | Fixed Spikes | Always dangerous on contact |
 | Trigger Spikes | Deploy when the player passes adjacent; retract after a moment |
 | Arrow Trap | Shoot arrows in the direction of the trap |
